@@ -95,7 +95,7 @@
     }
 
     .name-container sub a {
-        color: #F35D91;
+        color: #009DD1;
         text-decoration: none;
     }
 
