@@ -12,11 +12,12 @@
   <title>Isaiah Murray</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/favicon.png" type="image/png">
+ 
 </svelte:head>
 
 <div class="layout-container">
-  <Header />
+  <div class="header-container">
+  <Header /></div>
   
   <main class="content">
     <slot></slot> <!-- This slot tag is crucial -->
@@ -30,6 +31,14 @@
     margin: 0;
     padding: 0;
     height: 100%;
+  }
+
+  .header-container {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    padding: 0px;
   }
 
   .layout-container {

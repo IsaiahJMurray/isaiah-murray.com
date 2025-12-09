@@ -1,32 +1,72 @@
 <script>
-  // Add any necessary imports or logic here
+  let menuOpen = false;
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+  }
+
+  function closeMenu() {
+    menuOpen = false;
+  }
 </script>
 
 <header class="header-container">
   <nav class="navigation-bar">
-    <ul class="nav-links">
-      <li><a href="/" tabindex="0" class="name-title">Isaiah Murray</a></li>
-      <li><a href="/projects" tabindex="0">Projects</a></li>
-      <li><a href="/contact" tabindex="0">Contact</a></li>
+    <a href="/" class="brand" on:click={closeMenu}>
+      <span class="name-title">Isaiah Murray</span>
+    </a>
+
+    <!-- Mobile menu button -->
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Toggle navigation"
+      aria-expanded={menuOpen}
+      on:click={toggleMenu}
+    >
+      <span class:open={menuOpen}></span>
+      <span class:open={menuOpen}></span>
+    </button>
+
+    <!-- Desktop / mobile nav -->
+    <ul class="nav-links" class:open={menuOpen}>
+      <li><a href="/projects" on:click={closeMenu}>Projects</a></li>
+      <li><a href="/resume" on:click={closeMenu}>Resume</a></li>
+      <li><a href="/contact" on:click={closeMenu}>Contact</a></li>
     </ul>
   </nav>
 </header>
 
 <style>
   .header-container {
-    background-color: #030302;
+    background-color: #03030200;
     display: flex;
-    width: auto;
+    width: 100%;
     align-items: center;
-    padding: 0 30px;
-    height: 50px;
+    padding: 0px;
+    height: 3.25em;
+    position: relative;
+    z-index: 20;
   }
 
   .navigation-bar {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
+    margin: 1em 1em;
+  }
+
+  .brand {
+    text-decoration: none;
+  }
+
+  .name-title {
+    color: #fefef9;
+    font: 700 1.25rem Inter, system-ui, -apple-system, BlinkMacSystemFont,
+      sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .nav-links {
@@ -36,30 +76,104 @@
     padding: 0;
     margin: 0;
   }
+
   .nav-links li a {
-    color: #FEFEF9;
-    font: 24px Inter, sans-serif;
+    color: #fefef9;
+    font: 400 0.95rem Inter, sans-serif;
     text-decoration: none;
-    transition: all 0.2s ease-in-out;
+    transition: color 0.18s ease-in-out, transform 0.18s ease-in-out;
   }
-  
+
   .nav-links li a:hover {
-    color: #CA9679;
-    scale: 1.1 !important;
+    color: #ca9679;
+    transform: scale(1.05);
   }
 
-  .name-title {
-    font-weight: 700 !important;
+  /* --- Mobile styles --- */
+  .menu-toggle {
+    display: none;
+    position: relative;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid rgba(254, 254, 249, 0.18);
+    border-radius: 999px;
+    background: rgba(3, 3, 2, 0.65);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
   }
 
-  @media (max-width: 991px) {
+  .menu-toggle span {
+    position: absolute;
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 999px;
+    background: #fefef9;
+    transition: transform 0.18s ease, opacity 0.18s ease, top 0.18s ease;
+  }
+
+  .menu-toggle span:first-child {
+    top: 0.95rem;
+  }
+
+  .menu-toggle span:last-child {
+    top: 1.25rem;
+  }
+
+  .menu-toggle span.open:first-child {
+    transform: rotate(45deg);
+    top: 1.1rem;
+  }
+
+  .menu-toggle span.open:last-child {
+    transform: rotate(-45deg);
+    top: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
     .header-container {
-      padding-right: 20px;
+      padding: 0px;
+      height: 3rem;
     }
 
     .navigation-bar {
-      flex-wrap: wrap;
-      padding-right: 20px;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+    }
+
+    .nav-links {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      margin-top: 0.35rem;
+      padding: 0.6rem 1.1rem 0.9rem;
+      background: rgba(5, 6, 8, 0.96);
+      border-bottom: 1px solid rgba(254, 254, 249, 0.08);
+      border-top: 1px solid rgba(254, 254, 249, 0.05);
+      flex-direction: column;
+      gap: 0.5rem;
+      transform-origin: top;
+      transform: scaleY(0.8);
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(12px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .nav-links.open {
+      opacity: 1;
+      transform: scaleY(1);
+      pointer-events: auto;
+    }
+
+    .nav-links li a {
+      font-size: 0.9rem;
+      padding: 0.15rem 0;
     }
   }
 </style>
