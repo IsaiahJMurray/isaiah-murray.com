@@ -1,5 +1,5 @@
 <script>
-  import HeroFlame from "$lib/hero/HeroFlame.svelte";
+  import ResponsiveHeroFlame from "$lib/hero/ResponsiveHeroFlame.svelte";
   import WhatIDo from "$lib/sections/WhatIDo.svelte";
   import ProjectsGrid from "$lib/sections/ProjectsGrid.svelte";
   import ExperienceStrip from "$lib/sections/ExperienceStrip.svelte";
@@ -14,7 +14,7 @@
 </svelte:head>
 
 <div class="page">
-  <HeroFlame scrollTarget="#overview" />
+  <ResponsiveHeroFlame scrollTarget="#overview" />
 
   <main class="content">
     <WhatIDo />

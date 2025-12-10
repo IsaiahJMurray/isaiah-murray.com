@@ -95,9 +95,9 @@
     position: relative;
     width: 2.2rem;
     height: 2.2rem;
-    border: 1px solid rgba(254, 254, 249, 0.18);
+    border: 1px solid rgba(254, 254, 249, 0);
     border-radius: 999px;
-    background: rgba(3, 3, 2, 0.65);
+    background: rgba(3, 3, 2, 0);
     cursor: pointer;
     align-items: center;
     justify-content: center;
@@ -152,9 +152,9 @@
       left: 0;
       margin-top: 0.35rem;
       padding: 0.6rem 1.1rem 0.9rem;
-      background: rgba(5, 6, 8, 0.96);
-      border-bottom: 1px solid rgba(254, 254, 249, 0.08);
-      border-top: 1px solid rgba(254, 254, 249, 0.05);
+      background: rgba(5, 6, 8, 0);
+      border-bottom: 1px solid rgba(254, 254, 249, 0);
+      border-top: 1px solid rgba(254, 254, 249, 0);
       flex-direction: column;
       gap: 0.5rem;
       transform-origin: top;
