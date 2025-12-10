@@ -161,7 +161,6 @@
       transform: scaleY(0.8);
       opacity: 0;
       pointer-events: none;
-      backdrop-filter: blur(12px);
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
