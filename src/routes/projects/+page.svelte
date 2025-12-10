@@ -10,7 +10,7 @@
     archived: 'Archived'
   };
 </script>
-
+<div class = "nav spacer"></div>
 <section class="section projects-page">
   <header class="section-header">
     <h1 class="section-heading">Projects</h1>
@@ -74,10 +74,16 @@
 </section>
 
 <style>
-  .projects-page {
+  :global(.nav.spacer) {
+    height: 3.25em;
+  }
+
+
+  :global(.projects-page) {
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
+    margin: 2em;
   }
 
   .section-header {

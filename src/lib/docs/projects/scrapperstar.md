@@ -1,9 +1,9 @@
 ---
 title: Scrapperstar
-subtitle: "A Unity-based project focused on automated data or asset \u201Cscraping\u201D\
-  \ and collection workflows inside the game engine. Ideal for developers who want\
-  \ to integrate web-style scraping concepts into Unity tools or pipelines, with a\
-  \ focus on editor-side automation and efficient asset management."
+subtitle: "A Unity-based project tentatively set up for building a game or interactive\
+  \ experience called ScrapperStar. Aimed at players or prototypes needing rapid iteration,\
+  \ it\u2019s structured with a clean Unity-specific .gitignore for streamlined collaboration\
+  \ and build management."
 slug: scrapperstar
 date: '2023-08-07'
 updated: '2023-08-22'
@@ -15,76 +15,83 @@ heroImage: /generated/logos/scrapperstar.png
 ---
 ## Overview
 
-ScrapperStar is a small Unity-based prototype where I explored building a modular system for “scraping” and collecting in-game objects in a 3D environment. The goal was to experiment with interactive mechanics and project structure in Unity, focusing on clean separation between gameplay logic, scene setup, and input handling.
+ScrapperStar is a Unity-based prototype I created to explore data collection, content “scraping,” and aggregation mechanics inside a game-like environment. Rather than being a traditional web scraper, the project experiments with simulating scraping behavior as a gameplay loop: finding, extracting, and organizing pieces of information in a 3D space. The goal was to practice structuring a Unity project, experimenting with systems design, and iterating quickly on an idea without focusing on polish or production visuals.
 
 ## Role & Context
 
-I built this project independently as a learning and experimentation sandbox. I used it to:
+I built ScrapperStar as a solo side project. It originated as a sandbox for testing Unity workflows and experimenting with abstractions for data-driven gameplay:
 
-- Practice structuring a Unity project for rapid iteration.
-- Experiment with interactive “collect and process” style gameplay mechanics.
-- Get more comfortable with Unity-specific workflows, including scenes, prefabs, and build configuration.
+- I handled the concept, design, and implementation.
+- I set up the Unity project structure and environment.
+- I explored patterns for separating “data” from presentation and interaction.
+
+The repository is intentionally small and experimental, serving more as a playground than a complete game.
 
 ## Tech Stack
 
-- Unity (project structure and engine)
-- C# (gameplay scripts)
-- .NET (runtime for C# scripts)
-- Git & GitHub (version control and hosting)
+- Unity (C#)
+- .NET / Mono runtime (via Unity)
+- Git & GitHub for version control
 
 ## Problem
 
-I wanted a focused playground where I could quickly prototype:
+I wanted a small, constrained project where I could:
 
-- A clear, reusable interaction pattern for collecting objects in a 3D scene.
-- A simple event-driven flow from “player input” → “interaction” → “feedback/score.”
-- A Unity project layout that stays maintainable even as small features are added.
+- Prototype a “collection/scraping” mechanic without building a full game.
+- Practice organizing a Unity project for iterative experimentation.
+- Try out patterns for representing and updating in-game data items that behave like web-scraped entities (discrete items with properties, states, and relationships).
 
-Large tutorials or existing sample projects often come with a lot of unrelated code, so my goal was to create a minimal yet realistic project I fully controlled and understood.
+The challenge was to keep scope small but still build something interactive enough to test ideas around data collection and state changes.
 
 ## Approach / Architecture
 
-I approached the project with a lightweight architecture:
+I structured the project as a standard Unity project with clear separation between core logic and presentation:
 
-- **Core gameplay scripts** handle the logic for detecting, collecting, and tracking “scrap” objects.
-- **Interaction layer** interprets player inputs (e.g., trigger, click, or key press) and routes them to the appropriate gameplay systems.
-- **Scene setup and prefabs** define collectible objects and interaction volumes, while keeping logic out of the scene where possible.
-- **Separation of concerns** between:
-  - Player/controller input.
-  - Object state (available, collected, processed).
-  - Visual/audio feedback.
-
-This allowed me to quickly tweak behaviors without constantly editing scene objects or duplicating logic.
+- **Scene-centric organization:** Core test scenes for quickly iterating on mechanics, each focused on a specific idea or interaction pattern.
+- **Component-based systems:** C# MonoBehaviours encapsulate individual responsibilities—data items, collectors, visual markers, and UI feedback.
+- **Data-first thinking:** Even though the data is local and simulated, I treated each collectible/scrap as if it were a scraped record, with fields and state transitions (e.g., discovered, collected, processed).
+- **Iteration over architecture:** Given the prototype nature, I optimized for speed of change over heavy abstraction, using simple, composable components instead of complex frameworks.
 
 ## Key Features
 
-- Collectible “scrap” objects defined as reusable prefabs.
-- Simple interaction mechanic for targeting and “scraping” nearby objects.
-- Basic state management for objects (idle, targeted, collected).
-- Modular components so collection logic can be reused or extended.
-- Git-based workflow with a Unity-specific `.gitignore` to keep the repo lean.
+- Simulated “scrapable” data items represented as interactive objects in the scene.
+- Collection mechanics that let a player or agent “scrape” items and move them into an inventory/state store.
+- Simple state transitions for data items (e.g., unscanned → scanned → collected).
+- Visual feedback for collected vs. uncollected items.
+- Basic project structure set up with a clean Unity `.gitignore` to support ongoing iteration.
 
 ## Technical Details
 
-- **Unity project layout**: I followed a conventional Unity structure separating `Assets`, `Scenes`, and `Scripts`, which keeps the repository aligned with common Unity practices.
-- **Version control hygiene**: I adopted the official Unity `.gitignore` template to exclude large or generated directories such as `Library`, `Temp`, `Builds`, and `Logs`, as well as IDE-specific artifacts (e.g., `.vs/`, `*.csproj`, `*.sln`). This keeps the repo clean, reduces clone time, and avoids merge conflicts on generated files.
-- **Build-focused exclusions**: Output artifacts like `.apk`, `.unitypackage`, and `*.aab` are explicitly ignored to prevent accidental check-ins of large binaries.
-- **Extensibility considerations**: While the gameplay is intentionally simple, I structured the logic to make it easy to later add:
-  - Scoring systems tied to collected objects.
-  - Different object types with varying behaviors.
-  - Visual indicators for interactable vs. non-interactable items.
+From a technical standpoint, the project focuses on Unity workflows rather than production-ready systems:
+
+- **Unity project hygiene:** I used a tailored `.gitignore` optimized for Unity to keep the repository lightweight, excluding build artifacts, Library/Temp/Obj folders, IDE caches, and other generated content. This keeps the repo clean and reduces noise in version control.
+- **Componentization:** Each interactable object in the scene is intended to be controlled by a small, focused script—responsible for:
+  - Storing basic data properties (acting like a “scraped record”).
+  - Handling interactions such as “scan” or “collect.”
+  - Communicating status changes to other components (e.g., simple event calls or inspector-assigned references).
+- **Iteration-centric workflow:** Because the project is a sandbox, I kept the architecture flexible:
+  - Minimal coupling between systems to avoid refactor pain.
+  - Use of prefabs for quick duplication and variation of “scrapable” objects.
+  - Scenes meant as experiments rather than polished levels.
+
+Given the early stage of the project, much of the work is foundational: project setup, ignoring the right files, and preparing the environment for more complex data-driven and scraping-inspired mechanics.
 
 ## Results
 
-- Created a small but complete Unity prototype that I fully control and understand end-to-end.
-- Improved my familiarity with Unity’s project structure, asset pipeline, and build outputs.
-- Established a clean, reusable base for future experiments in 3D interaction and collection mechanics.
+ScrapperStar served its purpose as a quick Unity sandbox:
+
+- I established a clean Unity repository baseline with proper version control practices.
+- I validated a lightweight approach to modeling “scraped” data as in-game objects with state.
+- I identified patterns I want to refine in future Unity work, such as more formal data models (ScriptableObjects) and decoupled event systems.
+
+The project is intentionally small and unfinished, but it gave me a practical space to try ideas and confirm which directions are worth pursuing in more serious prototypes.
 
 ## Lessons Learned
 
-- A well-configured `.gitignore` is essential for Unity projects to avoid noise and unnecessary repository bloat.
-- Even for prototypes, a minimal separation of concerns (input, state, feedback) pays off quickly as new ideas are tested.
-- Keeping the scope intentionally small makes it easier to iterate on core mechanics instead of getting lost in peripheral features.
+- A clean `.gitignore` and project structure dramatically reduce friction when experimenting in Unity.
+- Treating in-game objects as “records” with explicit states helps when designing data-centric mechanics, even for small prototypes.
+- It’s better to keep architecture light and adaptable in early explorations; over-designing too soon slows down experimentation.
+- Using small, focused scenes and prefabs makes it much easier to test new mechanics without breaking existing experiments.
 
 ## Links
 

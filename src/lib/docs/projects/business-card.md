@@ -1,10 +1,10 @@
 ---
 title: Business Card
-subtitle: "Embedded firmware for a PCB \u201Cbusiness card\u201D that turns a tiny\
-  \ accelerometer-driven 8\xD78 LED matrix into an interactive sand simulation and\
-  \ motion display. Built in C++/Arduino for hardware hackers and PCB designers, it\
-  \ showcases direct I2C sensor interfacing, custom matrix scanning, and real-time\
-  \ physics-inspired animation on severely constrained hardware."
+subtitle: "Embedded firmware for a custom PCB business card that turns simple hardware\
+  \ into an interactive demo platform. Written in C++/Arduino, it drives an 8x8 LED\
+  \ matrix, reads a BMA400 accelerometer over I2C, and powers features like a tilt-driven\
+  \ \u201Csand\u201D simulation and on-board diagnostics. Designed for hardware enthusiasts\
+  \ and recruiters who appreciate hands-on electronics and low-level sensor integration."
 slug: business-card
 date: '2024-09-27'
 updated: '2024-11-04'
@@ -18,176 +18,168 @@ heroImage: /generated/logos/business-card.png
 ---
 ## Overview
 
-This repository contains the firmware I wrote for a custom PCB business card that doubles as an interactive hardware demo. The card combines an 8×8 LED matrix with a BMA400 accelerometer over I²C to showcase simple simulations (like a “digital sand” toy), sensor interaction, and general embedded programming skills in a business-card-sized form factor.
+This project contains the firmware for a custom PCB “business card” that doubles as an interactive hardware demo. The card integrates an 8×8 LED matrix and a BMA400 accelerometer to run simple animations and a sand simulation that responds to device tilt and shaking. I wrote the Arduino-based sketches to exercise each hardware subsystem (I2C devices, accelerometer, LED matrix) and then combined them into a playful, physics-inspired experience.
 
 ## Role & Context
 
-I designed and implemented the embedded software for this project myself. My focus was to:
+I designed and implemented the embedded software for the card:
 
-- Bring up and test the hardware interfaces (I²C, LED matrix pins).
-- Build small, self-contained sketches for each subsystem.
-- Integrate them into an engaging interaction: a tilt- and shake-responsive sand simulation.
+- Brought up and validated the hardware interfaces (I2C, GPIO).
+- Wrote test sketches for the LED matrix and the BMA400 accelerometer.
+- Implemented a tilt- and shake-responsive “sand simulation” on the 8×8 LED matrix.
+- Structured the code so it could be reused for additional visual effects in the future.
 
-This project sits somewhere between a hardware bring-up exercise and a portfolio piece meant to be physically handed out.
+This was a personal project to explore low-power embedded graphics and sensor-driven interaction on a very constrained form factor.
 
 ## Tech Stack
 
-- C++ (Arduino-style sketches)
-- Arduino toolchain / AVR-style microcontroller (via `.ino` files)
-- I²C (Wire library)
-- BMA400 accelerometer
-- 8×8 LED matrix (row/column scanning)
+- C++ (Arduino-style sketches / `.ino`)
+- Arduino core (Wire, Serial, pinMode/digitalWrite APIs)
+- I2C (via `Wire.h`)
+- BMA400 accelerometer (I2C)
+- Custom 8×8 LED matrix (row/column multiplexing)
 
 ## Problem
 
-I wanted a business card that did more than display my name and contact information. The PCB already provided:
+I wanted a business card that was more than static contact information: it should demonstrate embedded systems skills in a visually interesting way, on very limited hardware and power. The key challenges were:
 
-- A small MCU.
-- An 8×8 LED matrix.
-- A BMA400 accelerometer via I²C.
-
-The challenge was to write firmware that:
-
-- Reliably initialized and talked to the BMA400 over I²C on non-default pins.
-- Drove the 8×8 LED matrix without ghosting, using simple row/column multiplexing.
-- Implemented a visually interesting, physics-inspired “sand” simulation that responded to tilt and shake—within the tight resource and power constraints of a business card form factor.
+- Bringing up a custom PCB with a non-trivial LED matrix and an I2C accelerometer.
+- Validating all pins and connections without dedicated lab equipment.
+- Implementing an interactive, physics-like effect (“falling sand”) on an 8×8 LED matrix with no frame buffer hardware, only GPIO.
+- Keeping the code simple and robust enough to run reliably on a tiny microcontroller in a pocket-sized form factor.
 
 ## Approach / Architecture
 
-I organized the code into focused sketches:
+I broke the work into focused sketches, each validating a layer of the system:
 
-- **I2C_scanner**: Generic I²C bus scanner to verify wiring and confirm the BMA400 address.
-- **BMA400_polling**: Basic accelerometer polling/printing to validate register access and data format.
-- **BMA400_yaw**: Simple Z-axis “angle” calculation to explore orientation-based interactions.
-- **matrix_test**: Row/column scanning tests to exercise every LED, row, and column.
-- **sand_sim**: The main interactive demo that fuses matrix control and accelerometer readings.
+1. **I2C_scanner**  
+   A generic I2C bus scanner to confirm that the BMA400 (and any future I2C peripherals) were wired correctly and responding at the expected address.
 
-The architectural idea was to treat each `.ino` as a small experiment, then converge the designs into `sand_sim.ino`, which:
+2. **BMA400_* sketches (polling, yaw)**  
+   Minimal drivers that:
+   - Initialize the BMA400 into normal mode.
+   - Read raw 16-bit acceleration data from X, Y, Z registers.
+   - Convert readings into simplified angles (e.g., Z-axis tilt).
 
-- Continuously reads accelerometer data.
-- Detects “shake” events to reset the simulation.
-- Computes a simple tilt angle and updates a boolean 2D grid of “sand” cells.
-- Continuously multiplexes the LED matrix to render the grid.
+3. **matrix_test**  
+   A pure GPIO test for the 8×8 LED matrix:
+   - Validated row/column mapping.
+   - Implemented simple row/column scanning logic.
+   - Provided patterns to visually confirm no shorts, opens, or swapped lines.
 
-This modular progression let me debug hardware in isolation before attempting the more complex simulation.
+4. **sand_sim**  
+   The main “business card demo”:
+   - Maintains an 8×8 Boolean grid representing sand particles.
+   - Uses accelerometer readings to infer tilt and shaking.
+   - On tilt, updates the sand grid to simulate gravity in a particular direction.
+   - On shake, resets the sand distribution for a fresh pattern.
+   - Continuously refreshes the matrix via row/column multiplexing.
+
+This modular approach made it easy to debug hardware and then layer on higher-level behavior.
 
 ## Key Features
 
-- I²C bus scanner to discover and validate connected devices.
-- BMA400 accelerometer initialization and 16-bit register reading on custom SDA/SCL pins.
-- Continuous accelerometer polling with raw X/Y/Z streaming over serial for diagnostics.
-- 8×8 LED matrix driver using direct pin control and row/column multiplexing.
-- “Digital sand” simulation with a boolean grid representing particles.
-- Shake detection to reset the sand distribution when the card is shaken.
-- Simple tilt-based update logic to move sand over time, creating a dynamic effect.
+- I2C device scanner to detect and verify connected sensors.
+- BMA400 accelerometer initialization and raw data polling.
+- Simple yaw/tilt angle computation from accelerometer readings.
+- 8×8 LED matrix test harness (per-LED, per-row, and per-column tests).
+- Interactive sand simulation that reacts to tilt and shake events.
+- Time-based update loop for smooth sand motion without blocking the display refresh.
+- Reusable utility functions for matrix control and I2C register reads.
 
 ## Technical Details
 
-### I²C / BMA400 Integration
+### I2C and BMA400 Integration
 
-For all accelerometer-based sketches, I used the `Wire` library, but explicitly set the SDA/SCL pins since they are not on the default hardware I²C pins:
+- I used the Arduino `Wire` library to manage I2C communication, explicitly specifying SDA/SCL pins:
 
-```cpp
-Wire.begin(11, 12);  // SDA on pin 11, SCL on pin 12
-```
+  ```cpp
+  Wire.begin(11, 12); // SDA on pin 11, SCL on pin 12
+  ```
 
-The BMA400 is addressed at `0x14`:
+- The BMA400 accelerometer is addressed at `0x14`. I configured it into normal mode by writing to its power mode register:
 
-```cpp
-#define BMA400_ADDRESS 0x14
-```
-
-To bring the sensor into a usable state, I write to its power mode register:
-
-```cpp
-void initializeBMA400() {
+  ```cpp
   Wire.beginTransmission(BMA400_ADDRESS);
-  Wire.write(0x19);  // Power mode register
-  Wire.write(0x01);  // Normal mode
+  Wire.write(0x19);   // Power mode register
+  Wire.write(0x01);   // Normal mode
   Wire.endTransmission();
-  delay(10);
-}
-```
+  ```
 
-16-bit register reads are handled with a small helper that requests two bytes and combines them:
+- To read 16-bit accelerometer values, I used a small helper that:
+  - Writes the register address.
+  - Requests 2 bytes.
+  - Combines them into a signed 16-bit integer:
 
-```cpp
-int16_t readRegister16(uint8_t reg) {
-  Wire.beginTransmission(BMA400_ADDRESS);
-  Wire.write(reg);
-  Wire.endTransmission();
-  Wire.requestFrom(BMA400_ADDRESS, 2);
+  ```cpp
+  int16_t readRegister16(uint8_t reg) {
+    Wire.beginTransmission(BMA400_ADDRESS);
+    Wire.write(reg);
+    Wire.endTransmission();
+    Wire.requestFrom(BMA400_ADDRESS, 2);
 
-  int16_t value = 0;
-  if (Wire.available() >= 2) {
-    value = (Wire.read() | (Wire.read() << 8));
+    int16_t value = 0;
+    if (Wire.available() >= 2) {
+      value = (Wire.read() | (Wire.read() << 8));
+    }
+    return value;
   }
-  return value;
-}
-```
+  ```
 
-Separate sketches (`BMA400_polling`, `BMA400_yaw`) print raw X/Y/Z and a scaled Z-axis “angle” to verify that orientation changes are measurable and stable enough for the sand simulation.
+- A simplified tilt “angle” is computed by scaling the raw acceleration:
 
-### I²C Bus Scanning
-
-The `I2C_scanner` sketch walks through all valid 7-bit addresses (1–126), attempting a transmission to each and checking the error code from `Wire.endTransmission()`:
-
-```cpp
-for (address = 1; address < 127; address++) {
-  Wire.beginTransmission(address);
-  error = Wire.endTransmission();
-
-  if (error == 0) {
-    // Device found at address
-  } else if (error == 4) {
-    // Unknown error
+  ```cpp
+  int16_t calculateZAngle(int16_t accelZ) {
+    return accelZ / 256; // Approximate, integer-only scaling
   }
-}
-```
+  ```
 
-This allowed me to confirm that the BMA400 responded at `0x14` and that there were no bus conflicts.
+  This keeps computation cheap and avoids floating point.
+
+### I2C Scanner
+
+- The I2C scanner iterates addresses 1–126, calling `Wire.beginTransmission()` and checking `endTransmission()` error codes:
+  - `error == 0` → device acknowledged.
+  - `error == 4` → unknown error logged for debugging.
+- Results are printed via `Serial` for use over USB, which was essential during early hardware bring-up.
 
 ### LED Matrix Control
 
-The 8×8 LED matrix is driven directly via GPIO:
+- The 8×8 LED matrix is driven via two arrays of pins:
 
-```cpp
-int rowPins[8] = {1, 2, 3, 4, 5, 6, 8, 10};
-int colPins[8] = {13, 14, 15, 16, 17, 18, 19, 20};
-```
+  ```cpp
+  int rowPins[8] = {1, 2, 3, 4, 5, 6, 8, 10};
+  int colPins[8] = {13, 14, 15, 16, 17, 18, 19, 20};
+  ```
 
-The `matrix_test` sketch exercises:
+- Each LED is addressed by setting one row pin HIGH (anode) and one column pin LOW (cathode):
 
-- Individual LEDs:
   ```cpp
   void lightUpLED(int row, int col) {
     digitalWrite(rowPins[row], HIGH);
     digitalWrite(colPins[col], LOW);
   }
+
+  void turnOffLED(int row, int col) {
+    digitalWrite(rowPins[row], LOW);
+    digitalWrite(colPins[col], HIGH);
+  }
   ```
-- Entire rows and columns with helper functions like `lightUpRow`, `turnOffRow`, `lightUpColumn`, `turnOffColumn`.
 
-This verified that pin mapping, polarity (row as source, column as sink), and basic multiplexing worked across all 64 pixels.
+- I added row and column helper functions to:
+  - Exercise entire rows/columns for diagnostics.
+  - Simplify multiplexed rendering in the sand simulation.
 
-### Sand Simulation
+### Sand Simulation Logic
 
-The `sand_sim.ino` sketch is the main demo. It uses:
-
-- A boolean grid to represent sand:
+- The sand state is represented as a 2D Boolean grid:
 
   ```cpp
-  #define MATRIX_SIZE 8
+  const int MATRIX_SIZE = 8;
   bool sandMatrix[MATRIX_SIZE][MATRIX_SIZE] = {false};
   ```
 
-- A periodic update mechanism:
-
-  ```cpp
-  unsigned long lastUpdate = 0;
-  const int updateInterval = 100;  // ms
-  ```
-
-- Initialization of the matrix and starting sand distribution:
+- Initialization clears the grid, then seeds a region (e.g., top-left quarter) with “sand”:
 
   ```cpp
   void initializeSand() {
@@ -197,7 +189,6 @@ The `sand_sim.ino` sketch is the main demo. It uses:
       }
     }
 
-    // Fill a quarter of the matrix with sand
     for (int i = 0; i < MATRIX_SIZE / 2; i++) {
       for (int j = 0; j < MATRIX_SIZE / 2; j++) {
         sandMatrix[i][j] = true;
@@ -206,49 +197,66 @@ The `sand_sim.ino` sketch is the main demo. It uses:
   }
   ```
 
-- A simple tilt calculation using accelerometer values:
+- Tilt handling:
+  - I read `accelX`, `accelY`, and `accelZ`, then derive a coarse tilt angle from the accelerometer data.
+  - Every `updateInterval` milliseconds (100 ms), I call `updateSand(tiltAngle)` to move particles “downhill” relative to the current tilt.
+  - The implementation uses simple rules (e.g., try to move sand cells in the dominant direction if the target cell is empty), giving a discrete, cellular-automaton feel.
+
+- Shake detection:
+  - I approximate the acceleration magnitude using the squared sum:
+
+    ```cpp
+    bool detectShake(int16_t accelX, int16_t accelY, int16_t accelZ) {
+      int magnitude = accelX * accelX + accelY * accelY + accelZ * accelZ;
+      return magnitude > SHAKE_THRESHOLD;
+    }
+    ```
+
+  - When a shake is detected, I reset the sand pattern, which feels like flipping a physical sand timer.
+
+- To avoid blocking, the main loop uses `millis()`-based timing:
 
   ```cpp
-  int calculateZAngle(int16_t accelX, int16_t accelY, int16_t accelZ) {
-    return accelZ / 256;  // Scaled approximation
+  unsigned long lastUpdate = 0;
+  const int updateInterval = 100;
+
+  void loop() {
+    unsigned long currentMillis = millis();
+
+    // read accelerometer ...
+
+    if (detectShake(accelX, accelY, accelZ)) {
+      initializeSand();
+    } else if (currentMillis - lastUpdate >= updateInterval) {
+      int tiltAngle = calculateZAngle(accelX, accelY, accelZ);
+      updateSand(tiltAngle);
+      lastUpdate = currentMillis;
+    }
+
+    displaySand(); // continuous multiplexed rendering
   }
   ```
 
-- Shake detection based on the magnitude of the acceleration vector:
-
-  ```cpp
-  #define SHAKE_THRESHOLD 2000
-
-  bool detectShake(int16_t accelX, int16_t accelY, int16_t accelZ) {
-    int magnitude = accelX * accelX + accelY * accelY + accelZ * accelZ;
-    return /* magnitude comparison vs SHAKE_THRESHOLD */;
-  }
-  ```
-
-Conceptually, on each update tick:
-
-1. I read `accelX`, `accelY`, and `accelZ`.
-2. If `detectShake` returns true, I reinitialize the sand grid.
-3. Otherwise, I derive a tilt direction and move sand cells one step “downhill” in the grid.
-4. In parallel, I continuously scan over the matrix pins and light LEDs where `sandMatrix[row][col]` is `true`.
-
-The end result is a simple, resource-light simulation that noticeably shifts when you tilt the card and “resets” when you shake it.
+- `displaySand()` repeatedly scans rows and lights LEDs according to `sandMatrix`, providing persistence of vision for the animation.
 
 ## Results
 
-- Validated custom I²C wiring and confirmed proper BMA400 communication on non-standard pins.
-- Verified the behavior of all 64 LEDs in the 8×8 matrix and established a reliable multiplexing pattern.
-- Produced a compact, interactive “digital sand” demo that visually responds to tilt and shake.
-- Created a reusable codebase of small sketches (scanner, sensor tests, matrix tests) that can be applied to other PCB prototypes or sensor boards.
+- Successfully brought up a custom PCB with an 8×8 LED matrix and BMA400 accelerometer using only Arduino tooling and serial logs.
+- Verified all matrix pins and I2C lines with dedicated test sketches, reducing debugging time.
+- Delivered an interactive “sand” animation that:
+  - Visibly reacts to tilt (sand flows in a direction).
+  - Resets on a strong shake.
+- Created a compact, self-contained example of sensor-driven embedded graphics suitable to showcase on a business card.
 
 ## Lessons Learned
 
-- Small, single-purpose sketches are extremely effective for hardware bring-up and debugging.
-- Explicitly specifying SDA/SCL pins with `Wire.begin` is crucial on custom boards; assuming defaults can silently fail.
-- Even very simple physics approximations (like integer-scaled tilt) are enough to create engaging visual effects on low-resource microcontrollers.
-- Maintaining clear helper functions for matrix control (`lightUpLED`, `lightUpRow`, etc.) simplifies later simulations and animations.
+- Simple, focused sketches (scanner, matrix test, sensor test) dramatically speed up hardware validation compared to building everything into one “final” program.
+- Using integer-only arithmetic for sensor processing is often sufficient and keeps code smaller and more predictable on microcontrollers.
+- Designing clear hardware abstraction layers (e.g., `readRegister16`, `initializeMatrix`, `initializeSand`) pays off when iterating on behavior and experimenting with new effects.
+- Time-based loops using `millis()` are essential for combining smooth animations with responsive input on constrained devices.
+- Even with just 8×8 pixels, careful use of patterns and motion can create engaging, intuitive interactions.
 
 ## Links
 
-- [GitHub Repository](https://github.com/IsaiahJMurray/Business-Card)
-- Demo: _(TBD – link to video or live demo if available)_
+- [GitHub Repository – Business-Card](https://github.com/IsaiahJMurray/Business-Card)
+- Demo (TBD)

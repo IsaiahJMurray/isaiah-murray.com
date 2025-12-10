@@ -1,10 +1,9 @@
 ---
 title: Github Grader
 subtitle: "An Apple Fitness\u2013style dashboard for developers that visualizes your\
-  \ daily GitHub activity and repository stats as motivational rings and medals. Built\
-  \ with SvelteKit, it uses GitHub OAuth and the Octokit API to aggregate commits,\
-  \ lines of code, and repo metadata into an interactive, progress-focused coding\
-  \ overview."
+  \ GitHub activity, daily coding stats, and repository health. Built with SvelteKit,\
+  \ it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and\
+  \ repo metadata into interactive SVG \u201Cactivity rings\u201D and stat cards."
 slug: github-grader
 date: '2024-06-24'
 updated: '2024-07-11'
@@ -20,288 +19,277 @@ heroImage: /generated/logos/github-grader.png
 ---
 ## Overview
 
-I built **github-grader** as a SvelteKit web app that turns GitHub activity into an Apple Fitness–style experience. Instead of closing activity rings with steps or workouts, users “close” their rings with commits, lines of code, and file changes. The app authenticates with GitHub, fetches live development activity, and visualizes it through animated rings, medals, and repository cards so that progress on coding goals feels more tangible and rewarding.
+I built **github-grader** as a SvelteKit web app that turns GitHub activity into something that feels more like Apple Fitness rings than a traditional developer dashboard. Instead of raw lists of repositories and commits, the app visualizes daily programming milestones—commits, lines of code, and file changes—as progress rings and simple achievement-style components.
+
+The goal was to explore how to make engineering progress feel more tangible and motivating, while giving me hands-on experience with GitHub OAuth, the Octokit SDK, and SvelteKit’s server-side API routes.
 
 ## Role & Context
 
-I designed and implemented this project end-to-end as a personal experiment in:
+I designed and implemented this project end-to-end:
 
-- Using SvelteKit for a full-stack SPA with server routes
-- Integrating with the GitHub API and OAuth
-- Translating raw developer metrics into a simple, visual feedback loop inspired by Apple’s fitness UI
+- Defined the concept and UX direction (Apple Fitness–inspired “rings” for coding activity).
+- Implemented GitHub OAuth in a SvelteKit environment with secure cookies.
+- Built server-side endpoints to aggregate GitHub activity data.
+- Built the dashboard UI with reusable Svelte components for repos, medals, and the activity ring.
+- Set up basic testing, linting, and formatting for a healthy development workflow.
 
-The project started as a scratchpad SvelteKit app and evolved into a minimal but complete GitHub dashboard focused on motivation, not just analytics.
+This is a personal project intended both as a learning vehicle and as a foundation I can extend into a more fully featured “programming fitness” app.
 
 ## Tech Stack
 
-- Svelte 4
-- SvelteKit 2
-- JavaScript (ES Modules)
-- HTML/CSS
+- Svelte
+- SvelteKit
+- JavaScript (ES modules)
+- HTML / CSS
 - Vite
-- Playwright (E2E tests)
-- Octokit (GitHub REST API client)
-- dotenv / SvelteKit `$env` for configuration
-- Prettier + prettier-plugin-svelte for formatting
+- Octokit (GitHub REST API)
+- Playwright (basic E2E tests)
+- Prettier + prettier-plugin-svelte
+- dotenv
+- Node.js
 
 ## Problem
 
-Typical GitHub dashboards are data-heavy and motivation-light. They show contribution graphs, stars, and commit histories, but they do not answer a simple question: **“Did I make meaningful progress on my coding practice today?”**
+Developer dashboards often present GitHub data in a way that’s useful but not especially motivating: lists of repos, raw commit counts, and activity feeds. I wanted something that:
 
-I wanted:
+- Felt **visually rewarding** and quick to interpret at a glance.
+- Focused on **daily progress**, not long-term vanity metrics.
+- Used **authentic GitHub data** (repos, commits, code changes) but surfaced it in a way that feels like closing rings in Apple Fitness.
 
-- A **daily** view of progress that feels like closing Apple Fitness rings
-- A simple, encouraging dashboard instead of dense analytics
-- A way to surface **recent repo activity** with enough context to feel rewarding, not overwhelming
+Concretely, I needed to solve:
+
+- How to authenticate with GitHub and keep the user session secure.
+- How to aggregate **today’s activity** from GitHub (commits, lines, file changes).
+- How to transform repo/activity data into a compact dashboard that encourages regular programming “streaks.”
 
 ## Approach / Architecture
 
-I used SvelteKit’s file-based routing and server endpoints to keep the architecture lightweight:
+I used SvelteKit’s file-based routing to separate concerns cleanly between:
 
-- **Frontend UI (Svelte components)**  
-  - A `DailyActivityWheel` made of layered `Ring` components for Apple-style rings  
-  - `Repo` cards for recently updated repositories  
-  - A simple layout with navigation and authentication-aware header
+- **Auth routes** (`/api/auth/*`) for GitHub OAuth and user session management.
+- **GitHub data routes** (`/api/github/*`) for repository and daily activity queries.
+- **UI routes** for the public landing page (`/`) and the authenticated dashboard (`/dashboard`).
 
-- **Backend-in-the-frontend (SvelteKit server routes)**  
-  - `/api/auth/*` routes handle GitHub OAuth and cookie-based session management
-  - `/api/github/repositories` and `/api/github/daily-activity` call GitHub via Octokit from the server
-  - All GitHub calls run server-side to keep tokens out of the client
+High-level architecture:
 
-- **Auth & Session**  
-  - GitHub OAuth 2.0 with `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in private env vars  
-  - Tokens and user info stored in **HTTP-only cookies**, checked on each API call
+- **Frontend (Svelte/SvelteKit)**  
+  - `+layout.svelte` handles global navigation and checks the current user via `/api/auth/user`.  
+  - `+page.svelte` (root) is a simple welcome page prompting sign-in.  
+  - `dashboard/+page.svelte` fetches repos and renders the “fitness-inspired” view with an activity ring and repo cards.
 
-The result is a single SvelteKit app that owns both UI and data access, with minimal external dependencies beyond GitHub.
+- **Auth flow**  
+  - `/api/auth/github` redirects to GitHub’s OAuth authorize endpoint.  
+  - `/api/auth/callback` exchanges the `code` for an access token, fetches the authenticated user via Octokit, and stores both user and token in HTTP-only cookies.  
+  - `/api/auth/user` returns the user from a secure cookie for client-side checks.  
+  - `/api/auth/signout` clears the cookies.
+
+- **Data aggregation**  
+  - `/api/github/repositories` uses Octokit to fetch recent repositories and enrich them with pseudo-commit counts, language-based size, and other metadata, returning a compact list for the dashboard.  
+  - `/api/github/daily-activity` computes “rings metrics” (commits, total lines changed, and file size changes) for **today** using GitHub’s search and commit APIs, then returns a single summary object.
+
+On the client, components like `DailyActivityWheel.svelte`, `Ring.svelte`, and `Repo.svelte` transform this data into the visual “fitness” metaphor.
 
 ## Key Features
 
-- GitHub OAuth login with secure, HTTP-only cookie sessions
-- Apple Fitness–style **daily activity rings** for:
-  - Commits
-  - Lines of code changed
-  - File change volume
-- Personalized dashboard with an encouraging, progress-based message
-- Repository grid showing recent repos with:
-  - Commit-based “activity” score
-  - Approximate repo size (from language usage)
-- Reusable `Ring` component with layered gradients and animated stroke offsets
-- Simple sign-out flow that clears session cookies and returns users to Home
+- GitHub OAuth sign-in with secure, HTTP-only cookie-based sessions.
+- Apple Fitness–style circular progress visualization of daily coding activity.
+- Aggregated “today” metrics: commit count, lines of code changed, and file change volume.
+- Repository grid with per-repo stats (pseudo-commit count and language-based size).
+- Personalized dashboard greeting plus dynamic encouragement messages based on progress.
+- Reusable Svelte components for rings, repos, and medals/achievements.
+- Basic end-to-end test coverage for the core landing page.
 
 ## Technical Details
 
-### Authentication & Session Handling
+### Authentication and Session Handling
 
-- **OAuth flow**:
-  - `GET /api/auth/github` constructs and redirects to the GitHub authorization URL using `GITHUB_CLIENT_ID` and a fixed `REDIRECT_URI`.
-  - `GET /api/auth/callback` receives the `code`, exchanges it for an access token via `https://github.com/login/oauth/access_token`, and validates that an `access_token` exists.
-- **User fetch & cookies**:
-  - Once the token is obtained, I initialize an `Octokit` instance and call `octokit.rest.users.getAuthenticated()` to fetch the logged-in user.
-  - Two cookies are set:
-    - `github_user`: serialized user object
-    - `github_token`: raw access token
-  - Both cookies:
-    - `httpOnly: true`
-    - `secure: process.env.NODE_ENV === 'production'`
-    - `maxAge` set to one week
-- **Session utilities**:
-  - `GET /api/auth/user` reads `github_user` from cookies and returns `401` if it’s absent.
-  - `POST /api/auth/signout` deletes `github_user` and `github_token` cookies and returns a `200`.
+I implemented OAuth using GitHub’s standard flow and SvelteKit server routes:
 
-The root layout (`src/routes/+layout.svelte`) calls `/api/auth/user` on mount to determine whether to show “Sign In with GitHub” or “Dashboard / Sign Out” links. The `signOut` handler calls `/api/auth/signout` and uses SvelteKit’s `goto` to navigate home.
+- **Auth redirect**:  
+  - `src/routes/api/auth/github/+server.js` constructs the GitHub OAuth URL using `GITHUB_CLIENT_ID` from `$env/static/private` and redirects the user.  
+  - A static `REDIRECT_URI` points back to `/api/auth/callback` during local development.
 
-### GitHub Data Fetching
+- **Callback and token exchange**:  
+  - `src/routes/api/auth/callback/+server.js`:
+    - Reads the `code` query param.
+    - POSTs to `https://github.com/login/oauth/access_token` with `client_id`, `client_secret`, and `code`, requesting JSON.
+    - Extracts the `access_token` from the response.
+    - Uses `Octokit` with that token to call `users.getAuthenticated()` and retrieve user info.
 
-I used two patterns for GitHub access:
+- **Cookie storage**:  
+  - Stores the serialized user object as `github_user` and the access token as `github_token`:
+    - `httpOnly: true` to mitigate XSS.
+    - `secure` conditioned on `NODE_ENV === 'production'`.
+    - `maxAge` set to one week.
+  - After setting cookies, redirects to `/dashboard`.
 
-1. **Octokit from SvelteKit server routes**  
-2. **A simple `fetch`-based helper (`src/lib/github.js`) for direct REST calls (kept for flexibility/experiments)**
+- **Session endpoints**:  
+  - `api/auth/user`: reads `github_user` from cookies, returns `401` if absent.  
+  - `api/auth/signout`: deletes `github_user` and `github_token` cookies, returning `200`.
 
-#### Recent Repositories: `/api/github/repositories`
+On the client, `+layout.svelte` calls `/api/auth/user` on mount to hydrate the navigation with the current user and to show either “Dashboard / Sign Out” or “Sign In with GitHub.”
+
+### GitHub Data Fetching and Aggregation
+
+I used both the Octokit library and a small helper wrapper around `fetch`:
+
+- `src/lib/github.js` exposes:
+  - `fetchRepoData(username, token)`
+  - `fetchRepoDetails(owner, repo, token)`
+  - `fetchCommits(owner, repo, token)`
+
+These are lower-level helpers, but for the dashboard I rely on dedicated API routes built with Octokit.
+
+#### Repositories API
+
+`src/routes/api/github/repositories/+server.js`:
 
 - Reads `github_token` from cookies; returns `401` if missing.
-- Initializes `Octokit` with `auth: token`.
-- Calls `octokit.rest.repos.listForAuthenticatedUser` with:
-  - `sort: 'updated'`
-  - `per_page: 10`  
-  to focus on the most recent work.
+- Creates an `Octokit` instance: `new Octokit({ auth: token })`.
+- Calls `octokit.rest.repos.listForAuthenticatedUser({ sort: 'updated', per_page: 10 })` for the 10 most recently updated repositories.
 - For each repo:
-  - Calls `octokit.rest.repos.listCommits` with `per_page: 1`.  
-    - To avoid heavy counting, it uses a pseudo “commit count” derived from the first commit SHA:  
-      `parseInt(commits[0].sha, 16) % 1000`
-  - Calls `octokit.rest.repos.listLanguages` and sums language sizes to get a rough code size:
-    ```js
-    const totalSize = Object.values(languages).reduce((sum, size) => sum + size, 0);
-    const sizeKb = Math.round(totalSize / 1024);
-    ```
-  - Returns a normalized object:
-    - `name`, `description` (with a fallback)
-    - `commits_count`
-    - `size` (KB)
-    - `url`, `language`, `stars`
+  - Fetches a page of commits via `repos.listCommits({ per_page: 1 })`:
+    - Uses the first commit’s SHA and converts it into a pseudo-count:  
+      `commitCount = commits[0]?.sha ? parseInt(commits[0].sha, 16) % 1000 : 0`.  
+      This is intentionally approximate and mainly for prototype visualization.
+  - Fetches language breakdown via `repos.listLanguages()`:
+    - Sums the byte counts across languages to get `totalSize`.
+    - Converts to kilobytes: `Math.round(totalSize / 1024)`.
 
-These objects are consumed by `dashboard/+page.svelte` and passed into the `Repo` component.
+- Returns a simplified object for each repo:
 
-#### Daily Activity: `/api/github/daily-activity`
+```js
+{
+  name: repo.name,
+  description: repo.description || 'No description provided',
+  commits_count: commitCount,
+  size: Math.round(totalSize / 1024),
+  url: repo.html_url,
+  language: repo.language,
+  stars: repo.stargazers_count
+}
+```
 
-This endpoint powers the Apple Fitness–style rings.
+The client maps this directly into `<Repo />` components.
 
-- Reads `github_token`, returns `401` (with a log) if absent.
-- Uses Octokit to:
-  - Fetch the authenticated user (`users.getAuthenticated`)
-  - Search for today’s commits using the search API:
-    ```js
-    const today = new Date().toISOString().split('T')[0];
-    const { data: commits } = await octokit.rest.search.commits({
-      q: `author-date:${today} author:${user.login}`,
-      sort: 'author-date',
-      order: 'desc',
-      per_page: 100
-    });
-    ```
-- Aggregates:
-  - `totalCommits = commits.total_count`
-  - For each commit in `commits.items`:
-    - Calls `repos.getCommit` with `owner`, `repo`, `ref: item.sha`
-    - Accumulates:
-      - `totalLinesAdded += commitData.stats.additions`
-      - `totalLinesRemoved += commitData.stats.deletions`
-      - `totalFileSize += commitData.files.reduce((sum, file) => sum + file.changes, 0)`
+#### Daily Activity API
+
+`src/routes/api/github/daily-activity/+server.js` powers the fitness-style rings:
+
+- Reads `github_token` from cookies; returns `401` if absent.
+- Creates an `Octokit` instance.
+- Determines today’s date string (`YYYY-MM-DD`).
+- Gets the authenticated user via `users.getAuthenticated()` to obtain their login.
+- Uses GitHub’s commit search API:
+
+```js
+const { data: commits } = await octokit.rest.search.commits({
+  q: `author-date:${today} author:${user.login}`,
+  sort: 'author-date',
+  order: 'desc',
+  per_page: 100
+});
+```
+
+- Initializes aggregate counters:
+  - `totalCommits` from `commits.total_count`.
+  - `totalLinesAdded`, `totalLinesRemoved`, `totalFileSize` all start at 0.
+- For each commit in `commits.items`, calls `repos.getCommit` to compute:
+  - Sum of `stats.additions` and `stats.deletions`.
+  - Sum of `file.changes` across all files in the commit.
 - Returns:
-  ```js
-  {
-    commits: totalCommits,
-    linesOfCode: totalLinesAdded + totalLinesRemoved,
-    fileSize: totalFileSize
-  }
-  ```
 
-Errors are logged and returned as a JSON body with status `500`.
+```js
+{
+  commits: totalCommits,
+  linesOfCode: totalLinesAdded + totalLinesRemoved,
+  fileSize: totalFileSize
+}
+```
 
-### Frontend: Dashboard & Components
+This compact structure is ideal for rendering progress rings.
 
-#### Dashboard Page
+### Visualizations & Components
+
+#### Activity Ring
+
+`src/lib/components/Ring.svelte` is a generic, multi-layer circular progress component:
+
+- Props:
+  - `size`, `strokeWidth`, `backgroundColor`, `showBackground`.
+  - `layers`: array of `{ startColor, endColor, progress }`.
+- Derived values:
+  - `radius`, `normalizedRadius`, and `circumference`.
+- Offsets:
+  - `calculateOffset(progress)` computes `stroke-dashoffset` from a percentage.
+  - Each ring layer uses `stroke-dasharray` / `stroke-dashoffset` with a `transform: rotate(-90deg)` to start at the top.
+- Uses `<defs>` and multiple `<linearGradient>` elements for layered gradients.
+- Animates via `transition: stroke-dashoffset 1s ease-in-out`.
+
+`DailyActivityWheel.svelte` wires this to daily activity metrics:
+
+- On mount:
+  - Fetches `/api/github/daily-activity`.
+  - Handles loading and error states explicitly.
+- Derives progress from task-based “goals” (hard-coded for now):
+  - `commitProgress = min((commits / 10) * 100, 100)`.
+  - `linesProgress = min((linesOfCode / 1000) * 100, 100)`.
+  - `fileSizeProgress = min((fileSize / 10000) * 100, 100)`.
+- Passes three layers to `Ring.svelte`, each with its own color pair.
+
+This gives me an extensible visual foundation that can represent any metric as a ring.
+
+#### Repo Cards
+
+`src/lib/components/Repo.svelte` displays key repo stats:
+
+- Inputs: `title`, `description`, `commits`, `size`.
+- Derives `sizeFormatted` as KB or MB based on the numeric size.
+- Uses a card-style layout with:
+  - Hover transform (`translateY(-5px)`) and shadow changes.
+  - Truncated multi-line descriptions using `-webkit-line-clamp`.
+
+The dashboard renders a grid of these cards, each bound to a single item from `/api/github/repositories`.
+
+#### Dashboard
 
 `src/routes/dashboard/+page.svelte`:
 
-- On mount:
-  - Fetches `/api/github/repositories` and hydrates `repositories`.
-- Maintains:
-  - `userName` (currently a placeholder, but tied to the authenticated user in the layout)
-  - `rings` array describing default ring progress levels (also used to generate a motivational message).
-- Generates an encouraging phrase based on average progress:
-  ```js
-  const averageProgress = rings.reduce((sum, ring) => sum + ring.progress, 0) / rings.length;
-  // Returns tiered messages like "Fantastic work! You're crushing it!"
-  ```
-- Renders:
-  - A greeting header with the dynamic phrase
-  - `<DailyActivityWheel />` for the rings
-  - A grid of `<Repo />` components using the fetched data
+- Fetches repos from `/api/github/repositories` on mount.
+- Holds a `rings` placeholder array and uses a helper `getEncouragingPhrase(rings)` to calculate a motivational message based on average progress.
+- Layout:
+  - Header section with:
+    - Greeting: `Welcome, {userName}!` (currently a placeholder; can be wired to cookie user).
+    - Encouraging phrase.
+    - Activity wheel component (`<DailyActivityWheel />`).
+  - A “Your GitHub Repositories” section with a responsive grid of `<Repo />` cards.
 
-#### DailyActivityWheel & Ring Components
+### Tooling & Configuration
 
-`DailyActivityWheel.svelte`:
-
-- Uses `onMount` to:
-  - Fetch `/api/github/daily-activity`
-  - Manage `loading` and `error` states
-- Derives progress percentages with soft caps:
-  ```js
-  $: commitProgress = Math.min((dailyActivity.commits / 10) * 100, 100);
-  $: linesProgress = Math.min((dailyActivity.linesOfCode / 1000) * 100, 100);
-  $: fileSizeProgress = Math.min((dailyActivity.fileSize / 10000) * 100, 100);
-  ```
-- Passes a `layers` array into `Ring`:
-  ```svelte
-  <Ring
-    size={250}
-    strokeWidth={20}
-    backgroundColor="#f0f0f0"
-    showBackground={true}
-    layers={[
-      { startColor: "#256EFF", endColor: "#99BBFF", progress: commitProgress },
-      { startColor: "#F61067", endColor: "#FB89B5", progress: linesProgress },
-      { startColor: "#3DDC97", endColor: "#4FDFA0", progress: fileSizeProgress }
-    ]}
-  />
-  ```
-
-`Ring.svelte`:
-
-- Accepts:
-  - `size`, `strokeWidth`, `backgroundColor`, `showBackground`
-  - `layers`: array of `{ startColor, endColor, progress }`
-- Derived values:
-  ```js
-  $: radius = size / 2;
-  $: normalizedRadius = radius - strokeWidth / 2;
-  $: circumference = normalizedRadius * 2 * Math.PI;
-  function calculateOffset(progress) {
-    return circumference - (progress / 100) * circumference;
-  }
-  ```
-- Uses `<defs>` and `<linearGradient>` per layer for smooth color transitions.
-- Renders:
-  - Optional background circles per layer
-  - Foreground progress circles with:
-    - `stroke-dasharray` and `stroke-dashoffset` for progress visualization
-    - `transform: rotate(-90deg)` to start from top (like Apple rings)
-    - A `mounted` flag toggled in `onMount` to animate from full offset to the correct stroke offset
-- CSS applies a subtle drop-shadow and 1s `stroke-dashoffset` transition.
-
-#### Repo Component
-
-`Repo.svelte`:
-
-- Props: `title`, `description`, `commits`, `size` (KB).
-- Formats size into KB/MB:
-  ```js
-  $: sizeFormatted = size < 1024 ? `${size} KB` : `${(size / 1024).toFixed(2)} MB`;
-  ```
-- Styled as cards with hover elevation, truncated description text, and pill-style stat badges.
-
-#### Layout & Styling
-
-- `src/app.html` sets global typography and background:
-  - Background color: `#E6E8E6`
-  - Text color: `#3F403F`
-- `+layout.svelte`:
-  - Provides a simple top nav with context-aware links
-  - Uses neutral, muted palette compatible with the ring gradients and repo cards
-
-### Testing & Tooling
-
-- **Playwright**:
-  - Basic test ensures the home page renders an expected `h1`.
-  - `playwright.config.js` builds and previews the app (`npm run build && npm run preview`) for tests.
-- **Linting/formatting**:
-  - `npm run lint` uses Prettier with `prettier-plugin-svelte`.
-  - `.prettierrc` enforces tabs, single quotes, and a 100-character line width.
-- **Vite config**:
-  - Integrates SvelteKit’s Vite plugin and exposes `process.env` via `define` for compatibility.
+- **Vite**: SvelteKit plugin and a simple `define` override for `process.env`.
+- **Playwright**: A minimal test to assert the presence of the landing page `<h1>`.
+- **Prettier + Svelte plugin**: Ensures code formatting, with a `.prettierrc` tuned for tabs and single quotes.
+- **Environment management**: `.env` files are ignored; sensitive GitHub credentials are accessed via `$env/static/private`.
 
 ## Results
 
-- Implemented a working **GitHub-authenticated dashboard** that visualizes:
-  - Daily commits, lines of code, and file changes via rings
-  - Recently active repositories with size and pseudo-commit metrics
-- Verified the end-to-end flow:
-  - Sign in with GitHub → OAuth callback → cookies set → dashboard renders activity
-  - API routes correctly handle unauthorized access and error propagation
-- Established a reusable pattern for:
-  - SvelteKit + OAuth + GitHub
-  - SVG-based progress visualizations with layered gradients
+- Delivered a working SvelteKit dashboard that:
+  - Authenticates with GitHub via OAuth.
+  - Persists sessions with secure HTTP-only cookies.
+  - Aggregates and visualizes daily coding activity.
+  - Presents a readable, motivational overview of a developer’s GitHub work.
+- Created a reusable SVG-based ring component suitable for future “fitness-like” dashboards.
+- Established a clean separation between auth, data APIs, and presentation components, making future iterations (e.g., badges, streaks, goals) straightforward.
 
 ## Lessons Learned
 
-- **SvelteKit server routes** make it straightforward to keep OAuth tokens on the server and still provide a SPA-like experience.
-- The **GitHub search and commit APIs** are powerful but can be expensive; batching and capping (e.g., `per_page: 100`) is important for responsiveness and rate limits.
-- Building a generic **ring visualization** component early paid off; it made it trivial to add or tweak activity layers without touching the SVG math again.
-- Even for a small project, **cookie security flags** (`httpOnly`, `secure`) and clear `401` responses prevent a lot of subtle auth bugs.
-- Translating raw metrics into **goal-based progress** (e.g., “10 commits = 100%”) requires thought: thresholds should be motivating, not discouraging.
+- **SvelteKit’s server routes and cookies** provide a clean model for implementing OAuth without needing a separate backend.
+- **GitHub’s search and commit APIs** are powerful but can be expensive; iterating over commits to gather detailed stats requires attention to pagination and performance when scaling beyond a prototype.
+- **Data shaping on the server** (e.g., pre-aggregating and normalizing fields) greatly simplifies the client, especially when building visual metaphors like progress rings.
+- **SVG-based components** like `Ring.svelte` benefit from thoughtful abstractions—once the math and gradients were right, reusing the component for multiple layers and metrics became trivial.
+- Tight **tooling integration** (Prettier, Playwright, strict `.npmrc`) improved developer experience even for a small personal project.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/github-grader)
-- [Live Demo](https://your-demo-url.com) <!-- replace with actual demo URL if available -->
+- [Live Demo](https://example.com) <!-- Replace with actual demo URL if/when deployed -->

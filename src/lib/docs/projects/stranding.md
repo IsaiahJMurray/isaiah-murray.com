@@ -1,8 +1,9 @@
 ---
 title: Stranding
-subtitle: An in-progress strand-based exercise app for iOS, built with Swift and SwiftUI.
-  The project is structured with unit and UI test targets from day one, laying groundwork
-  for a testable, modular fitness experience as features are added.
+subtitle: "Stranding is an early-stage SwiftUI iOS app exploring a \u201Cstrand-based\u201D\
+  \ approach to structuring workouts and exercise routines. It\u2019s set up with\
+  \ unit and UI test targets, making it a foundation for experimenting with fitness-focused\
+  \ interactions, UI, and architecture in native Swift."
 slug: stranding
 date: '2025-08-11'
 updated: '2025-08-11'
@@ -15,64 +16,66 @@ heroImage: /generated/logos/stranding.png
 ---
 ## Overview
 
-Stranding is an experimental, strand-based exercise app that I started as a SwiftUI playground. At this stage it is a minimal iOS app scaffold with the goal of eventually guiding users through “strands” of workouts—linked, progressive sessions instead of isolated routines.
+Stranding is an experimental iOS exercise app concept built with SwiftUI. The idea is to explore “strand‑based” workouts: instead of thinking in terms of isolated sessions, users build continuous strands of activity over time (e.g., daily movement streaks, micro‑workouts, and habit chains).  
 
-This project is currently in an early prototype phase. The main value lies in the clean SwiftUI/Xcode project setup, testing targets, and the architectural foundation for future fitness-specific features.
+This repository is the seed of that idea—a clean, minimal SwiftUI app skeleton set up for fast iteration, testability, and future expansion into a full fitness experience.
 
 ## Role & Context
 
-I am the sole developer and designer on Stranding. I created the project to:
+I created Stranding as a personal project to experiment with:
 
-- Explore SwiftUI app structure in a focused, single-purpose app.
-- Set up a testing-friendly Xcode project from day one.
-- Prepare a foundation for experimenting with different ways to model progressive workouts.
+- A lightweight SwiftUI app architecture.
+- Modern Xcode testing tools (`Testing` package and XCTest UI tests).
+- A foundation on which I can iterate quickly toward a richer fitness workflow.
 
-This is a personal side project, built outside of any company context.
+At this stage the UI is intentionally minimal (“Hello, world!”) while the project structure, targets, and tests are ready for feature development.
 
 ## Tech Stack
 
 - Swift
 - SwiftUI
-- Xcode (iOS app + unit tests + UI tests)
+- Xcode project / Workspace
 - XCTest (UI tests)
-- Swift Testing package (for unit-style tests where available)
+- Swift `Testing` package (for unit-style tests)
+- iOS (UIKit under the hood via SwiftUI lifecycle)
 
 ## Problem
 
-Most exercise apps treat workouts as flat lists: you pick a routine, complete it, and you’re done. I wanted an app that thinks in “strands”—sequences of related sessions where each workout is contextually linked to the previous one.
+I wanted a space to prototype an exercise app with a different mental model: tracking continuous “strands” of behavior instead of just workouts on a calendar.  
 
-Before building out complex features, I needed a solid, testable SwiftUI app skeleton that:
+Before investing in complex data models and design, I needed:
 
-- Launches cleanly on iOS.
-- Has separate targets for unit and UI testing.
-- Uses modern SwiftUI app lifecycle patterns.
-- Can easily evolve into a more complex fitness experience.
+- A clean, SwiftUI-first app template.
+- Properly configured unit and UI test targets.
+- A structure that can evolve into a more opinionated architecture without fighting Xcode defaults.
+
+Stranding solves this initial problem by giving me a well-structured sandbox that is still small and easy to refactor.
 
 ## Approach / Architecture
 
-I followed the SwiftUI App lifecycle and a layered Xcode project structure:
+I started from the SwiftUI App lifecycle template and focused on:
 
-- **App entry point** via `StrandingApp` using `@main`, hosting a single `WindowGroup`.
-- **Root view** (`ContentView`) as a placeholder UI that will later host navigation and workout strands.
-- **Separated targets** for app code, unit tests, and UI tests to enforce good testing discipline.
-- **Asset catalogs** prepared for app icon, accent color, and preview content so visual work can grow without restructuring.
+- **Single entry point** via `StrandingApp` using `@main` and a `WindowGroup`.
+- **Composable root view**: a simple `ContentView` that I can later replace with navigation, state management, and dependency injection.
+- **Multi-target project setup**: app, unit tests, and UI tests are all configured as separate targets in the Xcode project.
+- **Testing-first mindset**: created a test harness using both the new `Testing` framework and traditional XCTest UI tests so I can grow features with safety.
 
-This keeps the architecture simple while still following best practices for scaling later.
+The architecture is intentionally flat and minimal right now, with the expectation that I’ll introduce modules (e.g., “WorkoutStrands”, “Profile”, “Insights”) once the core domain model is clearer.
 
 ## Key Features
 
-- SwiftUI-based app entry using `@main` and `WindowGroup`.
-- Minimal, self-contained `ContentView` for quick UI iteration.
-- Dedicated **unit test target** (`StrandingTests`) using the new `Testing` APIs.
-- Dedicated **UI test target** (`StrandingUITests`) using XCTest.
-- Asset catalogs already wired for app icons, accent colors, and previews.
-- Xcode schemes and workspace configured for smooth development and running tests.
+- SwiftUI app entry point using the modern `App` protocol (`StrandingApp`).
+- Clean, minimal `ContentView` ready to be turned into the main exercise dashboard.
+- Separate targets for unit-style tests (`StrandingTests`) and UI tests (`StrandingUITests`).
+- Baseline UI test that launches the app and captures a screenshot of the launch screen.
+- Xcode workspace and scheme configuration checked into source control for reproducible builds.
+- Asset catalogs and app icon setup to support expansion into a shippable app.
 
 ## Technical Details
 
-### App entry
+### App Entry and Composition
 
-The app uses the SwiftUI app protocol:
+The app uses SwiftUI’s `App` protocol:
 
 ```swift
 @main
@@ -85,11 +88,9 @@ struct StrandingApp: App {
 }
 ```
 
-This avoids `AppDelegate` boilerplate and makes it easy to inject shared state or environment objects later (e.g., workout strand stores, persistence, or health data managers).
+This keeps the entry point declarative and makes it trivial to inject environment objects or root navigation later.
 
-### Root view
-
-`ContentView` is currently a simple placeholder:
+The initial `ContentView` is a simple vertical stack:
 
 ```swift
 struct ContentView: View {
@@ -105,63 +106,101 @@ struct ContentView: View {
 }
 ```
 
-This gives me a live canvas for experimentation (via `#Preview`) and a single place to start adding:
+I rely on this as a placeholder container; as features mature, this view will likely become a tab bar or navigation entry for different exercise strands.
 
-- Navigation stacks.
-- Strand list views.
-- Workout detail views.
+### Project & Targets
 
-### Testing setup
+The Xcode project defines three main products:
 
-I created two separate testing layers:
+- `Stranding.app` – the main iOS app.
+- `StrandingTests.xctest` – a test bundle for logic and model tests.
+- `StrandingUITests.xctest` – a UI test bundle for end-to-end scenarios.
 
-- **Unit-style tests** (`StrandingTests`):
+The `PBXFileSystemSynchronizedRootGroup` configuration in the `.pbxproj` ensures that the file system and Xcode’s logical groups stay aligned, which is helpful as the project grows and folders are reorganized.
 
-  ```swift
-  import Testing
-  @testable import Stranding
+### Unit-Style Tests with `Testing`
 
-  struct StrandingTests {
-      @Test func example() async throws {
-          // #expect(...) assertions will go here.
-      }
-  }
-  ```
+The `StrandingTests` target uses the new `Testing` package:
 
-  This is ready for future logic around scheduling, progression, and validation of workout strands.
+```swift
+import Testing
+@testable import Stranding
 
-- **UI tests** (`StrandingUITests` and `StrandingUITestsLaunchTests`):
+struct StrandingTests {
 
-  - Launch the app using `XCUIApplication`.
-  - Validate basic behaviors and capture a launch screenshot.
-  - Include a launch performance test using `XCTApplicationLaunchMetric`.
+    @Test func example() async throws {
+        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    }
+}
+```
 
-This separation will let me test both the business logic of strand progression and the user-facing flows.
+This gives me modern, Swift-native test declarations (`@Test`) and expressive assertions (`#expect`) once I introduce real business logic such as strand progression, streak retention, or workout scoring.
 
-### Project structure
+### UI Tests with XCTest
 
-The Xcode project contains:
+The UI test targets are based on Xcode’s template but wired to support baseline coverage:
 
-- Main app target: `Stranding`
-- Unit test target: `StrandingTests`
-- UI test target: `StrandingUITests`
-- Asset catalogs and preview assets for design iteration.
-- Scheme and workspace data checked in so the project is reproducible on other machines.
+```swift
+@MainActor
+func testLaunch() throws {
+    let app = XCUIApplication()
+    app.launch()
+
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = "Launch Screen"
+    attachment.lifetime = .keepAlways
+    add(attachment)
+}
+```
+
+This ensures:
+
+- The app launches correctly under automated conditions.
+- I can capture and track launch screen regressions visually as the UI evolves.
+
+Another test measures launch performance:
+
+```swift
+@MainActor
+func testLaunchPerformance() throws {
+    if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
+        measure(metrics: [XCTApplicationLaunchMetric()]) {
+            XCUIApplication().launch()
+        }
+    }
+}
+```
+
+This provides a performance baseline I can compare against as I add more complex startup logic (e.g., loading cached strands, syncing with HealthKit or a backend).
+
+### Assets & Theming
+
+The project includes standard asset catalogs:
+
+- `AppIcon.appiconset` – configured for iOS with multiple appearance variants (including dark and tinted luminosity).
+- `AccentColor.colorset` – a placeholder for the app’s primary tint color.
+
+Keeping these in place from the start simplifies theming and gives me a clear path to branding later.
 
 ## Results
 
-- Created a clean SwiftUI iOS app scaffold for the Stranding concept.
-- Established unit and UI testing targets at project inception.
-- Confirmed the app launches and runs in the simulator with a minimal UI.
-- Lined up a structure that will make it straightforward to add real workout strand models and flows.
+At this stage, Stranding delivers:
+
+- A functional SwiftUI app that builds and runs on iOS.
+- Validated launch flow via UI tests and screenshot capture.
+- A ready-to-extend test harness for both logic and UI.
+- A small, clean codebase that I can reshape into a strand-based exercise experience without wrestling with setup details.
+
+Even though the current UI is intentionally minimal, the groundwork is in place to iterate quickly on the core exercise concepts.
 
 ## Lessons Learned
 
-- Starting with tests and multiple targets from day one avoids painful restructuring later, even for small experiments.
-- The SwiftUI `@main` app lifecycle keeps the entry point simple and makes it easier to plan for injecting state and services.
-- Having asset catalogs and preview content wired early helps streamline future design work and makes it easier to iterate visually.
+- Starting with a **testing-aware template** (unit + UI) pays off later; it’s easier than retrofitting tests into a grown codebase.
+- Even a “Hello, world” app benefits from **clear project organization** and checked-in schemes, especially when moving between machines or collaborators.
+- SwiftUI’s `App` lifecycle keeps the entry point concise, but it’s important to think early about how you’ll introduce environment dependencies and navigation to avoid refactoring churn.
+- Establishing **performance tests early** gives a useful baseline when experimenting with data loading and background work.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Stranding)
-- Demo: _TBD_
+- [Live Demo (placeholder)](https://example.com/stranding-demo)

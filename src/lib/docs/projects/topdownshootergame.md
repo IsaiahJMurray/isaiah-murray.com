@@ -1,9 +1,8 @@
 ---
 title: Topdownshootergame
-subtitle: "A lighthearted top\u2011down shooter built in Unity for quick, chaotic\
-  \ matches with friends. Focused on simple controls and fast feedback, it experiments\
-  \ with top\u2011down camera design, collision handling, and prototype\u2011friendly\
-  \ project structure."
+subtitle: A lighthearted top-down shooter built in Unity for fast, chaotic matches
+  with friends. Focused on arcade-style gameplay and quick iteration, it explores
+  input handling, 2D movement, and shooting mechanics from a top-down perspective.
 slug: topdownshootergame
 date: '2024-01-18'
 updated: '2024-01-21'
@@ -15,76 +14,77 @@ heroImage: /generated/logos/topdownshootergame.png
 ---
 ## Overview
 
-This project is a small, goofy top‑down shooter I built for my friends. The goal wasn’t to make a polished commercial game but to quickly prototype a playable experience, experiment with Unity’s 2D tooling, and practice structuring a simple game loop, entity interactions, and input handling.
+TopDownShooterGame is a small, goofy top-down shooter I built for a group of friends. The goal was to quickly prototype a lighthearted game night experience rather than a polished commercial release. I focused on fast iteration, simple controls, and enough visual and gameplay feedback to make it fun in short bursts.
 
 ## Role & Context
 
-I designed and implemented the game on my own as a personal side project. I treated it as a sandbox to:
-
-- Refresh and deepen my Unity skills
-- Iterate rapidly on gameplay ideas based on friends’ feedback
-- Experiment with code organization for a small but complete game
+I was the sole developer on this project, responsible for game design, programming, basic art integration, and project setup in Unity. I built it as a short sprint side project, prioritizing gameplay feel and rapid experimentation over long-term architecture.
 
 ## Tech Stack
 
-- Unity (2D)
-- C#
-- Git & GitHub
+- Unity (project structure, scene management, assets)
+- C# (gameplay scripting)
+- Git & GitHub (version control)
 
 ## Problem
 
-I wanted a light, quick-to-play game that my friends could pick up without explanation. From a development perspective, the challenge was to:
+I wanted a quick way to play a custom, inside-joke–filled game with friends without relying on existing titles or complex modding tools. The challenge was to stand up a fully playable top-down shooter in a short timeframe, with:
 
-- Implement basic top‑down shooter mechanics (movement, shooting, enemies) in a maintainable way
-- Keep iteration time fast so I could tweak gameplay based on informal playtesting
-- Keep the scope small enough to finish a vertical slice rather than leave another prototype unfinished
+- Simple, learnable controls
+- Responsive player movement and shooting
+- Enemies that felt chaotic and fun without complex AI
+- A codebase I could easily tweak before game nights
 
 ## Approach / Architecture
 
-I structured the game around a traditional Unity component-based architecture:
+I structured the project using standard Unity patterns:
 
-- The player, enemies, and projectiles are all GameObjects with specialized C# components.
-- Movement, input, health, damage, and shooting are separated into focused scripts so I could reuse them across different entities.
-- Simple managers (e.g., for spawning enemies or resetting the game state) coordinate scene-level behavior without turning into a “god object.”
+- A core gameplay scene containing the player, enemies, and basic environment.
+- Separate components for movement, input, shooting, and health to keep scripts focused and reusable.
+- Unity’s built-in physics and collision system to handle bullet impacts and player-enemy interactions.
+- Simple scriptable settings (where helpful) for tuning speed, fire rate, and enemy stats without code changes.
 
-I also leaned on Unity’s editor tooling to quickly tune parameters like movement speed, fire rate, and health via serialized fields, which made balancing much easier than hard-coding constants.
+This approach let me iterate quickly on gameplay feel while keeping the architecture straightforward enough for a small hobby project.
 
 ## Key Features
 
-- Top‑down movement with responsive WASD/arrow-key controls
-- Directional shooting with simple projectile behavior
-- Basic enemy AI (chasing or targeting the player)
-- Hit detection and health/damage system for player and enemies
-- Simple game loop with player death and restart flow
+- Top-down player movement with keyboard or gamepad-style input
+- Directional shooting with independent movement and aim
+- Basic enemy spawning and pursuit behavior
+- Health and damage system for player and enemies
+- Simple win/lose conditions to complete or restart a session
+- Lightweight visual and audio feedback for hits and deaths
 
 ## Technical Details
 
-Most of the game logic is expressed through small, single-purpose C# MonoBehaviour scripts. Conceptually, it breaks down as follows:
+On the gameplay side, I used modular C# MonoBehaviour scripts to keep responsibilities narrow—e.g., one script for reading input and setting direction vectors, another for moving the character, and another for handling firing logic and projectile spawning.
 
-- **Player controller**: Reads input each frame, moves the player using Unity’s physics or direct transform manipulation, and triggers shooting actions.
-- **Shooting system**: Spawns projectile prefabs from a defined fire point, with configurable rate of fire, projectile speed, and lifetime.
-- **Enemy behavior**: Uses basic AI patterns (e.g., move toward player position) to create pressure on the player without complex pathfinding.
-- **Health & damage**: Encapsulates health state in a reusable component; projectiles signal damage on collision, and entities react (e.g., play effects, destroy on death).
-- **Game management**: Handles starting, ending, and restarting the game. This keeps scene transitions and high-level state separate from individual entities.
+Enemy behavior is intentionally simple, focusing on:
 
-Even though this is a small project, I aimed to keep scripts decoupled enough that I could swap out behaviors (for example, adding new enemy types) without rewriting the core systems.
+- Spawning at set intervals or from designated spawn points.
+- Moving toward the player using vector math rather than complex pathfinding.
+- Applying damage on collision or when in attack range.
+
+Projectiles are handled as pooled or short-lived objects to avoid cluttering the scene; they move on a fixed trajectory and destroy themselves on impact or after a timeout. Unity’s physics and collision callbacks drive hit detection, which then updates health components.
+
+I leaned on Unity’s prefab system to quickly duplicate and tweak enemies, bullets, and environmental objects without writing new code, keeping iteration time low.
 
 ## Results
 
-The final result is a small but complete top‑down shooter that my friends can play locally. It served its purpose as:
+The game achieved its main goal: it was playable, easy to pick up, and entertaining for the group it was built for. I was able to:
 
-- A quick, humorous game for friends
-- A practical exercise in Unity 2D game structure
-- A reference I can build on for future prototypes (new weapons, enemy types, or levels)
+- Go from blank project to a working prototype in a short period.
+- Rapidly tune movement speed, fire rate, and enemy behavior based on feedback.
+- Use the project as a sandbox for experimenting with Unity workflow and small gameplay tweaks.
 
 ## Lessons Learned
 
-- Keeping systems modular (movement, shooting, health) pays off even in very small games.
-- Exposing parameters in the Unity Inspector is crucial for rapid iteration and balance tuning.
-- Scoping aggressively—focusing on a single level and core loop—helps actually finish a playable build.
-- Even simple enemy AI and feedback (hit reactions, sound, or effects) dramatically improves how “alive” the game feels.
+- Small, well-scoped features make it much easier to hit a short deadline and still have a complete game loop.
+- Separating movement, input, and combat logic into different components keeps the code easier to tweak.
+- Even simple enemy AI can feel engaging if movement speed, spawn rate, and feedback are tuned carefully.
+- A good Unity-specific `.gitignore` is crucial to keep the repo clean and the project easy to share.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/TopDownShooterGame)
-- Demo (coming soon)
+- Demo: _TBD_

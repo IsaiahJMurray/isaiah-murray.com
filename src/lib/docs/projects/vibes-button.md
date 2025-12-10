@@ -1,9 +1,10 @@
 ---
 title: Vibes Button
-subtitle: A Chrome extension that overlays any webpage with custom ChatGPT-powered,
-  happy-go-lucky affirmations based on the current URL. Built for everyday web users
-  who want a mood boost, it combines a Flask backend with Chrome extension APIs, OpenAI
-  fine-tuning, per-user auth, and token usage logging for potential billing and analytics.
+subtitle: "A Chrome extension that overlays any webpage with cheerful, AI-generated\
+  \ affirmations tailored to the page\u2019s URL. Built for desktop Chrome users,\
+  \ it pairs a Flask backend (with user auth, usage logging, and API key management)\
+  \ with a Manifest V3 extension that streams OpenAI completions into a lightweight\
+  \ in-page UI."
 slug: vibes-button
 date: '2023-11-24'
 updated: '2023-12-08'
@@ -21,207 +22,277 @@ heroImage: /generated/logos/vibes-button.png
 ---
 ## Overview
 
-Vibes-Button is a Chrome extension and companion Flask backend that turns any webpage into a source of “happy vibes.” When I click the extension’s button, it sends the current URL to an OpenAI-powered model that generates a short, upbeat, context-aware quote. The server also tracks usage per user so I can view logs of past “vibes” and token consumption.
+Vibes-Button is a Chrome extension and local Flask-backed web app that work together to turn any webpage into a source of “happy vibes.” When I click the extension’s floating button, it sends the current URL to a fine-tuned OpenAI model and displays a short, positive, context-aware quote as an overlay on the page. Behind the scenes, a small dashboard logs my usage, including token counts and URLs, so I can inspect and potentially manage usage like an actual product.
 
-I originally built this as my CS50 final project, with the goal of combining browser extensions, modern web APIs, and a bit of ML customization into one cohesive system.
+I originally built this as my CS50 final project, focusing on full-stack integration, browser extension architecture, and safe interaction with the OpenAI API.
 
 ## Role & Context
 
-I designed and implemented the entire project end to end:
+I designed and implemented the entire project end-to-end:
 
-- Built the Chrome extension (Manifest V3, background/service worker, content and overlay scripts).
-- Implemented the Flask backend with user authentication, API logging, and simple analytics.
-- Integrated with the OpenAI API, including experimentation with a fine-tuned model and the Assistants beta.
-- Designed the extension’s UI and the web dashboard for viewing history and configuring the API key.
+- Ideation and UX: deciding on the “happy quote overlay” interaction and button design.
+- Chrome extension implementation: background service worker, content scripts, overlay UI.
+- Backend: Flask app, SQLite schema, authentication, and request logging.
+- OpenAI integration: fine-tuning, prompt design, and token accounting.
+- Dev tooling: local environment, .env-based configuration, and test scripts for the OpenAI API.
 
-The project was done independently under the constraints and expectations of the CS50 final project.
+This was built as a solo project under the constraints of a course deadline and a local-only environment (no external hosting).
 
 ## Tech Stack
 
 - HTML
 - CSS
-- JavaScript (Chrome extension, frontend logic)
-- Python (Flask backend, OpenAI integration tooling)
+- JavaScript (Chrome Extension, frontend logic)
+- Python (Flask backend)
 - SQLite (via `cs50` SQL helper)
-- Chrome Extensions API (Manifest V3)
-- OpenAI API
-- Node.js + npm (for `dotenv` and tooling)
+- OpenAI API (fine-tuned model)
+- Chrome Extensions Manifest V3
+- Node.js (for `dotenv` in extension development)
 
 ## Problem
 
-Most webpages are neutral or stressful—news, deadlines, documentation. I wanted a lightweight way to inject some positivity into that experience, without asking users to leave the page or open a separate app.
+I wanted to explore how to make AI feel ambient and supportive rather than “chat-box based.” Specifically:
 
-The challenges were:
+- How can I surface short, positive, context-aware messages while browsing, without interrupting the user?
+- How can I let users control their own OpenAI API key but still track usage and associate it with accounts?
+- How can a Chrome extension and a local web app share state (user identity, API key configuration) cleanly and securely?
 
-- Providing page-aware positive quotes with minimal friction (one button, anywhere on the web).
-- Letting users bring their own OpenAI API key securely, so I didn’t have to host secrets.
-- Tracking usage (URLs, tokens, timestamps) per user for transparency and potential future billing.
-- Coordinating state between a browser extension and a Flask web app (login status, user IDs, API keys) under Chrome extension security constraints.
+The core challenge was orchestrating three moving parts:
+
+1. A Chrome extension injected into arbitrary sites.
+2. A local Flask web application with login and a dashboard.
+3. The OpenAI API, including a fine-tuned model, with per-user logging and token tracking.
 
 ## Approach / Architecture
 
-I split the system into two main components:
+I split the project into two primary components:
 
-1. **Chrome Extension**
-   - **Background service worker (`background.js`)**  
-     - Injects the overlay script when the user clicks the extension action.
-     - Manages `chrome.storage.sync` for `userId` and `openaiApiKey`.
-     - Handles messages from content/overlay scripts to call the OpenAI API and log results to the server.
-   - **Content script (`content.js`)**  
-     - Runs on the Flask site (localhost:5000).
-     - Bridges communication between the web pages (login / options screens) and the background script using `window.postMessage` + `chrome.runtime.sendMessage`.
-   - **Overlay (`overlay.js` + `overlay.html` + `overlay.css`)**  
-     - Injects a small popup at the bottom-right of any page with a “:)” activation button.
-     - On click, sends the current URL to the background script to generate and display a positive quote.
+1. **Chrome Extension (client-side)**
+   - A background service worker (`background.js`) that:
+     - Injects a content script into the Flask site when needed.
+     - Injects the overlay script into any tab when the extension icon is clicked.
+     - Manages `chrome.storage.sync` for the OpenAI API key and `userId`.
+     - Handles requests to the OpenAI API and logs results to the Flask backend.
+   - Content scripts (`content.js`, `overlay.js`) that:
+     - Mediate communication between the web page and the extension.
+     - Inject and control a minimal overlay UI.
+     - Relay user ID and API key configuration messages.
 
-2. **Flask Backend (`server-side/app.py`)**
-   - **Authentication & session management**
-     - Users can register and log in, with passwords hashed via `werkzeug.security`.
-     - Sessions store `user_id`; I mirror this into Chrome storage via the extension bridge.
-   - **API logging & dashboard**
-     - Stores each OpenAI call in SQLite: user ID, URL, response text, tokens, timestamp.
-     - Shows a dashboard (`index.html`) with total tokens and request count, plus detailed activity logs.
-   - **API key configuration**
-     - Options page (`/options`) lets logged-in users configure their OpenAI API key.
-     - The frontend JS verifies the key against `https://api.openai.com/v1/models` and, if valid, sends it to the extension to be stored securely in `chrome.storage.sync`.
+2. **Flask Server (backend + dashboard)**
+   - Handles user registration, login, and logout with session-based auth.
+   - Manages an SQLite database with `users` and `apicalls` tables.
+   - Exposes endpoints for:
+     - Logging API usage (`/api/store`).
+     - Syncing user IDs with the extension.
+     - Managing API key configuration via a settings page.
+   - Renders a small dashboard showing:
+     - Total tokens used.
+     - Total requests.
+     - Detailed per-call logs (time, URL, response snippet).
 
-For development and experimentation, I added separate Python scripts (in `development/`) to test the fine-tuned model and the Assistants beta, and a `training3.jsonl` file with prompt/completion pairs for a “supportive assistant” specialized on URLs.
+**State and communication flow:**
+
+- **User auth and ID sync:**
+  - Flask maintains a `session['user_id']`.
+  - After register/login/logout, a transitional page (`post_*` templates) posts the `user_id` (or `-1` for guest) to the window.
+  - The content script listens for this message and forwards it to the background script, which persists it in `chrome.storage.sync`.
+  - When needed, the extension sends the stored `userId` back to the Flask app.
+
+- **API key configuration:**
+  - The extension’s `options_page` is actually a redirect to the Flask `/options` route.
+  - The options page verifies a user-supplied key by calling OpenAI’s `/v1/models` endpoint.
+  - If valid, it posts a message to the content script; the content script passes it to the background script, which saves it in `chrome.storage.sync`.
+
+- **Happy quote generation:**
+  - When I click the Vibes button on any page:
+    - The overlay script sends a `queryChatGPT` message to the background.
+    - The background script fetches the OpenAI API key and `userId` from `chrome.storage.sync`.
+    - It calls the fine-tuned model with a prompt that includes the current URL.
+    - It approximates token usage, logs the call to the Flask server, and returns the best “vibes” snippet to the overlay for display.
 
 ## Key Features
 
-- **One-click positivity overlay**: A floating “:)” button that works on any website and reveals a generated positive quote about the current page.
-- **User authentication & guest mode**: Login/registration flows with a special guest `user_id = -1` to preserve usability without always being logged in.
-- **Per-user API logging**: Every OpenAI call is logged with timestamp, URL, token count, and response for later review.
-- **Bring-your-own OpenAI API key**: Users configure and validate their own key via the web UI; the key is stored only in Chrome extension storage.
-- **Chrome extension–Flask handshake**: A custom message bridge between content scripts and the Flask pages to sync user IDs and trigger storage updates.
-- **Lightweight analytics dashboard**: A web UI showing total tokens used, number of requests, and a scrollable history of all “vibes” generated.
+- Chrome extension with an always-available, floating “:)" Vibes button.
+- Fine-tuned OpenAI integration producing short, positive, URL-aware quotes.
+- Local Flask web app with registration, login, logout, and API key configuration.
+- Activity dashboard: per-user history of requests, tokens used, timestamps, and URLs.
+- Extension–backend handshake for keeping `userId` in sync, including a guest mode with `user_id = -1`.
+- Client-side validation of OpenAI API keys before saving them.
+- Overlay UI that reveals quotes character-by-character for a more delightful feel.
 
 ## Technical Details
 
-### Extension internals
+### Chrome Extension
 
-- **Manifest V3** (`manifest.json`)
+- **Manifest (v3)**
   - Permissions: `activeTab`, `scripting`, `storage`, `tabs`.
-  - `host_permissions`: `<all_urls>` for overlay injection and logging.
+  - `host_permissions`: `<all_urls>` for overlay injection.
   - `background.service_worker`: `background.js`.
-  - `content_scripts`: `content.js` injected on `http://localhost:5000/*` (the Flask app).
-  - `web_accessible_resources`: exposes `overlay.html` and `overlay.css` to injected pages.
+  - `content_scripts` bound to `http://localhost:5000/*` to integrate with the Flask app.
+  - `web_accessible_resources`: `overlay.html`, `overlay.css` so the injected script can load them.
 
 - **Background script (`background.js`)**
-  - On action click, injects `overlay.js` into the active tab:
-    ```js
-    chrome.action.onClicked.addListener((tab) => {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['overlay.js']
-      });
-    });
-    ```
-  - Approximates token count with a simple heuristic (word count + length-based adjustment) before logging to the server.
-  - Stores and retrieves `openaiApiKey` and `userId` in `chrome.storage.sync` and logs them for debugging.
-  - Handles messages:
-    - `setUserId` / `getUserId`
-    - `setApiKey` / `getApiKey`
-    - `contentScriptQuery === "queryChatGPT"` → calls `handleChatGPTQuery`, which:
-      - Fetches the API key and user ID from storage.
-      - Calls the OpenAI completions endpoint.
-      - Uses the approximate token count to call `sendDataToServer`, which POSTs to `http://127.0.0.1:5000/api/store`.
+  - On extension icon click, injects `overlay.js` into the current tab.
+  - Listens to `chrome.tabs.onUpdated` and injects `content.js` whenever the user visits the local Flask app (`port 5000`).
+  - Maintains:
+    - `openaiApiKey`
+    - `userId`
+    in `chrome.storage.sync`, with helper logging to debug current values.
+  - Handles API key and user ID messages:
+    - `setUserId`, `getUserId`
+    - `setApiKey`, `getApiKey`
+  - Implements `handleChatGPTQuery`:
+    - Reads `openaiApiKey` and `userId`.
+    - If no key is stored, returns an error message advising configuration.
+    - Calls the OpenAI completions endpoint for a fine-tuned `babbage-002` model.
+    - Approximates tokens using a simple heuristic:
+      ```js
+      function approximateTokenCount(text) {
+        const wordCount = text.split(' ').length;
+        const extraTokensForSubwords = Math.floor(text.length / 8);
+        return wordCount + extraTokensForSubwords;
+      }
+      ```
+    - Sends the token count, URL, and response text to `http://127.0.0.1:5000/api/store`.
 
 - **Content script (`content.js`)**
-  - Runs on the Flask app’s domain.
-  - Listens to `window.postMessage` events from the page and maps them to Chrome runtime messages:
-    - `SET_USER_ID` → `chrome.runtime.sendMessage({ action: "setUserId", userId })`
-    - `GET_USER_ID` → `chrome.runtime.sendMessage({ action: "getUserId" })` → replies back with `USER_ID_RESPONSE`.
-    - `FROM_PAGE` → forwards a generic message to the background, then posts `FROM_EXTENSION` back to the page with the response.
-  - On DOMContentLoaded at `http://127.0.0.1:5000/`, if a `userId` exists in storage, it POSTs it to `/receive-user-id` so the Flask app can reconcile session state.
+  - Bridges messages between the page JavaScript and the extension:
+    - Listens for `window.postMessage` events:
+      - `SET_USER_ID`: forwards to background (`setUserId`).
+      - `GET_USER_ID`: requests from background, then posts `USER_ID_RESPONSE` back.
+      - `FROM_PAGE`: forwards arbitrary messages to the background (used for API key save).
+  - On `DOMContentLoaded` at the Flask home page:
+    - Requests `userId` from background.
+    - Sends it to `/receive-user-id` so Flask can reconcile extension state and session state.
 
-- **Overlay script (`overlay.js`)**
-  - Injects `overlay.css` into the `<head>` and appends the HTML from `overlay.html` into the `<body>`.
-  - Maintains a `requesting` flag to avoid concurrent requests.
-  - On “:)” button click:
-    - Updates the text box with the current URL and adds a loading class to the button.
-    - Sends `{ contentScriptQuery: "queryChatGPT", url: currentUrl }` to the background script.
-    - On response:
-      - Removes the loading state.
-      - Extracts the main quote from the `[[...]]`-delimited sections returned by the fine-tuned model, picks the longest chunk, removes special characters, and gradually reveals it character by character for a simple typing effect.
-
-### Backend internals
-
-- **Flask app (`server-side/app.py`)**
-  - Uses `cs50.SQL("sqlite:///api-logs.db")` to interact with SQLite.
-  - `users` table:
-    - `id`, `username` (unique), `password_hash` (unique).
-  - `apicalls` table:
-    - `id`, `time` (default current timestamp), `user_id`, `tokens`, `url`, `response`.
-  - Routes:
-    - `/`: If `session['user_id']` is set and valid, loads user info and API logs, computes total tokens and total requests, and renders `index.html`. Otherwise, shows `login.html`.
-    - `/register`: Handles registration, checks unique username, hashes password, inserts user, sets `session['user_id']`, and returns `post_register.html` (which kicks off the client–extension sync).
-    - `/login`: Validates credentials using `check_password_hash`, sets `session['user_id']`, and returns `post_login.html`.
-    - `/logout`: Clears or sets `session['user_id']` appropriately and returns `post_logout.html`.
-    - `/options`: Only accessible if `session['user_id'] != -1`; renders the API key configuration page.
-    - `/api/store`: (Implied from `background.js`) API endpoint to store logs from the extension.
-
-- **Client–extension sync (“handshake”)**
-  - After register / login / logout, the templates `post_register.html`, `post_login.html`, and `post_logout.html` run a script:
+- **Overlay (`overlay.js` and `overlay.html`, `overlay.css`)**
+  - Dynamically injects CSS using `chrome.runtime.getURL`.
+  - Loads `overlay.html`, appends it to `document.body`.
+  - Implements a “typewriter” reveal function for the text:
     ```js
-    window.addEventListener('DOMContentLoaded', (event) => {
-      setTimeout(function() {
-        var userId = {{ user_id or -1 }};
-        window.postMessage({ type: 'SET_USER_ID', userId: userId }, '*');
-        window.location.href = '/';
-      }, 1000);
-    });
-    ```
-  - The 1-second delay is a pragmatic workaround because the content script injection timing and Chrome’s security constraints made a more robust handshake tricky in the first iteration.
-
-- **Options page scripts (`server-side/static/options.js`)**
-  - Provides a small single-page flow:
-    - Reads the user’s API key input.
-    - Calls `verifyApiKey` by issuing a GET to `https://api.openai.com/v1/models` with the provided key.
-    - Shows a loading spinner via a `loading` class and toggles the error message’s visibility.
-    - If valid, posts a message (`FROM_PAGE`) that the content script forwards to the background as `{ action: "setApiKey", apiKey }`.
-
-### Model training & experimentation
-
-- **Fine-tuning**
-  - `development/training3.jsonl` holds prompt/completion pairs like:
-    ```json
-    {
-      "prompt": "You are a supportive assistant interpreting inputs as positive, supportive, statistically correct, and sometimes humorous sayings! You are designed to be positive, enjoyable, and natural. Input: 'https://en.wikipedia.org/wiki/Solar_System'",
-      "completion": "[[Like the planets in the solar system, each of us has a unique path that contributes to the harmony of the whole.]]"
+    function revealText(text, object) {
+      let index = 0;
+      const interval = 10;
+      function revealCharacter() {
+        if (index < text.length) {
+          object.textContent += text[index++];
+          setTimeout(revealCharacter, interval);
+        }
+      }
+      revealCharacter();
     }
     ```
-  - The completions are wrapped in `[[...]]`, which `overlay.js` expects and parses.
+  - Sends `contentScriptQuery: "queryChatGPT"` to the background when the activation button is clicked.
+  - Extracts the most meaningful quote from the API completion by:
+    - Splitting response text on `[[...]]` markers (used in fine-tune completions).
+    - Sorting chunks by length and picking the longest as the “main” quote.
+    - Stripping special characters for a cleaner display.
 
-- **Testing scripts**
-  - `request_general_model.py`:  
-    - Loads `OPENAI_API_KEY2` from `.env` with `dotenv`.
-    - Hits a specific fine-tuned Babbage engine and prints out the trimmed completion.
-  - `request_assistant.py`:  
-    - Tests the Assistants beta endpoint using `ASSISTANT_KEY`.
-    - Demonstrates a simple conversation flow.
+### Flask Backend
+
+- **Core app (`server-side/app.py`)**
+  - Uses `Flask` + `cs50.SQL` on `sqlite:///api-logs.db`.
+  - `home ("/")`:
+    - If `session['user_id']` is set (not `None` or `-1`), fetches user and their `apicalls`.
+    - Computes:
+      - `total_tokens = sum(entry['tokens'] for entry in entries)`
+      - `total_requests = len(entries)`
+    - Renders `index.html` with a dashboard of recent responses and metadata.
+    - Otherwise, renders `login.html`.
+  - `/options`:
+    - Only accessible when `session['user_id']` is a real user (not `-1`).
+    - Renders `options.html` with API key configuration UI.
+  - `/register`, `/login`:
+    - Create and authenticate users with `werkzeug.security` password hashing.
+    - After a successful register or login:
+      - Store `session['user_id']` and render `post_register.html` or `post_login.html`.
+      - These templates include a script that:
+        - Waits 1 second (workaround for extension timing/permissions).
+        - Calls `window.postMessage({ type: 'SET_USER_ID', userId: {{ user_id }} }, '*');`.
+        - Redirects back to `/`.
+  - `/logout`:
+    - Clears the session, renders `post_logout.html` which:
+      - After a 1-second delay, posts `userId = -1` to the content script.
+      - Redirects back to `/`.
+  - `/api/store` (inferred from `background.js`):
+    - Accepts JSON with `user_id`, `tokens`, `url`, `response`.
+    - Inserts into `apicalls` table for logging and analytics.
+
+- **Database schema (from `development/sql-commands`)**
+  - `users`:
+    - `id` (PK, autoincrement).
+    - `username` (unique).
+    - `password_hash` (unique, hashed).
+  - `apicalls`:
+    - `id` (PK, autoincrement).
+    - `time` (timestamp, default `CURRENT_TIMESTAMP`).
+    - `user_id` (FK to `users.id`).
+    - `tokens` (integer).
+    - `url` (text).
+    - `response` (text).
+
+- **Templates and static assets**
+  - Shared `layout.html` with Bootstrap and custom `styles.css`.
+  - `index.html`: dashboard of API calls.
+  - `login.html`, `register.html`: simple centered forms with the “Vibes Button :)” branding.
+  - `navbar.html`: includes links to “Switch API Key” and “Logout”, plus a “Welcome {{ username }}” badge.
+  - `options.html`: a styled card with:
+    - API key input.
+    - Save button with loading state.
+    - “Invalid API Key” error messaging, toggled by JavaScript.
+  - `home.js`:
+    - Example of checking user login status and wiring up logout and “switch API key” routes.
+  - `options.js`:
+    - Verifies the entered API key by calling `https://api.openai.com/v1/models`.
+    - Shows/hides an error message and manages a loading state on the save button.
+    - Relays a `setApiKey` action to the extension via `window.postMessage`.
+
+### Development & Fine-Tuning
+
+- `development/request_general_model.py`:
+  - Small script that reads `OPENAI_API_KEY2` from `.env`.
+  - Calls a fine-tuned Babbage model using a custom prompt and prints the result.
+- `development/training3.jsonl`:
+  - Contains training pairs like:
+    - Prompt: “You are a supportive assistant… Input: 'https://en.wikipedia.org/wiki/Solar_System'”
+    - Completion: `[[Like the planets in the solar system, each of us has a unique path that contributes to the harmony of the whole.]]`
+  - I used the `[[...]]` convention so the extension could easily extract the “main quote” from completions.
 
 ## Results
 
-- I built a working Chrome extension and backend that:
-  - Lets me log in, configure an OpenAI API key, and sync that state to the extension.
-  - Generates URL-aware positive quotes on arbitrary webpages with a single click.
-  - Logs all activity per user into an SQLite database, with a dashboard for reviewing usage.
-- I gained practical experience with:
-  - Chrome Manifest V3 patterns (service workers, `chrome.scripting`, `chrome.storage.sync`).
-  - Secure credential handling (hashing passwords, keeping API keys out of the backend).
-  - Bridging browser extensions with a traditional web app using `postMessage` and content scripts.
-- Although the repository is relatively small and has no stars yet, it served as a solid capstone for combining frontend, backend, and ML integration.
+- Built a fully working Chrome extension + local web app integration that:
+  - Generates positive, URL-specific quotes on any site.
+  - Tracks per-user usage with tokens and URLs.
+- Demonstrated:
+  - End-to-end flow from extension UI → OpenAI API → Flask logging → dashboard visualization.
+  - Practical use of Chrome Extension Manifest V3 features (service workers, `chrome.scripting`, `chrome.storage.sync`).
+  - A workable (if imperfect) communication pattern between a browser extension and a local authenticated web app.
+- Used successfully as a CS50 final project, meeting the course’s full-stack requirements.
 
 ## Lessons Learned
 
-- **Extension–page communication is subtle**: Getting a reliable handshake between the Flask pages and content scripts was harder than expected. I resorted to a timed workaround, but I now have a better mental model for permissions, injection timing, and message channels in Chrome.
-- **Storing user state across systems requires clear contracts**: Using `-1` as a “guest” `user_id` is simple but effective. It made it easier to think about login/logout while preserving usability.
-- **BYO API key simplifies security but complicates UX**: Not hosting keys is nice for security and cost reasons, but it required validation flows, error states, and clear messaging to the user.
-- **Token estimation can be approximate**: For logging and billing-like scenarios, a heuristic can be “good enough,” but real-world systems would likely integrate proper token counting.
-- **Even small projects benefit from design docs**: Writing `DESIGN.md` and explicitly documenting trade-offs (like the delay-based handshake) helped clarify where the most important technical debt lives.
+- **Extension–page communication is subtle.**
+  - Mixing content scripts, `window.postMessage`, and background scripts introduces timing and security nuances. My 1-second delay workaround underscored how important a robust handshake design is.
+
+- **State duplication is easy to get wrong.**
+  - Keeping `session['user_id']` (Flask) and `userId` (Chrome storage) in sync required careful thinking. Introducing a special “guest” value (`-1`) simplified a lot of edge cases.
+
+- **Manifest V3 constraints change mental models.**
+  - Moving from persistent backgrounds to service workers pushed me to rely more on message passing and storage instead of in-memory state.
+
+- **User-supplied API keys need guardrails.**
+  - Validating keys against the OpenAI API before saving them made the UX much smoother and reduced confusing error states when calling the model.
+
+- **Even small products benefit from analytics.**
+  - Logging tokens, URLs, and timestamps made the project feel more like a real product and provided immediate insight into usage patterns and costs.
+
+If I iterate on this project, I’d like to:
+
+- Replace the timeout-based handshake with a more robust, event-driven protocol.
+- Add hosting and auth flows that work beyond `localhost`, including HTTPS.
+- Improve the overlay UX (movable button, mobile-friendly layout, more personalization).
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Vibes-Button)
-- [Live Demo (placeholder)](https://example.com/vibes-button-demo)
+- Demo: _TBD (link to demo or video walkthrough)_

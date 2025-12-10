@@ -1,10 +1,9 @@
 ---
 title: Rowing Form Detection
-subtitle: "A computer-vision \u201Cdigital coach\u201D that analyzes rowing videos\
-  \ and scores technique, aimed at athletes who want objective, frame-by-frame feedback\
-  \ on their form. Uses Google Cloud Video Intelligence for person detection and pose\
-  \ landmarks, forming the backbone for neural-network\u2013driven form grading and\
-  \ automated coaching cues."
+subtitle: "Neural-network-powered \u201Cdigital coach\u201D that analyzes rowing videos\
+  \ to grade form and surface detailed pose feedback. Uses Google Cloud Video Intelligence\
+  \ person detection and pose landmarks to extract keypoints and timestamps, forming\
+  \ the foundation for automated technique assessment and real-time coaching insights."
 slug: rowing-form-detection
 date: '2024-06-07'
 updated: '2024-06-09'
@@ -16,79 +15,76 @@ heroImage: /generated/logos/rowing-form-detection.png
 ---
 ## Overview
 
-Rowing-Form-Detection is an experiment in using computer vision as a “digital coach” to analyze my rowing technique. I built a small pipeline around Google Cloud Video Intelligence to detect people and pose landmarks in rowing videos, with the long‑term goal of grading form and providing targeted feedback on stroke quality.
-
-This project is an early prototype: it proves out the ability to ingest video, detect my body position over time, and expose enough structured data to eventually compute metrics like back angle, leg drive sequence, and consistency across strokes.
+Rowing-Form-Detection is an experiment in using machine learning as a “digital rowing coach.” I wanted a system that could analyze footage of my rowing sessions, detect my body pose over time, and eventually provide objective feedback on my technique. This initial iteration focuses on extracting person and pose information from video using Google Cloud’s Video Intelligence API as the foundation for more advanced form grading models.
 
 ## Role & Context
 
-I designed and implemented this project end‑to‑end:
+I built this project independently as a personal R&D effort to blend my interest in rowing with practical experience in applied computer vision. The primary goals were to:
 
-- Defined the goal of using ML‑driven analysis to improve my rowing technique.
-- Selected cloud video analysis tools and wired them into a simple Python workflow.
-- Implemented the initial analysis script and experimented with sample rowing footage.
-- Evaluated the feasibility of extending the output into form grading and coaching feedback.
-
-This is a personal project focused on learning and experimentation rather than production readiness.
+- Explore end-to-end video analysis, from raw footage to structured pose data.
+- Prototype a pipeline that could later support scoring, feedback, and coaching logic.
+- Learn and evaluate Google Cloud’s Video Intelligence API for person and pose detection.
 
 ## Tech Stack
 
 - Python
 - Google Cloud Video Intelligence API
-- Google Cloud Storage (for hosting input videos)
-- Command‑line / local execution environment
+- Google Cloud Storage (for video input)
+- Command-line tooling / scripts
 
 ## Problem
 
-I wanted a way to get objective, frame‑by‑frame feedback on my rowing form without needing a coach to review every video. Specifically, I needed:
+Rowing technique is hard to self-evaluate, especially without constant access to a coach. Filming sessions helps, but manually scrubbing through video and trying to judge posture, timing, and stroke consistency is tedious and subjective.
 
-- Automated detection of my body and pose over the entire video.
-- Access to pose landmarks (keypoints) rather than just bounding boxes.
-- A structured output format that could later be used to compute movement metrics (angles, symmetry, timing).
+I wanted a way to:
 
-The challenge was to move beyond “simple video playback” and extract enough reliable motion data to build a digital rowing coach over time.
+- Automatically detect my body in rowing videos.
+- Extract pose landmarks (e.g., shoulders, hips, knees) frame-by-frame.
+- Build a machine-readable representation of my motion that could later be used for form grading and feedback.
 
 ## Approach / Architecture
 
-I started by leveraging Google Cloud’s Video Intelligence API, focusing on its person detection and pose landmark capabilities. The high‑level flow is:
+I designed a simple, cloud-centric pipeline:
 
-1. Upload a rowing video to a Google Cloud Storage bucket.
-2. Run a Python script that calls the Video Intelligence API with `PERSON_DETECTION` enabled, including pose landmarks and attributes.
-3. Wait for the long‑running annotation operation to complete.
-4. Iterate through the results:
-   - For each detected person and track, traverse timestamped objects.
-   - For each timestamp, log the pose landmarks (x, y, z) and metadata.
-5. Use the console output (and potentially later, structured output) as the basis for calculating form‑related metrics.
+1. **Video capture & upload**  
+   I record rowing sessions and upload the video files to a Google Cloud Storage bucket.
 
-At this stage, the architecture is intentionally simple: a single script encapsulates the API call and result traversal, which I treat as the “feature extraction” phase of a larger coaching system I plan to build.
+2. **Video analysis script**  
+   A Python script calls the Google Cloud Video Intelligence API with `PERSON_DETECTION` enabled and pose landmarks configured. The script runs asynchronously and waits for the long-running operation to finish.
+
+3. **Pose and person extraction**  
+   The API returns a structured response with detected persons, tracks, timestamps, and pose landmarks (x, y, z coordinates for key body points). I iterate over these annotations to inspect the raw pose data and understand how consistent and detailed it is.
+
+4. **Foundation for future grading**  
+   In this first version, I primarily log and inspect the results. The data schema (tracks, timestamps, keypoints) is intentionally designed to be a foundation for future steps like calculating joint angles, timing phases of the stroke, and scoring technique against a reference.
 
 ## Key Features
 
 - Person detection on rowing videos using Google Cloud Video Intelligence.
-- Pose landmark extraction (x, y, z coordinates) for key body points.
-- Time‑aligned tracking of pose across the video timeline.
-- Configurable request to include bounding boxes and attributes.
-- Console‑based inspection of detected keypoints to validate data quality.
-- Extensible foundation for future form scoring and feedback logic.
+- Extraction of detailed pose landmarks (3D-ish x, y, z coordinates).
+- Timestamped tracking of detected persons across the video.
+- Configurable Google Cloud Storage URI for input videos.
+- Scripted workflow that can be integrated into a larger analysis pipeline.
 
 ## Technical Details
 
-The core of the project is a Python script (`analyze-video`) that wraps the Google Cloud Video Intelligence client:
+The core logic lives in a Python script that:
 
-- I instantiate a `VideoIntelligenceServiceClient` from `google.cloud.videointelligence_v1`.
-- I request the `PERSON_DETECTION` feature with a `PersonDetectionConfig` that:
-  - `include_bounding_boxes=True`
-  - `include_pose_landmarks=True`
-  - `include_attributes=True`
+1. **Initializes the Video Intelligence client**
 
-This configuration ensures I get both spatial context (where the rower is in the frame) and fine‑grained pose information.
+   ```python
+   from google.cloud import videointelligence_v1 as videointelligence
 
-The workflow:
+   client = videointelligence.VideoIntelligenceServiceClient()
+   ```
 
-1. **Request construction**
+2. **Configures the request for person and pose detection**
+
+   I use the `PERSON_DETECTION` feature with a `PersonDetectionConfig` that asks for bounding boxes, pose landmarks, and attribute metadata:
 
    ```python
    features = [videointelligence.Feature.PERSON_DETECTION]
+
    request = videointelligence.AnnotateVideoRequest(
        input_uri=video_uri,
        features=features,
@@ -100,59 +96,55 @@ The workflow:
    )
    ```
 
-2. **Long‑running operation**
+3. **Handles long-running video annotation**
+
+   Video analysis is asynchronous. I trigger the operation and block until the result is ready (with a generous timeout for longer clips):
 
    ```python
    operation = client.annotate_video(request=request)
    result = operation.result(timeout=600)
    ```
 
-3. **Result traversal**
+4. **Iterates through annotation results**
 
-   I walk through the nested response structure:
-
-   - `result.annotation_results`
-   - `person_detection_annotations`
-   - `tracks`
-   - `timestamped_objects`
-
-   For each `timestamped_object` I compute the timestamp in seconds:
+   The response structure is hierarchical: annotation results → person detection annotations → tracks → timestamped objects → pose landmarks. I walk this tree and log the most relevant parts:
 
    ```python
-   t = timestamped_object.time_offset
-   ts_seconds = t.seconds + t.nanos / 1e9
+   for annotation in result.annotation_results:
+       for person_detection in annotation.person_detection_annotations:
+           print(f"Person detected with confidence: {person_detection.confidence}")
+
+           for track in person_detection.tracks:
+               for timestamped_object in track.timestamped_objects:
+                   ts = (
+                       timestamped_object.time_offset.seconds
+                       + timestamped_object.time_offset.nanos / 1e9
+                   )
+                   print(f"Timestamp: {ts} seconds")
+
+                   for keypoint in timestamped_object.pose_landmarks:
+                       print(
+                           f" - Landmark {keypoint.name}: "
+                           f"(x: {keypoint.x}, y: {keypoint.y}, z: {keypoint.z})"
+                       )
    ```
 
-   Then I iterate over `pose_landmarks`:
-
-   ```python
-   for keypoint in timestamped_object.pose_landmarks:
-       print(
-           f" - Landmark {keypoint.name}: "
-           f"(x: {keypoint.x}, y: {keypoint.y}, z: {keypoint.z})"
-       )
-   ```
-
-The coordinates are normalized floats (0–1 range in image space) with depth information, which makes them suitable for later conversion into angles and distances, such as hip hinge angle or shoulder symmetry.
-
-This script currently prints to stdout for rapid prototyping. The next iteration will serialize this data (e.g., JSON or CSV) to feed into analytic and visualization tools.
+This structure gives me a detailed time series of body landmarks that I can later convert into more meaningful rowing metrics (e.g., back angle at catch/finish, knee extension timing).
 
 ## Results
 
-- Verified that Google Cloud Video Intelligence can reliably detect my body and provide a full set of pose landmarks across rowing strokes.
-- Established a working pipeline from raw rowing video (in GCS) to time‑stamped pose data.
-- Confirmed that the API output is sufficiently detailed to support future metrics like joint angles and movement sequencing.
-
-While there is no production “grading” system yet, this prototype validates the technical foundation needed for a digital rowing coach.
+- Successfully implemented an end-to-end pipeline from cloud-hosted video to structured pose landmark data.
+- Verified that the Video Intelligence API can reliably detect a rower and output a rich set of pose points suitable for further kinematic analysis.
+- Established a clear path for the next phase: transforming raw landmark sequences into domain-specific rowing metrics and automated coaching feedback.
 
 ## Lessons Learned
 
-- Cloud video analysis APIs significantly reduce the complexity of building pose‑aware applications; the primary challenge moves to post‑processing and interpretation.
-- Working with long‑running video annotation operations requires careful handling of timeouts and result traversal but is manageable with a clean, layered script.
-- Pose landmarks alone do not equal coaching insight—designing meaningful metrics (e.g., ideal back angle ranges, catch/finish timing) will be the main value‑add in subsequent iterations.
-- Structuring output early (beyond console prints) is important to support experimentation with visualization and form‑grading algorithms.
+- Cloud video APIs provide a fast path to high-quality pose data without training custom models, which is ideal for early prototypes.
+- Understanding the structure and granularity of the returned annotations is critical before designing downstream analytics or grading logic.
+- Long-running video analysis workflows benefit from robust timeout handling and clear logging, especially when experimenting with different video lengths and resolutions.
+- Starting with a simple script and clear data inspection was the right way to de-risk the more complex “digital coach” logic I plan to build next.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Rowing-Form-Detection)
-- Demo: _TBD_
+- Demo (coming soon)

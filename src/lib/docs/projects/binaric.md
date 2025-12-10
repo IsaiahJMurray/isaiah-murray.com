@@ -1,10 +1,11 @@
 ---
 title: Binaric
-subtitle: "A modular, Python-based audio modem that turns binary data and files into\
-  \ structured sound for device-to-device communication, inspired by dial\u2011up\
-  \ but built with modern signal processing. Aimed at developers and researchers exploring\
-  \ acoustic data links, it features configurable frequency maps, Manchester-encoded\
-  \ clocks, adaptive error correction, and spectrogram-based decoding tools."
+subtitle: "Audio-based data transmission protocol that turns files and messages into\
+  \ structured tone sequences, inspired by dial\u2011up but built for modern devices.\
+  \ Aimed at developers and researchers exploring acoustic modems, offline communication,\
+  \ or playful data-over-sound channels. Technically, it features layered modulation,\
+  \ Manchester-clocked multi-tone encoding, adaptive error correction, and spectrogram-driven\
+  \ decoding tools in Python."
 slug: binaric
 date: '2025-02-24'
 updated: '2025-03-06'
@@ -19,192 +20,200 @@ heroImage: /generated/logos/binaric.png
 ---
 ## Overview
 
-Binaric (Binary INterfaced Audio Relay for Intelligent Communication) is an experimental audio modem and protocol stack implemented in Python. I built it to explore how to send structured digital data over plain audio in a way that is:
+Binaric (Binary INterfaced Audio Relay for Intelligent Communication) is an experimental audio modem and protocol stack that encodes digital data as audible tones. Inspired by dial‑up modems, I use modern signal processing techniques, layered protocol design, and adaptive configuration to transmit files and structured messages over ordinary audio channels (e.g., speakers/microphones, recorded WAV files).
 
-- Robust to noise
-- Adaptively tuned to the channel
-- Modular and inspectable
-- Audibly distinctive and fun to listen to
-
-The project includes both a first-generation prototype (“binaric v1”) and a second pass (“binaric2”) focused on cleaner abstractions, real‑time buffering, and better tooling (spectrogram visualization and configuration‑driven modulation).
+The project explores how far I can push data integrity, framing, and negotiation in a noisy, low‑bandwidth environment, while also making the handshake and transfer audibly distinctive and “musical”.
 
 ## Role & Context
 
-I was solely responsible for:
+I designed and implemented Binaric end‑to‑end:
 
-- Designing the protocol (layers, framing, modulation, negotiation)
-- Implementing the encoder/decoder, error handling, and helper utilities
-- Building spectrogram and debugging tools
-- Iterating on a second architecture with clearer separation of concerns
+- Defined the protocol, frame formats, and layered architecture.
+- Built the encoding/decoding pipeline from data to tones and back.
+- Implemented helper utilities for configuration, logging, analysis, and visualization.
+- Iterated through two major versions (`binaric v1` and `binaric2`) to refine the modulation model and tooling.
 
-I treated this as a playground for signal processing, protocol design, and tooling around offline and near‑real‑time audio transmission.
+This is a personal R&D project focused on systems thinking, DSP, and protocol design, not a production modem. It’s structured so I can extend it toward ML‑assisted decoding and adaptive channel estimation later.
 
 ## Tech Stack
 
 - Python
 - NumPy
-- SciPy (spectrogram, signal processing)
-- Librosa (audio loading and analysis)
-- Matplotlib (visualization & interactive spectrograms)
-- Wave (WAV file I/O)
-- JSON (frequency and protocol configuration)
-- Command‑line tooling / small scripts
+- SciPy
+- librosa
+- Matplotlib
+- Wave / standard library audio I/O
+- JSON for configuration and message formats
 
 ## Problem
 
-I wanted a way to reliably send structured data (files, messages) between devices using only audio, inspired by legacy dial‑up and modem tones, but with:
+Transmitting structured data over audio is straightforward in principle—map bits to tones—but difficult in practice:
 
-- Configurable modulation schemes and symbol sets
-- Explicit session and capability negotiation
-- Tunable trade‑offs between throughput and robustness
-- Good introspection: being able to “see” what’s happening in the signal
+- Audio channels are noisy, bandwidth‑limited, and highly variable across devices and environments.
+- Naive tone‑per‑bit schemes are fragile and don’t scale: they’re slow, easy to mis‑detect, and hard to evolve.
+- I wanted a protocol that:
+  - Negotiates capabilities (modulation density, modes, error‑correction profile).
+  - Structures transfers (headers, payload, footers) so files and metadata can be reconstructed.
+  - Provides enough tooling to debug what’s happening in the frequency and time domains.
 
-Existing projects tend to be either research prototypes, very specific formats, or black‑box libraries. I wanted something I fully understood, could reconfigure via JSON, and could evolve from offline WAV‑based experiments toward interactive use.
+Binaric is my attempt to build such a system from scratch and understand the trade‑offs.
 
 ## Approach / Architecture
 
-I organized Binaric as a layered protocol:
+I organized Binaric into a layered architecture, closely mirroring a network stack:
 
-- **Physical layer**  
-  Converts bits / symbols to audio and back. Uses multi‑tone schemes (parallel sine waves per symbol), a configurable clock, and Manchester‑encoded timing where appropriate.
+- **Physical Layer**
+  - Converts bitstreams into audio tones and back.
+  - Uses frequency sets for clock, header, content, and footer bands.
+  - Supports multi‑tone symbols where each symbol encodes multiple bits by toggling specific frequencies.
 
-- **Data link layer**  
-  Frames packets, applies CRC, and implements ARQ‑style retransmission hooks. Focuses on integrity, symbol grouping, and base‑N conversions for denser encodings.
+- **Data Link Layer**
+  - Frames data, manages packetization, and annotates packets with checksums/CRCs.
+  - Provides basic ARQ‑style semantics (detect errors and retry or discard).
 
-- **Session layer**  
-  Handles preambles, capability exchange (supported modulation, error correction, bitrate ranges), and basic collision avoidance. This is where the audio “handshake” lives.
+- **Session Layer**
+  - Handles preamble generation and handshake routines.
+  - Negotiates modulation mode (e.g., “stable” vs “dense”), symbol timing, and error‑correction level.
+  - Manages session headers, collision prevention, and heartbeats.
 
-- **Optional transport/file layer**  
-  Segments and reassembles files, wraps content with headers/footers, and defines a portable “binaric file” representation.
+- **Optional Transport Layer**
+  - Segments and reassembles larger files.
+  - Provides a place for future encryption / higher‑level semantics.
 
-Implementation‑wise:
+I versioned the implementation in two trees:
 
-- **binaric v1** is a more exploratory codebase with standalone scripts:
-  - `binaric_to_audio.py` / `audio_to_binaric.py` for encoding/decoding
-  - Spectrogram and decode helpers for inspecting the signal
-  - Data and header converters to/from custom representations
+- **`binaric v1`**: First full pipeline with Manchester‑encoded clock, multi‑band modulation, and more exploratory decoding scripts.
+- **`binaric2`**: A cleaner, more modular core, with reusable audio primitives (`AudioBuffer`, `AudioHelper`), frequency configuration via JSON, and scripts focused on content generation and visualization.
 
-- **binaric2** refactors key ideas into:
-  - Reusable classes like `AudioBuffer` and `AudioHelper`
-  - A JSON‑driven frequency configuration (`freq_config.json`)
-  - Transmission scripts that work in terms of bitsets and frequency sets
-
-This split let me experiment freely in v1 and then “harden” the patterns that worked into cleaner abstractions in v2.
+Configuration (frequency bands, modes, timing) is externalized as JSON so I can quickly tune and compare different modulation schemes without rewriting core logic.
 
 ## Key Features
 
-- Configurable multi‑tone modulation with JSON‑defined frequency bands and modes
-- Manchester‑encoded clocking and timing grid reconstruction from the spectrogram
-- Session preamble, fingerprint tones, and capability negotiation hooks
-- Header/footer encoding for file metadata and framing
-- Packet fragmentation/reassembly with checksums and CRC‑based integrity checks
-- Interactive spectrogram tooling with overlays for clock and content bands
-- Utility classes for buffer‑based audio generation, manipulation, and I/O
+- Layered, modular protocol for audio‑based data transmission.
+- Manchester‑encoded clock channel for robust symbol timing.
+- Multi‑tone symbol encoding using configurable frequency bands and density modes.
+- File‑oriented framing: JSON headers, content, and footer with metadata and size information.
+- Pluggable error‑detection and correction utilities (CRC, ARQ pattern).
+- Rich spectrogram visualization tools with overlays for clock and data bands.
+- Reusable audio utilities (`AudioBuffer`, `AudioHelper`) for generating, buffering, and saving WAV data.
 
 ## Technical Details
 
-### Frequency and Mode Configuration
+### Frequency Configuration & Modes
 
-In `binaric v1`, I use several frequency band presets (`freq_bands_lite.json`, `freq_bands_stable.json`, `freq_bands_max.json`) that define:
+I define frequency plans in JSON, with separate bands for:
 
-- `clock`: two frequencies for Manchester clock encoding
-- `modes`: mode selection tones
-- `header`, `content`, `footer`: sets of discrete carrier frequencies for multi‑tone symbols
+- `clock`: typically a low pair of tones (e.g., `[250, 450] Hz`) used for Manchester‑encoded timing.
+- `modes`: tones indicating which modulation/profile is in use.
+- `header`, `content`, `footer`: distinct frequency sets to visually and algorithmically separate protocol phases.
 
-In `binaric2/config/freq_config.json`, I consolidated this into:
+Multiple presets (`freq_bands_lite`, `freq_bands_stable`, `freq_bands_max` and `binaric2/config/freq_config.json`) let me trade off density vs robustness. In `binaric2`, I group these under modes like `stable`, `standard`, and `dense`, each defining:
 
-- A `framework` section:
-  - `basis_freq`: core frequencies used across modes
-  - `clock`: clock tone pair
-  - `init_sequence` / `end_sequence`: symbolic sequences for session start/stop
-  - `clock_frequency`: logical symbol rate in Hz
-- A `modes` section with named modes (`stable`, `standard`, `dense`), each defining:
-  - `fingerprint_freq`: recognizable audio “signature” for that mode
-  - `content`: the set of content carrier frequencies for that mode
+- A small “fingerprint” frequency set to identify the mode.
+- A `content` frequency set governing how many bits per symbol I can pack.
 
-This config is consumed by multiple scripts so that modulation, decoding, and visualization stay in sync.
+### Encoding Pipeline
 
-### Encoding: Bits to Audio
+In v1, the `binaric_to_audio.py` and related scripts follow a consistent pattern:
 
-Across both versions, the core pattern is:
+1. **Data → Bits**
+   - Strings or bytes are converted to a bitstring (`string_to_bits`, `bytes_to_bits`).
+   - For higher‑radix experiments, I also convert bytes to arbitrary bases (`int_to_base`) and then map “digits” to tones.
 
-1. **Convert data to bits**  
-   - Text: `string_to_bits` / `string_to_bitset` (8 bits per character).
-   - Integers and structured content: base‑N converters (`int_to_base`, `RawData`) to take advantage of high‑arity symbol alphabets.
+2. **Clock Channel**
+   - A Manchester encoder (`manchester_encode`) maps each logical clock bit into a 2‑bit pattern (“0”→“10”, “1”→“01”).
+   - `generate_manchester_clock_wave` then builds a waveform by assigning one of two frequencies per Manchester sub‑bit, ensuring a clear alternating structure for timing recovery.
 
-2. **Group bits into symbols**  
-   - In v1: `encode_segment_from_bits` uses `len(freqs)` as bits‑per‑symbol; each symbol is a bitstring over that many frequencies.
-   - In v2: `string_to_bitset(text, chunk_length)` converts to nested lists of bits, each list representing a symbol.
+3. **Symbol Generation**
+   - Given a group of bits and a list of content frequencies, `generate_symbol_wave` creates a symbol:
+     - Each position in the symbol corresponds to a specific frequency.
+     - If the bit is `1`, that frequency is added as a sine wave; if `0`, it’s omitted.
+   - `encode_segment_from_bits` splits the bitstring into groups of length `len(freqs)` and concatenates the generated symbols.
 
-3. **Map symbols to tones**  
-   For a given symbol:
-   - For each bit and matching frequency, if bit == 1, add that sine wave; else silence.
-   - Normalize by the number of active tones to avoid clipping.
+4. **Framing**
+   - Headers and footers are encoded using distinct frequency bands to visually separate them in the spectrogram.
+   - For file transfers, I serialize a `BinaricHeader` object to JSON, encode it to bytes, then to digits in a chosen base; the same process is mirrored at decode time.
 
-   Example in `binaric2/scripts/transmit.py`:
+5. **WAV Output**
+   - Segments (clock + header + content + footer) are combined and written as 16‑bit PCM WAV files.
 
-   - Precompute one‑segment sine waves per frequency using `AudioHelper.create_sine_wave`.
-   - Scale each tone to `[-1, 1]` float.
-   - For each bitset, sum active waves and normalize, then concatenate across symbols.
+In `binaric2/scripts/transmit.py`, I simplified content generation:
 
-4. **Clock signal**  
-   In v1, I generate a dedicated Manchester‑encoded clock:
+- `string_to_bitset` converts text into an array of bit chunks.
+- For each chunk, `build_content_sequence_from_bits`:
+  - Generates one segment of duration `1 / clock_frequency`.
+  - Pre‑generates tone segments for each frequency.
+  - Sums active tones where the bit is `1`, normalizing by active count to avoid clipping.
+  - Returns a float32 waveform in `[-1, 1]` for further processing and saving.
 
-   - A repeating bit pattern is Manchester‑encoded (`"0" -> "10"`, `"1" -> "01"`).
-   - Each encoded bit maps to one of the two `clock` frequencies.
-   - Tones are concatenated into a continuous clock waveform for the duration of the payload.
+### Decoding Pipeline
 
-   This clock is mixed with the data segment so the receiver can reconstruct timing edges from the spectrogram.
+Decoding focuses on robust timing and frequency extraction:
 
-5. **WAV output / buffering**  
-   - v1: write raw NumPy arrays to WAV using `wave`.
-   - v2: use `AudioBuffer` to accumulate streaming data, support chunked reads (`get_latest_chunk`), and save/load WAVs as needed.
+1. **Spectrogram Computation**
+   - I use `scipy.signal.spectrogram` to compute `Sxx` (power), `f` (frequencies), and `t` (time bins).
+   - Spectrograms are log‑scaled and normalized to enhance contrast.
 
-### Decoding: Audio to Bits
+2. **Clock Edge Detection**
+   - I identify the indices of the clock frequencies, average their power over time, and normalize the signal.
+   - I compute the gradient of this power series; peaks in the gradient correspond to rising edges in the Manchester‑encoded clock.
+   - `find_peaks` (SciPy) recovers these transitions; in some variants I interpolate falling edges to produce a complete timing grid.
+   - The result is a list of transition times that define symbol boundaries.
 
-Decoding reverses the process and relies heavily on spectrogram analysis:
+3. **Bit Extraction**
+   - Around each transition window, I inspect the power at each content frequency.
+   - Comparing power against thresholds lets me reconstruct which frequencies were “on”, turning them back into bits.
+   - `bits_to_string` and `bits_to_bytes` then reconstruct the original payload.
 
-1. **Load audio & compute spectrogram**  
-   - With `librosa.load` and SciPy’s `spectrogram`.
-   - Use relatively large `nperseg` and tuned `noverlap` for good frequency resolution at the targeted data rate (e.g., `FFTSIZE = 2048`, `HOP_LEN = 1500`).
+4. **Header / Footer Parsing**
+   - For file transfers, I decode the header band first:
+     - Rebuild the digit sequence based on the chosen base.
+     - Convert digits back to bytes (`base_to_int`) and parse the JSON header (`BinaricHeader.from_raw`).
+   - This provides content length, type, and any metadata needed to interpret the remaining stream.
 
-2. **Detect clock transitions**  
-   Example: `detect_clock_edges` in `decode_binaric.py` / `audio_to_binaric.py`:
+### Helper Modules & Utilities
 
-   - Extract the power over the two `clock` frequencies across time.
-   - Normalize and compute the gradient, then use `scipy.signal.find_peaks` to detect rising edges.
-   - Optionally interpolate falling edges between detected peaks to reconstruct the full edge grid.
-   - Convert peak indices back to actual times.
+- **`audio_processing.py` (v1)**
+  - Handles recording/reading audio, noise filtering, and frequency extraction.
+  - Serves as the bridge between live microphone input and offline WAV processing.
 
-   These transition times define sampling points for symbol decisions.
+- **`AudioHelper` and `AudioBuffer` (v2)**
+  - `AudioHelper` provides reusable primitives for generating sine/square waves and white noise, mixing waveforms, and normalizing/clipping.
+  - `AudioBuffer` manages streaming audio data in memory, supports appending chunks, slicing recent samples, and saving/loading WAV files.
 
-3. **Sample content bands**  
-   - For each transition window, look at the spectrogram bins around each content frequency.
-   - Decide whether each frequency was “on” or “off” (presence/absence or thresholding on magnitude).
-   - This yields a bitset per symbol, which is flattened into a bitstring.
+- **`packet_manager.py`**
+  - Handles fragmentation/reassembly of files into packets, adding sequence numbers and integrity metadata.
 
-4. **Reassemble payload**  
-   - Join bits, then map:
-     - To bytes and strings (`bits_to_string`, `bits_to_bytes`).
-     - Back from base‑N digits to integers or structured content (using `base_to_int` and the `RawData` abstraction).
-   - Rebuild headers/footers and content from `BinaricHeader` and `RawData`.
+- **`error_correction.py`**
+  - Provides CRC generation and verification, allowing trade‑offs between overhead and robustness.
 
-Debug functions can optionally plot the gradient, detected peaks, and overlay them on the spectrogram so I can visually confirm that my timing grid lines up with the tones.
+- **Visualization**
+  - `binaric v1/core/spectogram.py` and `binaric2/scripts/spectogram.py`:
+    - Plot spectrograms with overlaid frequency bands for clock/header/content/footer.
+    - Add predicted bit timing lines (based on configured data rate).
+    - Provide interactive controls (sliders, checkboxes) to toggle overlays and adjust power thresholds.
+  - These tools were critical to tuning frequency choices and symbol timing.
 
-### Framing, Headers, and File Transfer
+## Results
 
-In v1’s `binaric_data.py` and related scripts:
+- Implemented a working end‑to‑end audio transmission pipeline that:
+  - Encodes arbitrary text and structured file metadata into WAV files using multi‑tone symbols and a dedicated clock channel.
+  - Recovers timing and reconstructs payloads from spectrograms in controlled environments.
+- Built a flexible configuration system to experiment with:
+  - Different frequency allocations and symbol densities.
+  - Multiple operational modes tuned for stability vs throughput.
+- Developed reusable audio utilities and visualization tools that I can apply to other DSP or protocol experiments.
+- Identified clear bottlenecks (e.g., decoding robustness in high noise, real‑time performance) and paved the way for ML‑assisted demodulation and adaptive filters.
 
-- `BinaricHeader` encapsulates:
-  - `file_name`, `file_size`, `file_type`
-  - `content_base` (base used for the main payload)
-  - Arbitrary `metadata`
+## Lessons Learned
 
-Encoding:
+- **Clock design is crucial.** A reliable timing signal (Manchester‑encoded clock) dramatically simplifies decoding; without it, symbol recovery quickly degrades.
+- **Visualization accelerates protocol work.** High‑resolution spectrograms with overlays made it easy to debug framing issues and see where signals were colliding or too close.
+- **Config‑driven design pays off.** Keeping all frequency and mode definitions in JSON allowed me to iterate on modulation schemes without rewriting DSP code.
+- **Multi‑tone encoding has non‑obvious trade‑offs.** Packing more bits per symbol via additional frequencies increases throughput but complicates decoding and raises sensitivity to noise and device response curves.
+- **Modularity enables experimentation.** Separating physical, link, and session concerns, plus isolating helpers, made it straightforward to evolve from v1 to v2 without breaking everything.
 
-- Serialize header as JSON, UTF‑8 encode, then convert each byte into digits in a chosen base using `int_to_base`.
-- Wrap this in a `RawData` object (`base`, `data[]`), which is then mapped to symbols and tones.
+## Links
 
-For file transfer:
-
-- `packet_manager
+- [GitHub Repository](https://github.com/IsaiahJMurray/Binaric)
+- Demo / audio samples: _TBD_

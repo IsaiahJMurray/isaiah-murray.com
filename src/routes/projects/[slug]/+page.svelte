@@ -13,7 +13,7 @@
   const displayDate = metadata.updated || metadata.date || null;
   const accent = metadata.accent || '#7bdcff';
 </script>
-
+<div class = "nav spacer"></div>
 <article class="project-page" style={`--accent:${accent}`}>
   <a href="/projects" class="back-link">← Back to projects</a>
 
@@ -61,10 +61,14 @@
 </article>
 
 <style>
+  .nav.spacer {
+    height: 3.25em;
+  }
   .project-page {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    margin: 2em;
   }
 
   .back-link {

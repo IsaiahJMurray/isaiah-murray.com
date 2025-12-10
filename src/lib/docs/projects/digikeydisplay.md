@@ -1,8 +1,9 @@
 ---
 title: Digikeydisplay
-subtitle: Treemap visualizer that turns DigiKey cart CSVs into a quick, glanceable
-  cost breakdown of your components. Built with Python, pandas, matplotlib, and squarify
-  to help electronics designers see which parts dominate their BOM spend.
+subtitle: A tiny Python tool that turns DigiKey cart CSVs into a treemap so you can
+  instantly see where your budget is going. Ideal for hardware engineers and hobbyists
+  optimizing BOM costs, it uses pandas, matplotlib, and squarify to visualize line-item
+  spend by description.
 slug: digikeydisplay
 date: '2024-09-27'
 updated: '2024-09-27'
@@ -16,77 +17,85 @@ heroImage: /generated/logos/digikeydisplay.png
 ---
 ## Overview
 
-DigikeyDisplay is a tiny utility I built to quickly visualize the cost distribution of components in a DigiKey cart. It reads a DigiKey-exported `.csv` cart file and renders a treemap using matplotlib and squarify, making it immediately obvious which parts dominate the total spend.
+DigikeyDisplay is a tiny, single-purpose tool I built to visualize DigiKey shopping cart exports as a treemap. Given a DigiKey cart `.csv` file, the script parses each line item and produces a matplotlib treemap where the area of each rectangle represents the total cost of that item (unit price × quantity). This makes it easy to see at a glance which components dominate the overall BOM cost.
 
 ## Role & Context
 
-I created this project as a small, focused tool to support electronics work, where I often wanted a fast visual sense of where money was going in a bill of materials. Existing workflows required manual inspection of line items; I wanted a one-command visualization that I could run locally on any exported DigiKey cart.
+I built this project as a personal utility while preparing a bill of materials for electronics work. DigiKey’s cart interface is great for managing parts, but it doesn’t make it obvious which line items are driving cost. I wanted a quick, disposable script that I could point at a cart export and immediately get a visual breakdown of spending.
 
-I acted as the sole developer, handling everything from CSV parsing to data aggregation and visualization.
+I acted as the sole developer, handling everything from CSV parsing and data transformation to visualization and basic usability decisions (e.g., labels, layout, and figure sizing).
 
 ## Tech Stack
 
 - Python
 - pandas
 - matplotlib
-- squarify
+- squarify (treemap layout library)
 
 ## Problem
 
-When working on electronics projects, I regularly export DigiKey carts to CSV to review parts and prices. However, scanning through line items in a spreadsheet makes it hard to:
+When working with a DigiKey cart that contains dozens or hundreds of line items, it’s hard to answer questions like:
 
-- See which components contribute most to the total cost
-- Spot expensive outliers quickly
-- Communicate cost structure to collaborators at a glance
+- Which parts account for most of the cost?
+- Are there any surprisingly expensive items hiding in the list?
+- How does cost distribute across the cart at a glance?
 
-I needed a lightweight, scriptable visualization that could transform a DigiKey cart CSV into a clear cost breakdown without any additional tooling or setup overhead.
+DigiKey’s native tools are text- and table-based, which makes it tedious to gain this kind of high-level insight. I needed a way to transform a raw `.csv` export into a visual summary in seconds, without setting up a full analytics stack.
 
 ## Approach / Architecture
 
-I took a minimal, script-first approach:
+I chose the simplest possible architecture: a single Python script that reads a CSV, computes item totals, and passes them into a treemap layout.
 
-1. Use `pandas` to read the DigiKey cart CSV and extract the relevant columns: description, unit price, and quantity.
-2. Compute total line-item cost as `unit_price * quantity` for each row.
-3. Feed the resulting series of costs and labels (descriptions) into `squarify` to build a treemap.
-4. Render the treemap via `matplotlib`, apply a simple title, and hide axes for a cleaner presentation.
+1. **Input**: A DigiKey cart exported as a CSV file.
+2. **Processing**:
+   - Load the CSV into a pandas DataFrame.
+   - Extract each line’s description.
+   - Compute total cost per line as `Unit Price * Quantity`.
+3. **Visualization**:
+   - Use `squarify` to generate a treemap based on the per-line total costs.
+   - Render the result with matplotlib, labeling each rectangle with its description.
+4. **Output**:
+   - A fullscreen treemap plot that quickly reveals cost distribution across the cart.
 
-The entire workflow is contained in a single `main.py` script, making it easy to adapt or extend for other BOM or cart formats.
+There is intentionally no additional infrastructure: no CLI framework, no configuration files, and no external dependencies beyond the plotting and data libraries. The goal is fast time-to-insight with minimal friction.
 
 ## Key Features
 
-- Visual treemap of DigiKey cart costs
-- Automatic cost calculation (`Unit Price * Quantity`) per line item
-- Uses part descriptions directly as treemap labels
-- Simple, single-file implementation easy to customize
-- CSV files ignored via `.gitignore` to keep carts out of version control
+- Visual treemap of DigiKey cart items sized by total cost.
+- Automatic calculation of line-item totals from unit price and quantity.
+- Direct use of item descriptions as labels for quick identification.
+- Simple, single-file script that’s easy to run and modify.
+- Sensible default figure size for readable, presentation-ready plots.
 
 ## Technical Details
 
-The core logic lives in `main.py` and follows this sequence:
+The core logic lives in `main.py` and is organized procedurally for clarity:
 
-- **Data loading**  
-  I read the DigiKey cart file with:
+- **CSV ingestion**
 
   ```python
+  import pandas as pd
+
   df = pd.read_csv('2024-09-16T091030.csv')
   ```
 
-  This assumes the CSV has at least the columns `Description`, `Unit Price`, and `Quantity`, which are standard in DigiKey exports.
+  The script expects a standard DigiKey cart export and relies on specific column names like `Description`, `Unit Price`, and `Quantity`.
 
-- **Data extraction and transformation**  
-  I map the CSV columns into variables for clarity:
+- **Cost computation**
 
   ```python
   items = df['Description']
   prices = df['Unit Price'] * df['Quantity']
   ```
 
-  `prices` becomes the list of rectangle sizes in the treemap, representing the total spend per line item.
+  `prices` is a numeric sequence representing the total spend per line item. This becomes the `sizes` parameter for the treemap.
 
-- **Treemap generation**  
-  I set up the figure and invoke `squarify`:
+- **Treemap generation**
 
   ```python
+  import matplotlib.pyplot as plt
+  import squarify
+
   plt.figure(figsize=(12, 8))
   squarify.plot(sizes=prices, label=items, alpha=.8)
   plt.title('Digikey Cart Treemap')
@@ -94,32 +103,26 @@ The core logic lives in `main.py` and follows this sequence:
   plt.show()
   ```
 
-  - `sizes=prices` controls the relative area of each rectangle.
-  - `label=items` uses each item description as the label.
-  - `alpha=.8` gives a slightly transparent fill for visual softness.
-  - `axis('off')` removes chart clutter and focuses attention on the treemap itself.
+  - `squarify.plot` handles the rectangle layout so that larger totals get proportionally larger areas.
+  - `alpha` provides slight transparency to help with overlapping labels and visual comfort.
+  - The axis is hidden to keep the focus on the treemap itself.
 
-- **Repository hygiene**  
-  I added a `.gitignore` that excludes `.csv` files and `.venv/` so that:
-
-  - Personal or sensitive cart data doesn’t enter version control.
-  - Local virtual environment artifacts remain untracked.
-
-This design keeps the project trivial to understand while still being useful and easy to adapt (e.g., changing the filename, color maps, or label formatting).
+The `.gitignore` excludes virtual environments and CSVs to keep the repository focused on code rather than local data.
 
 ## Results
 
-- I can now inspect a DigiKey cart’s cost distribution visually in seconds.
-- High-cost components and outliers are immediately obvious, which helps guide part substitutions or design changes.
-- The script serves as a minimal, clear example of using `pandas` + `matplotlib` + `squarify` for quick one-off data visualizations.
+- I can now export any DigiKey cart and get a visual breakdown of cost distribution in a few seconds.
+- The treemap immediately highlights a small number of high-cost items that dominate total spend, which is much less obvious from a raw table.
+- The simplicity of the script makes it easy to adapt—for example, to group items by category or manufacturer in future iterations.
 
 ## Lessons Learned
 
-- Even very small scripts can significantly improve everyday workflows when they target a specific pain point.
-- Treemaps are effective for communicating relative cost contribution without requiring much configuration or UI.
-- Keeping the implementation minimal encourages future reuse; this script can easily evolve into a more general BOM visualization tool by parameterizing the CSV path or wrapping it in a CLI.
+- Even a very small amount of code can dramatically improve usability over a raw CSV, especially when paired with the right visualization.
+- Libraries like `squarify` make it trivial to experiment with nonstandard visualizations (like treemaps) without writing layout algorithms from scratch.
+- Enforcing consistent column naming and file formats is important; real-world CSV exports can change structure, so future enhancements should include simple validation and error handling.
+- Keeping the script minimal encourages experimentation—I’m more likely to extend or repurpose it because there’s almost no complexity overhead.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/DigikeyDisplay)
-- Demo: _TBD_
+- [Live Demo](#)

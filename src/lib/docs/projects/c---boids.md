@@ -1,9 +1,9 @@
 ---
 title: C Boids
-subtitle: A C++ flocking simulation that visualizes 1,000 boids navigating around
-  rectangular obstacles in real time using SFML. Built for graphics and simulation
-  enthusiasts, it explores separation, alignment, cohesion, and prediction-based collision
-  avoidance with tunable parameters for emergent behavior.
+subtitle: High-performance Boids flocking simulation in C++ and SFML, rendering 1,000
+  agents navigating a 2D space with wrap-around boundaries. Designed for graphics
+  and game dev enthusiasts exploring emergent behavior, it adds obstacle-aware steering,
+  leader boids, and tunable separation/alignment/cohesion radii and coefficients.
 slug: c---boids
 date: '2025-05-19'
 updated: '2025-05-19'
@@ -16,147 +16,138 @@ heroImage: /generated/logos/c---boids.png
 ---
 ## Overview
 
-This project is a C++ implementation of Craig Reynolds’ Boids algorithm, visualized in real time using SFML. I simulate a flock of agents (boids) that follow simple local rules—separation, alignment, and cohesion—while also navigating around rectangular obstacles in a 2D environment. The goal was to explore emergent behavior, performance considerations with many agents, and low-level control of a graphical simulation.
+This project is a real-time Boids simulation written in C++ using SFML for rendering. I implemented a classic flocking model—separation, alignment, and cohesion—extended with basic obstacle avoidance and leader behavior. The simulation runs with up to 1000 boids moving within a 2D world, wrapping around the screen while interacting with rectangular obstacles.
 
 ## Role & Context
 
 I built this project independently as a way to deepen my understanding of:
 
-- Steering behaviors and emergent systems
-- Basic physics-style motion in 2D
-- Real-time rendering loops with SFML in C++
-- Managing performance with hundreds to thousands of objects on screen
+- Steering behaviors and emergent flocking
+- Basic real-time simulation constraints in C++
+- Practical use of SFML for 2D graphics and input
 
-All architecture, implementation, and tuning of parameters were done by me.
+It started as an experiment to see how far I could push a straightforward, single-file implementation before needing more advanced optimization or architectural patterns.
 
 ## Tech Stack
 
 - C++
 - SFML (Simple and Fast Multimedia Library)
-- Standard Library (`<vector>`, `<ctime>`, `<cmath>`, etc.)
 
 ## Problem
 
-I wanted to create a visually interesting, interactive simulation that:
+I wanted to simulate flocking behavior in a way that feels natural and visually engaging, while also incorporating:
 
-- Demonstrates flocking behavior using local rules
-- Scales to ~1000 boids without stuttering on a typical desktop
-- Handles world boundaries and obstacle avoidance
-- Gives me a hands-on playground for tuning steering parameters
+- A large number of agents (up to 1000 boids) moving in real time
+- Rectangular obstacles that boids must avoid or bounce off
+- A simple way to designate and treat “leader” boids differently
+- Basic performance and stability safeguards (speed limiting, world wrapping)
 
-The challenge was to keep the code relatively simple while still achieving natural-looking behavior and acceptable performance.
+The challenge was to do this with clear, understandable code rather than heavily optimized or over-engineered architecture.
 
 ## Approach / Architecture
 
-I implemented the simulation around two core structs:
+I took a minimal, data-oriented approach:
 
-- `Boid` – represents a single agent with position, velocity, and flocking logic.
-- `Rectangle` – represents static rectangular obstacles and their basic spatial logic.
+- Represent boids and obstacles as lightweight `struct`s with just the state needed for simulation and rendering.
+- Keep the core simulation loop straightforward: update positions, enforce physics constraints, then render.
+- Use compile-time `#define` constants to quickly tune simulation parameters (e.g., radii, coefficients, speeds) without changing logic.
+- Implement obstacle interaction directly inside the boid update step to avoid complex spatial structures, given the modest obstacle count.
 
-The main loop:
-
-1. Processes events and keeps the SFML window open.
-2. Updates each boid’s position and velocity based on:
-   - Flocking rules
-   - Collision and obstacle avoidance
-   - World wrapping and speed clamping
-3. Renders all boids and obstacles each frame.
-
-Key design choices:
-
-- Use simple structs and vectors of pointers (`std::vector<Boid*>`, `std::vector<Rectangle*>`) to keep the implementation lightweight.
-- Use compile-time constants (`#define`) to tune flocking and environment parameters.
-- Implement a basic predictive collision check so boids can react to obstacles before direct impact.
+The architecture is intentionally flat and contained in a single file (`main.cpp`) to keep the focus on the flocking logic and steering rules.
 
 ## Key Features
 
-- Boid flocking behavior using separation, alignment, and cohesion rules
-- Support for up to 1000 boids (`NUM_BOIDS`) in real-time
-- Rectangular obstacles with collision response and basic avoidance
-- Toroidal world wrapping on all boundaries
-- Velocity clamping between minimum and maximum speeds
-- Leader boids that are exempt from drag and can influence flock direction
-- Simple, clear SFML rendering of agents and obstacles
+- Real-time 2D visualization of up to 1000 boids using SFML
+- Classic flocking rules: separation, alignment, and cohesion
+- Rectangular obstacles with collision response
+- World wrapping at screen boundaries
+- Speed clamping to keep boid motion stable and visually coherent
+- Leader flag on boids that alters drag behavior
 
 ## Technical Details
 
-The simulation is configured through a set of constants:
+### Core data structures
 
-- World and simulation:
-  - `WIDTH`, `HEIGHT` – window and world dimensions
-  - `NUM_BOIDS` – number of boids in the simulation
-  - `NUM_RECTS` – number of obstacles
-  - `DRAG` – velocity damping for non-leader boids
+- `struct Rectangle`
+  - Stores `x`, `y`, `width`, `height`.
+  - Methods:
+    - `bool intersects(Rectangle& other)` for basic AABB intersection.
+    - `void draw(sf::RenderWindow& window)` to render a filled black rectangle.
 
-- Flocking and neighborhood radii:
-  - `SEARCH_RADIUS` – general neighborhood distance
-  - `SEPERATION_RADIUS`, `ALIGNMENT_RADIUS`, `COHESION_RADIUS` – specific radii for each rule
-  - `SEPERATION_COEFFICIENT`, `ALIGNMENT_COEFFICIENT`, `COHESION_COEFFICIENT` – weights for combining the three steering forces
+- `struct Boid`
+  - Stores position (`x`, `y`) and velocity (`vx`, `vy`).
+  - `bool leader` to indicate whether this boid is a leader (affecting drag).
+  - `bool colliding(Rectangle* rect, float prediction_factor = 0)`:
+    - Predicts a future position by `pred_x = x + vx * prediction_factor`, `pred_y = y + vy * prediction_factor`.
+    - Checks whether that predicted point lies inside the rectangle bounds.
+  - `void update(std::vector<Boid*> input_boids, std::vector<Rectangle*> input_rectangles)`:
+    - Integrates position: `x += vx; y += vy;`
+    - Applies drag unless the boid is a leader.
+    - Wraps around when crossing world bounds (`WIDTH`, `HEIGHT`).
+    - Clamps speed to `Max_SPEED` by converting to polar coordinates (`atan2`, `cos`, `sin`).
+    - Iterates over rectangles and checks for collisions:
+      - If colliding, it determines which side of the rectangle was hit and:
+        - Repositions the boid to the rectangle edge.
+        - Inverts the appropriate velocity component (`vx` or `vy`), giving a bounce effect.
 
+### Simulation parameters
+
+Simulation constants are defined with `#define` for straightforward tuning:
+
+- Population and world:
+  - `NUM_BOIDS` (e.g., 1000)
+  - `WIDTH`, `HEIGHT` for window size
+  - `DRAG` factor controlling velocity decay for non-leader boids
+- Flocking behavior:
+  - `SEARCH_RADIUS`
+  - `SEPERATION_RADIUS`, `ALIGNMENT_RADIUS`, `COHESION_RADIUS`
+  - `SEPERATION_COEFFICIENT`, `ALIGNMENT_COEFFICIENT`, `COHESION_COEFFICIENT`
+- Obstacles:
+  - `NUM_RECTS`
+  - `OBSTACLE_COEEFFICIENT` (used to adjust response strength)
 - Motion constraints:
-  - `Max_SPEED`, `MIN_SPEED` – velocity clamping to keep motion stable
-  - `PREDICTION_FACTOR` – scales look-ahead distance for predictive collision checks
+  - `Max_SPEED`, `MIN_SPEED`
+  - `PREDICTION_FACTOR` for collision prediction (used by `colliding`)
 
-### Boid struct
+These constants allow quick iteration over the “feel” of the flocking without changing control flow.
 
-Each `Boid` tracks:
+### Update and collision logic
 
-- `float x, y;` – position
-- `float vx, vy;` – velocity
-- `bool leader;` – whether the boid is exempt from drag and can lead
+The update flow inside `Boid::update` is:
 
-Key methods:
+1. **Integrate** current velocity into position.
+2. **Apply drag**:
+   - If `leader == false`, scale `vx` and `vy` by `DRAG`.
+3. **World wrapping**:
+   - If `x < 0`, set `x = WIDTH`, and similarly for other edges.
+4. **Speed clamping**:
+   - If `sqrt(vx*vx + vy*vy) > Max_SPEED`, compute the movement angle and rescale `(vx, vy)` to `Max_SPEED`.
+5. **Rectangle collisions**:
+   - For each rectangle, call `colliding(rect, 0)`.
+   - On collision:
+     - Extract rectangle bounds.
+     - Determine if the boid is to the left, right, above, or below the rectangle.
+     - Snap `x` or `y` to the edge and invert the respective velocity component, creating a simple reflection.
 
-- `bool colliding(Rectangle* rect, float prediction_factor = 0)`  
-  Predicts a future position (`pred_x`, `pred_y`) based on current velocity and `prediction_factor`, then checks whether that point lies inside the rectangle’s bounds. This is used both for immediate and predictive collision checks.
-
-- `void update(std::vector<Boid*> input_boids, std::vector<Rectangle*> input_rectangles)`  
-  Handles per-frame updates:
-  - Integrate position: `x += vx; y += vy;`
-  - Apply drag to non-leaders: `vx *= DRAG; vy *= DRAG;`
-  - Wrap around if leaving the world:  
-    - If `x < 0` → `x = WIDTH`; if `x > WIDTH` → `x = 0`; similarly for `y`
-  - Clamp speed: if `sqrt(vx^2 + vy^2) > Max_SPEED`, recompute `(vx, vy)` from the velocity angle with magnitude `Max_SPEED`
-  - Loop over `input_rectangles`:
-    - If `colliding(rect, 0)` is true, adjust `x` or `y` to sit on the obstacle’s boundary and invert the corresponding velocity component (`vx` or `vy`) to create a bounce effect
-
-(The flocking forces—alignment, separation, and cohesion—are combined before or during the velocity update using the defined radii and coefficients; they are computed over neighboring boids within the respective radii.)
-
-### Rectangle struct
-
-The `Rectangle` struct represents axis-aligned obstacles:
-
-- `float x, y, width, height;`
-
-Methods:
-
-- `bool intersects(Rectangle& other)` – AABB intersection test between rectangles
-- `bool contains(Boid* boid)` – checks whether a boid lies inside the rectangle (declared, used in collision logic)
-- `void draw(sf::RenderWindow& window)` – builds an `sf::RectangleShape`, sets position, outline, and fill color, and draws it
-
-### Rendering
-
-Using SFML:
-
-- The main loop repeatedly clears the window, updates all boids, then:
-  - Draws each `Rectangle` via `Rectangle::draw`
-  - Draws boids as simple shapes (e.g., circles or triangles) at `(x, y)` with a color that may distinguish leaders
-- Finally, the window is displayed each frame to present smooth real-time animation.
+This logic combines straightforward kinematics with simple but effective collision handling sufficient for basic obstacle avoidance and visual clarity.
 
 ## Results
 
-- Achieved stable real-time rendering of ~1000 boids with obstacle avoidance on a typical desktop.
-- Produced visually coherent flocking behavior with clear separation, alignment, and cohesion.
-- Verified that basic predictive collision handling reduces boids getting “stuck” inside obstacles and produces more natural avoidance.
+- Achieved a visually coherent flocking simulation with up to 1000 boids in real time.
+- Demonstrated emergent behavior (group movement and clustering) from relatively simple local rules.
+- Verified stable performance and motion by:
+  - Enforcing speed limits.
+  - Using world wrapping to avoid boids getting “stuck” at boundaries.
+  - Keeping collision checks simple and predictable.
 
 ## Lessons Learned
 
-- Simple local rules can generate surprisingly complex emergent behavior, but require careful parameter tuning.
-- Even with a straightforward O(n²) neighborhood search, performance is acceptable at modest scales, but spatial partitioning (e.g., quadtrees or grids) would be necessary for larger flocks.
-- Using clear constants for radii and coefficients makes the system much easier to experiment with and debug.
-- SFML provides a good balance between low-level control and ease of use for real-time visualizations in C++.
+- Small, local rules (separation, alignment, cohesion) can create surprisingly complex global behavior.
+- Even in simple simulations, speed clamping and boundary handling are critical for visual stability.
+- Using compile-time constants is a fast way to iterate on simulation “feel,” but a configuration system would be more flexible for future extensions.
+- Representing entities as plain `struct`s keeps the mental model simple, which is helpful when focusing on behavior rather than architecture.
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/C---Boids)
-- Demo: _TBD_
+- [Live Demo](#) (placeholder)

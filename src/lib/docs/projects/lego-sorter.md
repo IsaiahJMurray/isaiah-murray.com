@@ -1,9 +1,9 @@
 ---
 title: Lego Sorter
-subtitle: Neural-network-powered classifier that identifies LEGO bricks from images
-  using configurable convolutional models. Built for students and ML tinkerers, it
-  provides a `train.py` CLI to train, benchmark, and log experiments on both handcrafted
-  and randomly generated TensorFlow architectures.
+subtitle: A configurable CNN-based image classifier that learns to distinguish between
+  different LEGO pieces from photos. Built for students and ML practitioners exploring
+  TensorFlow pipelines, it supports randomized architecture generation, automated
+  training/evaluation, and rich logging of run histories for comparative experiments.
 slug: lego-sorter
 date: '2024-04-13'
 updated: '2024-04-20'
@@ -19,87 +19,85 @@ heroImage: /generated/logos/lego-sorter.png
 ---
 ## Overview
 
-Lego-Sorter is an image classification project that uses convolutional neural networks to identify LEGO pieces from images. I built it as an exploratory project for Harvard Extension’s CSCI E-80 (CS50 AI), focusing on experimenting with CNN architectures, data pipelines, and model evaluation at scale.
+Lego-Sorter is an image-classification project that trains convolutional neural networks to recognize different LEGO brick types from photos. The goal of the project was to explore neural architecture design, automated model search, and experiment tracking in a constrained, real-world dataset, as part of a CSCI E-80 exploratory assignment.
 
-The core of the project is a flexible training script that can either use a baseline CNN architecture or automatically generate randomized TensorFlow models and benchmark their performance on a dataset of LEGO brick images.
+Rather than handcrafting a single CNN, I built a small framework that can generate, train, and evaluate many randomized TensorFlow models on a LEGO image dataset, and persist detailed results for later analysis.
 
 ## Role & Context
 
-I designed and implemented this project end-to-end:
+I owned this project end-to-end:
 
-- Set up the TensorFlow environment and project structure.
-- Built the image loading and preprocessing pipeline.
-- Implemented the training script with configurable hyperparameters and automated result capture.
-- Developed a random model generator to explore different CNN architectures.
-- Ran and analyzed many training runs to understand the trade-offs between model depth, regularization, and training time.
+- Collected and preprocessed LEGO brick images.
+- Designed the training pipeline and evaluation metric.
+- Implemented the model-randomization utility.
+- Built the experiment harness that runs, logs, and saves each training run.
 
-This was done in the context of an academic exploratory assignment where the goal was not just to “get a good model,” but to learn how different architectural choices affect performance.
+This was done as an exploratory assignment in Harvard’s CS50 AI (CSCI E-80), focused on gaining intuition about CNN behavior and hyperparameter sensitivity on a computer-vision task.
 
 ## Tech Stack
 
 - Python
 - TensorFlow / Keras
-- NumPy
-- Pandas
+- NumPy / Pandas
 - Matplotlib
-- OpenCV (in deprecated preprocessing pipeline)
-- Conda (for environment management)
+- scikit-learn
+- OpenCV
+- Pillow
+- Conda (environment management)
 
 ## Problem
 
-I wanted to answer two related questions:
+The core problem was: how can I design and compare different CNN architectures for LEGO brick classification without laboriously hand-tuning each configuration?
 
-1. How can I build a robust pipeline to train CNNs for LEGO piece classification from directory-based image datasets?
-2. Given the same dataset and training setup, how do different CNN architectures (depth, filter sizes, pooling, dropout, dense layers) impact classification accuracy, loss, and training efficiency?
+Specifically, I wanted to:
 
-The assignment provided the high-level task (image classification with CNNs), but left model design and experimentation up to me. I needed tooling that made it easy to:
+- Classify LEGO pieces into multiple classes from RGB images.
+- Explore how architectural choices (number of conv layers, filters, kernel sizes, pooling, dense layers, dropout) affect accuracy, training time, and generalization.
+- Automate experiment logging so runs are reproducible and comparable.
 
-- Load and split LEGO image data consistently.
-- Define and train many different CNNs with minimal manual code changes.
-- Systematically save and compare results across runs.
+The constraints were:
+
+- A relatively small, fixed image dataset.
+- GPU resources available but limited training time.
+- Need for a repeatable environment that others could set up (course requirement).
 
 ## Approach / Architecture
 
-I structured the project around a single, configurable training entry point and a supporting set of utilities:
+I split the project into three main pieces:
 
-- **Data loading & preprocessing**  
-  - Use `tf.keras.utils.image_dataset_from_directory` to load images directly from a directory structure where each subfolder corresponds to a LEGO class.
-  - Apply a fixed image size (180×180×3) defined in `constants.py`.
-  - Split into training and validation sets with a fixed validation split and seed for reproducibility.
-  - Use `.cache()`, `.shuffle()`, and `.prefetch(AUTOTUNE)` to optimize data input throughput.
+1. **Data pipeline**
+   - Use `tf.keras.utils.image_dataset_from_directory` to load images from a directory-structured dataset.
+   - Apply a train/validation split via `validation_split` and `subset`, with a fixed seed for reproducibility.
+   - Standardize input shape using global constants (`HEIGHT`, `WIDTH`, `DEPTH`) and leverage dataset caching, shuffling, and prefetching.
 
-- **Model architecture exploration**
-  - Implement `generate_random_model` in `model_randomization.py` to build random CNNs (1–5 conv layers, optional pooling, optional dropout, 1–3 dense layers).
-  - Keep the final dense layer size fixed (16 outputs) to match the dataset’s number of classes, using logits + SparseCategoricalCrossentropy.
+2. **Model search via randomization**
+   - Implement `generate_random_model` to programmatically build CNNs with randomized hyperparameters (number of conv layers, filters, kernel sizes, pooling, dense layers, dropout).
+   - Use a consistent input pipeline and loss function (sparse categorical cross-entropy with logits) so architectures are directly comparable.
 
-- **Training orchestration**
-  - Encapsulate training and logging in `run_training_and_save_all` within `train.py`.
-  - Compile models with Adam, track loss and accuracy, and evaluate on the validation set.
-  - Compute a custom “effectiveness” metric that combines loss, accuracy, and training duration.
+3. **Training and experiment tracking**
+   - Implement `run_training_and_save_all` to:
+     - Train a given model.
+     - Evaluate it on the validation set.
+     - Compute a custom “effectiveness” score combining loss, accuracy, and training duration.
+     - Persist model artifacts, weights, training curves, scalar metrics, and history CSVs into a timestamped run directory.
 
-- **Experiment tracking**
-  - Generate a unique run directory name including timestamp, epochs, loss, accuracy, and effectiveness.
-  - Save model artifacts (architecture, weights), training history (CSV), and summary statistics to disk for later analysis.
-
-Earlier, I experimented with a custom CSV- and OpenCV-based preprocessing pipeline (in `deprecated/`), but ultimately moved to the directory-based image loader to simplify and standardize the flow.
+This setup allowed me to repeatedly generate and train new architectures, then analyze runs offline to see which designs offered the best trade-offs.
 
 ## Key Features
 
-- Randomized CNN architecture generation for automated model exploration.
-- Reproducible training/validation split with configurable image size and batch size.
-- Optimized TensorFlow `tf.data` pipeline with caching, shuffling, and prefetching.
-- Central `train.py` script with CLI options for epochs, batch size, data directory, run naming, and verbosity.
-- Automatic per-run result directories containing:
-  - Model files and weights
-  - Training history (loss/accuracy curves)
-  - Final loss, accuracy, and custom effectiveness score
-- Support for both “baseline” and “random” models to compare hand-designed vs. auto-generated architectures.
+- Random CNN architecture generator for LEGO image classification.
+- Reproducible data loading with standardized image dimensions and validation split.
+- Custom effectiveness metric combining accuracy, loss, and training time.
+- Automated run directory creation with embedded hyperparameter/metric metadata in the path.
+- Persisted model artifacts (full model + weights) for later reuse or analysis.
+- Training history export to CSV for plotting and offline comparison.
+- Conda environment definition to make the entire stack reproducible on other machines.
 
 ## Technical Details
 
 ### Data pipeline
 
-I defined constants in `constants.py`:
+I centralized image dimensions and validation split in `constants.py`:
 
 ```python
 HEIGHT = 180
@@ -108,7 +106,7 @@ DEPTH = 3
 VALIDATION_SPLIT = 0.2
 ```
 
-In `train.py`, I used these to create TensorFlow datasets:
+In `train.py`, I used `image_dataset_from_directory` to build datasets directly from a folder hierarchy:
 
 ```python
 training_data = tf.keras.utils.image_dataset_from_directory(
@@ -117,7 +115,7 @@ training_data = tf.keras.utils.image_dataset_from_directory(
     subset="training",
     seed=123,
     image_size=(HEIGHT, WIDTH),
-    batch_size=batch_size,
+    batch_size=batch_size
 )
 
 validation_data = tf.keras.utils.image_dataset_from_directory(
@@ -126,64 +124,81 @@ validation_data = tf.keras.utils.image_dataset_from_directory(
     subset="validation",
     seed=123,
     image_size=(HEIGHT, WIDTH),
-    batch_size=batch_size,
+    batch_size=batch_size
 )
 ```
 
-To improve throughput and stability during training:
+To keep the GPU busy and avoid I/O bottlenecks, I applied:
 
 ```python
 AUTOTUNE = tf.data.AUTOTUNE
-
 training_data = training_data.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 validation_data = validation_data.cache().prefetch(buffer_size=AUTOTUNE)
 ```
 
-### Random model generator
+Earlier in the project (now in `deprecated/`), I had a more manual pipeline using CSV-based file lists, `tf.data.Dataset.from_tensor_slices`, and `tf.py_function` to load and preprocess images. I moved away from that after the image-directory API proved cleaner and less error-prone.
 
-The `generate_random_model` function builds a Keras `Sequential` model with randomized structure:
+### Model randomization
 
-- Initial `Rescaling(1./255)` layer for normalization.
-- A random number of convolutional blocks (1–5), each with:
-  - Filters as powers of two: `filters = 2 ** random.randint(0, 7)` (1–128).
-  - Kernel size randomly chosen from `[3, 5]`.
-  - Padding randomly chosen from `['same', 'valid']`.
-  - Optional `MaxPooling2D` with `pool_size` of 2 or 3, added with 50% probability.
-- Flatten layer.
-- Optional `Dropout` (up to 0.5 rate), added with 50% probability.
-- 1–3 dense layers with 64, 128, or 256 units each and ReLU activation.
-- Final dense layer with 16 outputs (logits over 16 LEGO classes).
+The heart of the architecture exploration lives in `model_randomization.py`:
 
-This allowed me to quickly generate a diverse set of CNN architectures and compare their outcomes using the same dataset and training procedure.
+```python
+def generate_random_model(input_shape=(HEIGHT, WIDTH, DEPTH)):
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Rescaling(1./255, input_shape=input_shape))
+    
+    # Randomly decide the number of convolutional layers
+    num_conv_layers = random.randint(1, 5)
+    
+    for _ in range(num_conv_layers):
+        filters = 2 ** random.randint(0, 7)     # 1–128 filters
+        kernel_size = random.choice([3, 5])
+        padding = random.choice(['same', 'valid'])
+        model.add(tf.keras.layers.Conv2D(filters, kernel_size, padding=padding, activation='relu'))
+        
+        if random.random() < 0.5:
+            pool_size = random.choice([2, 3])
+            model.add(tf.keras.layers.MaxPooling2D(pool_size=pool_size)
+    ...
+```
 
-### Training & evaluation
+Key design decisions:
 
-The core training function `run_training_and_save_all`:
+- Always start with a `Rescaling(1./255)` layer so raw pixel values are normalized.
+- Vary:
+  - Number of conv layers: 1–5.
+  - Filters: powers of 2 up to 128.
+  - Kernel size: 3 or 5.
+  - Pooling presence and size.
+  - Dense layer count (1–3) and width (64/128/256).
+  - Optional dropout (0–0.5 rate).
+- Use a fixed output dimension (`Dense(16)`) corresponding to the number of LEGO classes in the dataset; loss uses `from_logits=True`.
 
-- Accepts:
-  - A compiled or uncompiled Keras model.
-  - Run configuration: `base_run_dir`, `epochs`, `batch_size`, `data_dir`, `verbose`, `name`.
-- Compiles the model with:
+This generator gives a wide but still reasonable search space that is quick to experiment with in a course context.
+
+### Training and evaluation
+
+In `train.py`, I wrapped training, evaluation, and logging in `run_training_and_save_all`:
 
 ```python
 model.compile(
     optimizer='adam',
     loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-    metrics=['accuracy'],
+    metrics=['accuracy']
 )
-```
 
-- Trains with:
-
-```python
+start_time = time.time()
 history = model.fit(
     training_data,
     validation_data=validation_data,
-    epochs=epochs,
+    epochs=epochs
 )
+training_time = time.time() - start_time
+
+loss, accuracy = model.evaluate(validation_data)
 ```
 
-- Measures wall-clock training time and computes a custom effectiveness score:
+I introduced a custom “effectiveness” scalar to compare runs that have different training times:
 
 ```python
 def model_effectiveness(loss, accuracy, duration):
@@ -191,51 +206,74 @@ def model_effectiveness(loss, accuracy, duration):
     return correctness * 100 / (duration ** 0.25)
 ```
 
-I used this heuristic metric to balance performance and speed when comparing models: high accuracy and low loss are rewarded, while longer training times are mildly penalized.
+This is not a formal metric, but it helped me reason about “bang for the buck”: high accuracy and low loss are rewarded, while excessively long training runs are softly penalized.
 
-- Evaluates on the validation set via `model.evaluate`.
-- Logs a human-readable report and writes all artifacts into a timestamped directory under `train_results`.
+### Experiment tracking and artifacts
 
-Training history is saved as CSV, making it easy to later plot learning curves or aggregate statistics across runs.
+Each run optionally writes to a `base_run_dir`:
 
-### Experiment history
+- I build a directory name that embeds key metadata:
 
-I ran a large batch of experiments, both with:
+  - Run name (CLI argument `--name`).
+  - Timestamp.
+  - Epoch count.
+  - Final validation loss.
+  - Final validation accuracy.
+  - Effectiveness score.
 
-- Manually tuned architectures.
-- Randomized architectures using `generate_random_model`.
+  (e.g. `train_19_20-49-55_epochs-10_loss-0.3_accuracy-0.89_E-28.77`)
 
-Some runs achieved:
+- Inside each run directory I save:
+  - The trained model and separate weights.
+  - A textual summary (`model.summary()` redirected to a file).
+  - `loss_accuracy.txt` containing final metrics.
+  - `training_history.csv` containing the full epoch-wise history (`loss`, `accuracy`, `val_loss`, `val_accuracy`).
 
-- Validation accuracies in the ~0.90–0.95 range.
-- Loss values typically in the 0.23–0.5 range for higher-performing models.
-- Outlier runs (e.g., with pathological random configurations) with very poor accuracy and high loss, which were helpful to see the downside of some model choices.
+These exports made it easy to inspect, plot, and compare multiple runs. For example, some of the better randomized models reached:
 
-All of these runs were captured under `train_results/`, with subfolders like:
+- Validation accuracy around 0.94–0.95 with moderate loss (~0.40–0.42).
+- More conservative architectures yielding ~0.90+ accuracy with lower loss.
 
-- `R_params/` and `R_params_2/` for randomized model configurations.
-- Timestamped folders that include epochs, loss, accuracy, and effectiveness in the directory name (e.g., `train_19_20-52-23_epochs-20_loss-0.24_accuracy-0.9_E-27.22`).
+### Environment & reproducibility
+
+To ensure the project is reproducible, I defined an explicit Conda environment in `environment.yml`:
+
+- Pins Python to 3.9 and TensorFlow to 2.10.1 with matching CUDA and cuDNN versions.
+- Lists all relevant Python dependencies under `pip:`.
+
+Users can recreate the environment via:
+
+```bash
+conda env create -f environment.yml
+conda activate tf
+```
+
+Alternatively, `requirements.txt` can be used directly with `pip` if Conda is not preferred.
 
 ## Results
 
-- Built a reusable, configurable training script for image classification tasks based on directory-structured datasets.
-- Achieved strong validation performance on LEGO classification:
-  - Multiple runs with validation accuracy in the 0.90–0.95 range.
-  - Best runs balancing accuracy and training time using the “effectiveness” metric.
-- Demonstrated that:
-  - Deeper or more complex random models do not always outperform simpler ones.
-  - Proper data pipeline configuration (caching, shuffling, prefetching) makes a tangible difference in training stability and speed.
-- Produced a library of logged experiments that I can revisit to study architectural choices and hyperparameter sensitivities.
+Across multiple randomized architectures:
+
+- Many models achieved **~88–92%** validation accuracy after 10 epochs.
+- Several high-capacity models achieved **~94–95%** validation accuracy, at the cost of longer training and some overfitting indications (training loss near zero, validation loss plateauing).
+- Effective architectures tended to:
+  - Use 2–4 convolutional layers.
+  - Moderate filter counts (often in the 32–64 range per layer).
+  - Include some pooling and at least one dense layer with 128–256 units.
+
+Using the custom effectiveness metric, I could see that the “best” model was not always the one with the highest raw accuracy; some smaller, faster models scored competitively once runtime was factored in.
+
+The framework successfully generated and evaluated dozens of distinct CNN architectures, and the saved histories and metrics gave me a clear picture of how design choices influenced performance.
 
 ## Lessons Learned
 
-- **Random search is powerful but noisy.** Randomly sampling architectures uncovered some surprisingly strong models, but also many weak ones; good logging was essential to identify and reproduce the best runs.
-- **Data pipeline optimizations matter.** Using the `tf.data` APIs correctly (cache/prefetch/shuffle) significantly improved throughput and reduced training hiccups compared to my initial, more manual pipeline.
-- **Standard tools beat ad-hoc preprocessing for most cases.** My original OpenCV- and CSV-based pipelines (now in `deprecated/`) gave way to `image_dataset_from_directory`, which was simpler, more maintainable, and less error-prone for this use case.
-- **Metrics should reflect real constraints.** Accuracy alone wasn’t enough; integrating training time into the effectiveness score gave a more realistic picture of “good” models under limited compute.
-- **Reproducible environments pay off.** Pinning versions in `environment.yml` and `requirements.txt` saved time when revisiting the project and ensured that experiments could be rerun consistently.
+- **Random search is surprisingly strong.** Even a simple randomized generator often found architectures within a few percentage points of the best models I would have hand-designed for this dataset.
+- **Experiment tracking matters.** Automatically saving models, metrics, and training histories turned this from a throwaway assignment into something I could revisit and reason about.
+- **Overfitting is easy with small image datasets.** Some models drove training loss essentially to zero while validation loss flattened or worsened, emphasizing the importance of regularization, data augmentation (a next-step improvement), and early stopping.
+- **Data APIs evolve.** Moving from a CSV + `tf.py_function` pipeline to `image_dataset_from_directory` dramatically simplified code and reduced bugs.
+- **Environment pinning saves time.** Defining a full Conda environment with matching CUDA/cuDNN eliminated the usual TensorFlow compatibility friction, especially for others running the project.
 
 ## Links
 
-- [GitHub Repository](https://github.com/IsaiahJMurray/Lego-Sorter)
-- [Live Demo (placeholder)](https://example.com/lego-sorter-demo)
+- GitHub Repository: [https://github.com/IsaiahJMurray/Lego-Sorter](https://github.com/IsaiahJMurray/Lego-Sorter)
+- Live Demo (placeholder): _TBD – link to hosted demo or notebook if/when available_

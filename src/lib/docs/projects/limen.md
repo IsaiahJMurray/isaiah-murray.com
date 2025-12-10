@@ -1,10 +1,10 @@
 ---
 title: Limen
-subtitle: "An iOS SwiftUI client for orchestrating conversational \u201Cassistant\u201D\
-  \ sessions backed by a custom API. Built for developers integrating tool-calling\
-  \ and async workflows on mobile, it models heterogeneous JSON payloads with a type-safe\
-  \ `CodableValue` enum and a reactive `SessionViewModel` that drives navigation and\
-  \ UI state."
+subtitle: "A SwiftUI iOS client for orchestrating AI assistant \u201Csessions\u201D\
+  \ that send user queries to a configurable backend and render dynamic responses.\
+  \ Built for developers integrating tool-calling/async workflows, it features a flexible\
+  \ `CodableValue` model for arbitrary JSON payloads and a clean MVVM structure around\
+  \ `SessionViewModel`."
 slug: limen
 date: '2025-04-13'
 updated: '2025-04-15'
@@ -17,104 +17,105 @@ heroImage: /generated/logos/limen.png
 ---
 ## Overview
 
-Limen is an experimental iOS client for a tool-augmented AI assistant. The app focuses on a minimal SwiftUI interface that talks to a backend “assistant” service, sends user queries, and renders structured responses that can include tool calls, async tool results, and free-form text.
+Limen is an experimental iOS client that talks to a custom AI “assistant” backend. I built it to explore how to model assistant-style responses (messages, tool calls, async work) in a clean SwiftUI architecture, and to have a concrete playground for iterating on my backend API design.
 
-This project is an early scaffold rather than a fully polished product, but it already encodes patterns I use for strongly typed networking with dynamic JSON payloads in Swift.
+The app is intentionally minimal in UI: it focuses on wiring a real session, exchanging JSON payloads, and surfacing results in a SwiftUI view model that can be extended later.
 
 ## Role & Context
 
-I built Limen as a solo project to explore:
+I designed and implemented Limen end to end:
 
-- How to structure a SwiftUI client around an LLM-style backend that can trigger tools and async flows.
-- How to decode heterogeneous, schema-lite JSON into strongly typed Swift models using `Codable`.
-- How to keep the UI layer simple while experimenting quickly with backend contracts.
+- Defined the data models for assistant responses, tool calls, and async calls.
+- Implemented the networking layer and view model to drive a SwiftUI session screen.
+- Set up a basic navigation shell and placeholder UI for testing flows.
+- Added a small utilities layer (`CodableValue`) to support flexible JSON from the backend.
+- Bootstrapped test targets and a basic XCTest-based launch flow.
 
-The repository is intentionally lightweight and focused on the core session screen and networking model.
+This is a solo project I use as a sandbox for iterating on an AI-assistant backend and iOS client patterns.
 
 ## Tech Stack
 
 - Swift
 - SwiftUI
 - Combine
-- URLSession (networking)
-- XCTest / XCUITest
-- Xcode’s `Testing` framework (for async tests)
-- iOS SDK
+- URLSession
+- XCTest / Xcode UI Tests
 
 ## Problem
 
-I wanted a small, focused iOS app that could:
+I wanted an iOS app that could:
 
-- Talk to a backend “assistant” API that returns more than just plain text (tool calls, tool results, async calls).
-- Handle dynamic JSON values without losing type safety across the rest of the codebase.
-- Provide a clear test bed for experimenting with prompt flows and tool orchestration while keeping the UI straightforward.
+- Maintain a “session” with my AI assistant backend.
+- Send user queries and receive rich responses that may include:
+  - Simple text replies.
+  - Immediate tool outputs.
+  - Tool calls that the client may want to display or act on.
+  - Asynchronous tool calls that may complete later.
+- Handle backend payloads whose shape is not strictly fixed, while still using Swift’s `Codable` system safely.
 
-The main challenges were:
-
-- Designing Codable models flexible enough to represent nested, mixed-type fields like `args` without sacrificing compile-time safety.
-- Keeping the networking layer simple but robust enough to support iterative changes in the backend schema.
-- Structuring the SwiftUI view and view model so the assistant session state remained easy to reason about.
+Existing chat/assistant examples are often tightly coupled to a specific provider or assume a fixed schema. I needed something small, testable, and flexible that matched my own backend’s contract.
 
 ## Approach / Architecture
 
-I implemented a fairly standard MVVM-style structure:
+I used a simple, layered approach:
 
-- **View layer (SwiftUI)**  
-  `ContentView` owns navigation and passes a configured `SessionViewModel` into `SessionView`, which displays the active session state.
+- **Models** represent exactly what the backend sends:
+  - `AssistantResponse` with status, message, run ID, tool results, tool calls, and async calls.
+  - `ToolResult`, `ToolCall`, and `AsyncCall` for more granular data.
+- **Dynamic JSON handling** through a `CodableValue` enum so the client can parse arbitrary argument payloads from the backend without losing type safety.
+- **View model** (`SessionViewModel`) as an `ObservableObject` that:
+  - Manages user input (`userText`), system output (`responseText`), and UI choices.
+  - Holds immutable session context (`sessionId`, `userId`, `baseURL`).
+  - Encapsulates all networking with `URLSession`.
+- **SwiftUI views**:
+  - `ContentView` acts as a simple entry point with navigation into a `SessionView`.
+  - `SessionView` (not fully shown in the snippet) binds directly to the view model.
+- **Testing**:
+  - Lightweight unit test scaffold using the new `Testing` library in `LimenTests`.
+  - Launch and UI tests using XCTest to verify the app boots and can be profiled.
 
-- **View model (`SessionViewModel`)**  
-  `ObservableObject` that:
-  - Holds published properties for user input, assistant responses, and any choice options.
-  - Builds and sends HTTP requests to the backend.
-  - Decodes the JSON response into typed models and updates published state on the main thread.
-
-- **Model layer**  
-  Swift `Codable` structs mirror the backend contract:
-
-  - `AssistantResponse` (top-level envelope)
-  - `ToolResult`
-  - `ToolCall`
-  - `AsyncCall`
-  - `CodableValue` (a dynamic, type-erased, yet Codable enum for arbitrary JSON values used in `args`).
-
-Networking is intentionally kept close to the view model, using `URLSession` directly, to reduce indirection while I iterate on the backend interface.
+This keeps the core logic testable and makes it straightforward to swap environments by changing the `baseURL`.
 
 ## Key Features
 
-- Minimal SwiftUI UI with a simple navigation flow and dark-background container.
-- Strongly typed models for complex assistant responses (`tool_results`, `tool_calls`, `async_calls`).
-- `CodableValue` enum to decode arbitrary JSON value types into a single Swift type.
-- Session-based request payloads including `session_id`, `user_id`, and `content`.
-- Configurable base URL to easily switch between local and production backend environments.
-- Basic test scaffolding with unit and UI test targets set up in Xcode.
+- Simple navigation shell to drive a session-based assistant flow.
+- `SessionViewModel` that encapsulates session context and networking.
+- `AssistantResponse` model capturing multiple tool-related concepts in one response.
+- `CodableValue` enum to decode arbitrary JSON argument payloads.
+- POST-based query submission to `/ios_session/query` with structured JSON.
+- Basic state published to SwiftUI (`userText`, `responseText`, `choices`) for easy UI binding.
+- XCTest-based UI launch tests to validate that the app starts and renders.
 
 ## Technical Details
 
-### SwiftUI structure
+The app starts in `LimenApp`, which sets a black background and hosts `ContentView` in a `WindowGroup`. `ContentView` displays a title and a `NavigationLink` wired to an instance of `SessionView`:
 
-The main app entry is `LimenApp`:
+```swift
+NavigationLink(
+    destination: SessionView(
+        viewModel: SessionViewModel(
+            sessionId: "4657f217-adcd-46e2-b1a2-4fe07dbc5b2b",
+            userId: "1",
+            baseURL: URL(string: "https://api.yourproductiondomain.com")!
+        )
+    )
+) {
+    Text("Go to Second View")
+        .padding()
+        .background(Color.blue)
+        .foregroundColor(.white)
+        .cornerRadius(10)
+}
+```
 
-- Wraps everything in a `WindowGroup`.
-- Applies a black background and extends it to ignore safe areas to control the visual framing.
+### Data Models
 
-`ContentView` contains:
-
-- A `NavigationView` with a welcome message.
-- A `NavigationLink` that instantiates a `SessionView` with a `SessionViewModel` configured with:
-  - A hardcoded `sessionId`.
-  - A hardcoded `userId`.
-  - A `baseURL` pointing at `https://api.yourproductiondomain.com`.
-
-This keeps the “shell” of the app trivial and makes the session screen the core of the experience.
-
-### Assistant response models
-
-I defined a set of `Codable` structs that directly map to the backend JSON:
+`SessionView.swift` defines the core models:
 
 ```swift
 struct AssistantResponse: Codable {
     let status: String
-    let message: String?
+    let message: String?          // Text response from the assistant
     let run_id: String
     let tool_results: [ToolResult]?
     let tool_calls: [ToolCall]?
@@ -140,46 +141,73 @@ struct AsyncCall: Codable {
 }
 ```
 
-The key design decision is the use of `CodableValue` for `args`, since those fields can be mixed-type.
+The `args` fields on `ToolCall` and `AsyncCall` are intentionally generic: they can carry different payloads depending on the tool type. To model this, I added `CodableValue`.
 
-### Dynamic JSON with `CodableValue`
+### Dynamic JSON: `CodableValue`
 
-`CodableValue` is a custom enum conforming to `Codable` that can represent:
+`CodableValue` is an enum that can represent several primitive and composite JSON types while still conforming to `Codable`:
 
-- `String`
-- `Int`
-- `Double`
-- `Bool`
-- Arrays of `CodableValue`
-- Dictionaries of `String` to `CodableValue`
-- `null`
+```swift
+enum CodableValue: Codable {
+    case string(String)
+    case int(Int)
+    case double(Double)
+    case bool(Bool)
+    case array([CodableValue])
+    case dictionary([String: CodableValue])
+    case null
 
-The `init(from:)` implementation attempts to decode in order:
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self = .null
+        } else if let str = try? container.decode(String.self) {
+            self = .string(str)
+        } else if let int = try? container.decode(Int.self) {
+            self = .int(int)
+        } else if let dbl = try? container.decode(Double.self) {
+            self = .double(dbl)
+        } else if let bool = try? container.decode(Bool.self) {
+            self = .bool(bool)
+        } else if let array = try? container.decode([CodableValue].self) {
+            self = .array(array)
+        } else if let dict = try? container.decode([String: CodableValue].self) {
+            self = .dictionary(dict)
+        } else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown type"
+            )
+        }
+    }
 
-1. `nil`
-2. `String`
-3. `Int`
-4. `Double`
-5. `Bool`
-6. `[CodableValue]`
-7. `[String: CodableValue]`
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let value): try container.encode(value)
+        case .int(let value): try container.encode(value)
+        case .double(let value): try container.encode(value)
+        case .bool(let value): try container.encode(value)
+        case .array(let values): try container.encode(values)
+        case .dictionary(let dict): try container.encode(dict)
+        case .null: try container.encodeNil()
+        }
+    }
+}
 
-If all fail, it throws a `DecodingError.dataCorruptedError`. The `encode(to:)` implementation mirrors this by switching on the case and encoding the underlying value.
+extension CodableValue {
+    var stringValue: String? {
+        if case let .string(value) = self { return value }
+        return nil
+    }
+}
+```
 
-This gives me:
+This lets me decode nested JSON structures while deferring strict type interpretation to higher layers when needed.
 
-- The ability to work with arbitrary JSON structures in `args` without resorting to `Any` or manual `JSONSerialization` everywhere.
-- Enough structure to add computed helpers (e.g., `stringValue`) for the types I care about in the UI or higher-level logic.
+### View Model and Networking
 
-### SessionViewModel and networking
-
-`SessionViewModel` is an `ObservableObject` with:
-
-- `@Published var userText: String`
-- `@Published var responseText: String`
-- `@Published var choices: [String]`
-
-It also stores the identifiers and base URL needed for session-scoped API calls:
+`SessionViewModel` is the main bridge between UI and backend:
 
 ```swift
 class SessionViewModel: ObservableObject {
@@ -196,65 +224,93 @@ class SessionViewModel: ObservableObject {
         self.userId = userId
         self.baseURL = baseURL
     }
+
+    func submitUserMessage() {
+        let queryURL = baseURL.appendingPathComponent("ios_session/query")
+        let requestData: [String: Any] = [
+            "session_id": sessionId,
+            "user_id": userId,
+            "content": userText
+        ]
+
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: requestData) else {
+            print("Error converting query request to JSON")
+            return
+        }
+
+        var request = URLRequest(url: queryURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Query network error: \(error)")
+                return
+            }
+
+            guard let data = data else {
+                print("Empty query response data")
+                return
+            }
+
+            do {
+                let decoded = try JSONDecoder().decode(AssistantResponse.self, from: data)
+                DispatchQueue.main.async {
+                    self.handleResponse(decoded)
+                }
+            } catch {
+                print("Query decoding error: \(error)")
+            }
+        }.resume()
+    }
+
+    func handleResponse(_ ar: AssistantResponse) {
+        // Implementation (partially truncated in snippet) would:
+        // - Update responseText from ar.message or tool_results
+        // - Populate choices from async_calls or tool_calls when relevant
+        // - Potentially drive additional follow-up requests
+    }
 }
 ```
 
-#### Submitting a user message
+Key points:
 
-`submitUserMessage()`:
+- I pass `sessionId`, `userId`, and `baseURL` into the view model so it is environment-agnostic and easy to test.
+- The query request is encoded with `JSONSerialization` to support the lightweight `[String: Any]` structure.
+- Responses are decoded with `JSONDecoder` into `AssistantResponse`, then processed on the main thread before updating published properties.
 
-1. Builds the endpoint: `baseURL.appendingPathComponent("ios_session/query")`.
-2. Creates a request payload:
+### Testing and UI Scaffolding
 
-   ```swift
-   let requestData: [String: Any] = [
-       "session_id": sessionId,
-       "user_id": userId,
-       "content": userText
-   ]
-   ```
+The project includes:
 
-3. Serializes it to JSON with `JSONSerialization`.
-4. Configures a `URLRequest` with `POST` and sets `Content-Type: application/json`.
-5. Executes a `URLSession.shared.dataTask`.
+- `LimenTests` with a placeholder test using the new `Testing` framework, ready to be expanded into model and view-model tests.
+- `LimenUITests` and `LimenUITestsLaunchTests` using XCTest to:
+  - Launch the app.
+  - Capture a screenshot of the launch screen.
+  - Support launch performance measurements with `XCTApplicationLaunchMetric`.
 
-On response:
-
-- Handles network errors and empty data.
-- Uses `JSONDecoder` to decode `AssistantResponse`.
-- Dispatches back to the main queue to call `handleResponse(_:)` and update UI-facing state.
-
-#### Handling responses
-
-Although the provided snippet truncates inside `handleResponse`, the intent is:
-
-- Check `status` (e.g., `"completed"`).
-- Use `message`, `tool_results`, and/or `async_calls` to build `responseText` and possibly populate `choices`.
-- Update published properties so SwiftUI re-renders automatically.
-
-This pattern keeps the network and decoding logic out of the SwiftUI view, while still being small and easy to trace.
-
-### Testing setup
-
-I generated separate targets for:
-
-- **Unit tests** (`LimenTests`), currently scaffolded using Xcode’s `Testing` package with an empty `example()` test.
-- **UI tests** (`LimenUITests`, `LimenUITestsLaunchTests`) using XCTest/XCUITest, including:
-  - A basic launch test that takes and stores a screenshot.
-  - A performance test measuring app launch time.
-
-These are placeholders but allow me to gradually add coverage around JSON decoding, view model logic, and basic UI flows.
+These tests are minimal but provide a base to automate regression checks as I evolve the API and UI.
 
 ## Results
 
-Because Limen is an early-stage experiment rather than a shipped app, the “results” are primarily architectural and developmental:
-
-- I established a reusable `CodableValue` pattern for dynamic JSON fields that I can now copy into other projects.
-- I validated a simple MVVM structure that keeps SwiftUI screens thin while letting me iterate rapidly on the backend schema.
-- I set up a small, end-to-end path from input text on iOS to a tool-augmented AI backend and back to rendered content, which is enough to prototype new assistant flows quickly.
+- Established a working SwiftUI client wired to a real assistant-style backend endpoint.
+- Validated an API design that supports:
+  - Synchronous text responses.
+  - Tool outputs and tool calls.
+  - Asynchronous calls that may produce follow-up UI.
+- Proved out the `CodableValue` pattern for handling mixed-type JSON payloads without resorting to untyped dictionaries everywhere.
+- Created a small, extensible codebase that I can use to prototype new assistant behaviors and session flows on iOS.
 
 ## Lessons Learned
 
-- **Dynamic JSON in Swift is manageable with a small amount of infrastructure.** A single `CodableValue` enum dramatically simplifies dealing with varied payloads from LLM-style backends.
-- **Type safety and flexibility can coexist.** By pushing the untyped boundary to a small, explicit part of the model (`args`), the rest of the app stays strongly typed.
-- **Start simple with MVVM
+- Modeling “tool calls” and “async calls” explicitly in the response object makes the client architecture cleaner than overloading a single text field.
+- A generic `CodableValue` type is a practical compromise between strict typing and real-world JSON flexibility, especially when integrating with experimental backends.
+- Keeping session context (`sessionId`, `userId`, environment `baseURL`) inside the view model constructor makes it much easier to spin up previews, local-dev builds, and production builds with different configurations.
+- Even a minimal UI benefits from having UI and logic separated via `ObservableObject`, particularly when adding tests later.
+- Starting with simple networking via `URLSession` and JSON payloads is enough to validate protocols before introducing more complex patterns like streaming or WebSockets.
+
+## Links
+
+- [GitHub Repository](https://github.com/IsaiahJMurray/Limen)
+- Demo: _TBD_

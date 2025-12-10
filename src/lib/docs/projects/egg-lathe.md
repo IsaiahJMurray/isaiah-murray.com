@@ -1,10 +1,9 @@
 ---
 title: Egg Lathe
-subtitle: Automated CNC-style lathe for decorating Ukrainian Pysanky eggs, from hardware
-  and laser-cut parts through firmware and a desktop control app. Built for makers
-  and digital artists who want repeatable, programmable patterns on curved egg surfaces,
-  it combines STM32/Arduino-style motion control, serial command queuing, and Python/PyQt
-  simulation and visualization of complex bands, grids, and single-line art.
+subtitle: An automated CNC-style lathe for decorating Ukrainian pysanky eggs, combining
+  custom hardware, firmware, and a desktop controller app. Built for makers and digital
+  artists, it turns parametric patterns and single-line image algorithms into precise
+  motion commands over serial to an STM32-based motion system.
 slug: egg-lathe
 date: '2024-03-26'
 updated: '2025-10-12'
@@ -23,360 +22,186 @@ heroImage: /generated/logos/egg-lathe.png
 ---
 ## Overview
 
-Egg-Lathe is my end-to-end attempt to automate the Ukrainian egg-dyeing tradition of Pysanky. The project spans custom hardware (a small CNC-like lathe for eggs), embedded firmware for motor control, and a desktop application that lets me define, simulate, and execute decorative patterns on real eggs.
-
-The repository contains:
-
-- Fusion 360 designs and laser-cutting files for the mechanical assembly.
-- STM32/Arduino-style firmware that exposes a serial command protocol.
-- A Python-based control and visualization application with a PyQt5 GUI.
-- Pattern-generation and simulation scripts, plus experimental image-to-pattern tooling.
+Egg-Lathe is my end-to-end attempt to automate Ukrainian egg dying (Pysanky) using a custom-built CNC-style lathe. The project spans hardware design, embedded firmware, and a desktop control application that can both simulate and drive the physical machine to draw programmable patterns around an egg.
 
 ## Role & Context
 
-I built Egg-Lathe as a personal side project to explore the full stack of a small CNC system: CAD, embedded firmware, communication protocol, host-side UI, and algorithmic pattern generation.
+I built this as a personal side project to explore the full stack of a mechatronics system:
 
-I was responsible for:
+- Mechanical design in CAD and laser-cut parts
+- Embedded control on a microcontroller-based lathe
+- A host-side Python application with a GUI, pattern generation, simulation, and serial control
 
-- Designing and iterating on the mechanical hardware in Fusion 360.
-- Implementing the firmware command set and motion logic.
-- Designing the serial command protocol between host and microcontroller.
-- Writing the Python control application, queueing layer, and PyQt5 GUI.
-- Implementing pattern generators (sine bands, zig-zags, grids, and circles).
-- Building experimental tooling for visualizing firmware and serial data.
+I owned the design and implementation across hardware, firmware, and software.
 
 ## Tech Stack
 
-- C / C++ (embedded firmware and protocol mappings)
-- Python (host application, pattern generation, visualization)
-- Shell (utility scripts)
+- C / C++ (embedded firmware, Arduino/STM32-style code)
+- Python (control application, pattern generation, simulation, tooling)
+- Shell (batch execution scripts and helpers)
 - PyQt5 (desktop GUI)
-- PySerial (microcontroller communication)
-- NumPy, Matplotlib, Pillow, SciPy (simulation and image tooling)
-- STM32 / Arduino-style environment (microcontroller target)
-- Fusion 360 (mechanical design)
-- SVG (laser-cutting fabrication files)
+- PySerial (serial communication with the lathe)
+- NumPy, Pillow, Matplotlib, SciPy (image and data processing, visualization)
+- Turtle / Pygame (2D preview / simulation experiments)
+- Fusion 360 (mechanical CAD)
+- SVG toolchain + laser cutting (hardware fabrication)
 
 ## Problem
 
-Traditional Pysanky egg decoration is precise, time-consuming, and hard to reproduce programmatically:
+Traditional Pysanky decoration is slow, highly manual, and difficult to reproduce exactly, especially for complex, banded, or algorithmic patterns. I wanted a system that could:
 
-- Patterns must wrap accurately around a fragile, curved surface.
-- Repeating bands, grids, and continuous line art are tedious by hand.
-- There was no straightforward way for me to prototype algorithmically generated patterns and then reliably transfer them onto a physical egg.
+- Hold and rotate an egg precisely
+- Move a tool linearly along its surface
+- Accept higher-level “patterns” (sine bands, grids, zig-zags, etc.)
+- Simulate designs before committing them to a fragile egg
+- Be extendable toward image-based, single-line art around the egg
 
-I wanted a system where I could script or design a pattern in software, preview it, and then press “go” to draw it automatically on an egg with repeatable precision.
+The challenge was turning high-level pattern descriptions into robust motion control on inexpensive hobby-grade hardware.
 
 ## Approach / Architecture
 
-I designed Egg-Lathe as a mini CNC system with clear separation between:
+I split the system into three main layers:
 
-1. **Hardware (Lathe Mechanism)**  
-   - Two axes: egg rotation and linear pen/carriage motion.
-   - Laser-cut acrylic parts and 3D-printed components exported from Fusion 360.
-   - Stepper motors and a microcontroller (STM32/Arduino-like) for motion.
+1. **Hardware (Lathe)**
+   - Custom laser-cut frame with chucks, bumpers, and slides for the egg and tool.
+   - Stepper-driven rotation (egg) and linear axis (tool), designed in Fusion 360 and exported to SVG for laser cutting.
 
-2. **Firmware (Egg_Lathe)**  
-   - A simple, line-oriented serial protocol.  
-   - Commands to move each axis, calibrate, and manage motion timing.
-   - Status and completion responses so the host can queue commands safely.
+2. **Firmware (Microcontroller)**
+   - A small command protocol over serial with explicit prefixes and completion markers.
+   - Commands like calibration, X/Y movement, and wait/break-wait, abstracted behind short, parseable tokens.
 
-3. **Host Application (Python / PyQt5)**  
-   - A `Command` abstraction that maps high-level moves into protocol strings.
-   - A `Queue` object to layer and sequence commands reliably.
-   - A desktop GUI to connect over serial, simulate the pattern, and monitor execution.
+3. **Desktop Application (Host)**
+   - A Python application that:
+     - Generates pattern commands as high-level objects (`SineBand`, `ZigZagBand`, `Circle`, `Band`, etc.).
+     - Compiles them into low-level serial commands using a `Command` + `Queue` abstraction.
+     - Provides a PyQt GUI for connection, movement control, pattern execution, and simulation/preview.
 
-4. **Pattern Generation & Simulation**  
-   - Parameterized pattern functions (e.g., sine bands, zig-zags, circles, bands).
-   - A simulation layer (using turtle/pygame-style drawing) to visualize the resulting pattern in 2D.
-   - Experimental pipelines to turn images and binary files into visual patterns.
-
-The architecture centers on generating a high-level command queue in Python, simulating it locally, and then streaming the same queue to the firmware over a thin text-based protocol.
+Around this, I experimented with image-based pattern generation (stippling, Bezier-curved single-line drawings) that could eventually map 2D art onto the egg surface.
 
 ## Key Features
 
-- Parameterized pattern primitives: sine bands, zig-zag bands, circles, and grid/band structures.
-- Text-based serial protocol with clear prefixes for commands, configuration, and status.
-- Python command queue that supports layering, position tracking, and calibration resets.
-- PyQt5 GUI for connecting to the device, simulating patterns, and monitoring progress.
-- Simulation environment using turtle/pygame-style drawing for previewing egg patterns.
-- Hardware fabrication files (SVG) for laser cutting the lathe components.
-- Experimental tools for converting files and hex/color data into images and spectrogram-like visualizations.
+- Programmable pattern primitives (`SineBand`, `ZigZagBand`, `Circle`, `Band`) that compose into complex designs.
+- Serial command abstraction (`Command`/`Queue`) with automatic position tracking and layering.
+- PyQt-based control UI with movement controls, connect/simulate buttons, and a preview area.
+- Simulation of motion paths using Turtle/Pygame and on-screen previews before running on hardware.
+- Hardware design exported from Fusion 360 directly to laser-cuttable SVG parts.
+- Serial monitoring and plotting tools for debugging motion and sensor data.
+- Experimental image-to-path tooling (stippling + Bezier curves and binary-to-image encoders).
 
 ## Technical Details
 
-### Command Protocol & Firmware Integration
+### Command Protocol and Firmware Interface
 
-On the firmware side, I defined a small command vocabulary in `Production/Lathe Firmware/Egg_Lathe/CommandMapping.h`:
+On the firmware side, I defined a very small, string-based protocol in `CommandMapping.h`:
 
-```cpp
-String CommandPrefix = "C-";
-String CommandComplete = "-CC"; 
-String ResponsePrefix = "R-";
-String StatusPrefix = "S-";
+- Prefixes such as:
 
-String ConfigPrefix = "CONF";
-String SetPrefix = "SET:";
+  - `C-` – command prefix  
+  - `R-` – response  
+  - `S-` – status  
+  - `C-MX`, `C-MY` – move X / Y  
+  - `C-CB` – calibrate (`CalibratePrefix = "CB"`)
 
-String SteptypePrefix = "stept";
-String SpeedPrefix = "speed";
-String InputPrefix = "input";
+- A completion token `-CC` signals that the microcontroller finished executing a command batch.
 
-String CalibratePrefix = "CB";
-String MovementPrefix = "M";
-String XString = "X";
-String YString = "Y";
-String WaitPrefix = "W";
-String BreakwaitPrefix = "BW";
-String FORCEBREAKWAIT = "FB";
-```
-
-On the Python side, I mapped this protocol to a higher-level `Command` abstraction in `Production/Lathe Application/structure.py`:
-
-- `type == "move"` translates into:
-  - `C-MX <dx>`
-  - `C-MY <dy>`
-- `type in ["cal", "calibrate"]` translates into `C-CB`.
-- Raw command strings can be injected and split using a regex-based delimiter.
-
-The `Command.execute()` method writes each command string over serial, then blocks until it receives the `-CC` completion token from the firmware or a timeout occurs:
+On the host side, the `Command` class in `structure.py` encodes these:
 
 ```python
-def send_command(self, command, ser):
-    print(f"Sending: {command}")
-    ser.write((command + "\n").encode())
-    start_time = time.time()
-    while True:
-        if abs(start_time-time.time()) > 5:
-            print("Breaktime")
-            return
-        if ser.in_waiting > 0:
-            response = ser.readline().decode().strip()
-            if response == "-CC":
-                print(f"{response} recieved")
-                return response
+if self.type == "move":
+    movement = (round(value[0]), round(value[1]))
+    self.commands.append(f"C-MX {movement[0]}")
+    self.commands.append(f"C-MY {movement[1]}")
+elif self.type in ["cal", "calibrate"]:
+    self.commands.append("C-CB")
 ```
 
-This keeps the host in control while ensuring the device never overruns its motion buffer.
-
-### Queueing, Layers, and Position Tracking
-
-The `Queue` class in `structure.py` is responsible for aggregating and sequencing `Command` objects:
-
-- Accepts either single `Command` instances or lists of them.
-- Auto-assigns `layer` indices when not provided, allowing layered patterns.
-- Tracks a running `position = (x, y)` to know where the virtual pen is.
-- Resets the position to `(0, 0)` on calibration commands.
-
-Conceptually:
+The `execute` method sends each underlying string and blocks until it reads `-CC` or a timeout:
 
 ```python
-class Queue():
-    def __init__(self):
-        self.queue = []
-        self.length = 0
-        self.layers = set()
-        self.position = (0,0)
-    
-    def add(self, commandset):
-        if isinstance(commandset, list):
-            # flatten list of Commands
-            ...
-        elif isinstance(commandset, Command):
-            ...
-            if commandset.type == "move":
-                self.position = (
-                    self.position[0] + commandset.value[0],
-                    self.position[1] + commandset.value[1]
-                )
-            elif commandset.type == "calibrate":
-                self.position = (0,0)
+ser.write((command + "\n").encode())
+...
+if response == "-CC":
+    return response
 ```
 
-This provides a clean mental model: pattern functions build lists of `Command` objects, then the queue executes them in order, optionally visualizing progress.
+This keeps the host and device synchronized without needing complex state machines.
 
-### Pattern Generators
+### Motion Planning and Pattern Generation
 
-In `Production/Lathe Application/commands.py`, I implemented several parametric pattern generators that output lists of `Command` objects.
+Pattern primitives live in `Production/Lathe Application/commands.py` and generate lists of `Command` objects, not raw strings:
 
-**Sine Band**
+- **SineBand**: Wraps a cosine-based wave around the egg; each step increments the Y axis while modulating X:
 
-Generates a sinusoidal band around the egg by incrementally moving in X and Y:
+  ```python
+  for i in range(0, steps):
+      queue.append(Command("move", (math.cos(i/200*frequency*2*math.pi)*amplitude/4, 1), layer))
+  ```
 
-```python
-def SineBand(amplitude, frequency, layer = 0, steps = STEPS):
-    queue = []
-    for i in range(0, steps):
-        queue.append(
-            Command(
-                "move",
-                (math.cos(i/200*frequency*2*math.pi)*amplitude/4, 1),
-                layer
-            )
-        )
-    return queue
-```
+- **Circle**: Builds a closed loop on the surface by integrating the derivative of a circle’s parametric equation, while tracking floating-point overflow and correcting for rounding:
 
-Here:
+  - `circleCoordinates(angle)` computes incremental motion as `(-sin(angle) * mult, cos(angle) * mult)`.
+  - Each step accumulates overflow in `movement_overflow` and only sends rounded movements when non-zero.
+  - At the end, it issues a correction move so the net displacement closes the loop.
 
-- X is modulated by a cosine term for the sine-wave profile.
-- Y is incremented by 1 step per iteration, wrapping the pattern around the egg.
+- **ZigZagBand**: Alternates direction across a band, accumulating sub-step movement and emitting commands only when rounding yields a non-zero integer step to avoid jitter.
 
-**Circle**
+- **Band**: Produces a rectangular band via repeated Y sweeps and X increments, then returns to the origin.
 
-A more sophisticated generator that approximates a circle using parametric derivatives and handles rounding error:
+The `Queue` class is responsible for:
 
-```python
-def Circle(radius, layer=0, resolution=None, center=True):
-    if resolution is None:
-        resolution = max(12, round(radius * 2 * math.pi))
+- Flattening nested lists of commands
+- Assigning layers (for future interleaving/visualization)
+- Tracking an approximate position by summing move values
+- Iterating across commands to execute them over serial
 
-    mult = radius / (2 * (resolution / (4 * math.pi)))
-    
-    def circleCoordinates(angle):
-        return (-math.sin(angle) * mult, math.cos(angle) * mult)
-    
-    queue = []
-    circle_completion = 0
-    movement_overflow = (0, 0)
-    totalMovement = (0, 0)
+### GUI and Simulation
 
-    if center:
-        initial_move = (radius/2, 0)
-        queue.append(Command("move", initial_move, layer))
-        totalMovement = initial_move
+In `Production/Lathe Application/application.py` I built a PyQt `MainWindow` that:
 
-    while circle_completion < 2 * math.pi:
-        circle_completion += 2 * math.pi / resolution
-        if circle_completion > 2 * math.pi:
-            circle_completion = 2 * math.pi
-        circle_coords = circleCoordinates(circle_completion)
+- Accepts a pre-built `Queue` of commands.
+- Provides:
+  - A movement control panel (for manual jogging and calibration).
+  - Buttons for connecting to the serial port and for starting a simulation.
+  - A preview area (`QLabel`) where I can draw or load an image representing the current pattern.
+- Uses a `QTimer` to periodically step through the `Queue` in simulation mode, updating the preview and internal progress.
 
-        movement = (
-            movement_overflow[0] + circle_coords[0],
-            movement_overflow[1] + circle_coords[1]
-        )
-        rounded_movement = (round(movement[0]), round(movement[1]))
-        movement_overflow = (
-            movement[0] - rounded_movement[0],
-            movement[1] - rounded_movement[1]
-        )
+Earlier experiments in `init test/` use PyQt and a lightweight script editor (`execution.py`) where I can quickly iterate on pattern scripts and send them via a `SerialCommunication` wrapper. These experiments informed the final “Production” structure.
 
-        if rounded_movement != (0, 0):
-            queue.append(Command("move", rounded_movement, layer))
-            totalMovement = (
-                totalMovement[0] + rounded_movement[0],
-                totalMovement[1] + rounded_movement[1]
-            )
+For visualizing and debugging:
 
-    if center:
-        correction_move = (
-            initial_move[0] - totalMovement[0],
-            initial_move[1] - totalMovement[1]
-        )
-        if correction_move != (0, 0):
-            queue.append(Command("move", correction_move, layer))
+- Turtle/Pygame are used in `structure.py` and `draw_functions.py` to render paths.
+- `seriallisten.py` logs time-stamped numeric data from the device, segments it based on inactivity, and plots segments with Matplotlib to inspect behavior over time.
 
-    return queue
-```
+### Image and Data Tooling
 
-Highlights:
+I built a few utilities around the core system:
 
-- Dynamically chooses resolution based on radius to keep circles smooth.
-- Accumulates floating-point deltas, but only moves in integer steps, tracking leftover `movement_overflow` so the path stays accurate.
-- Computes a final correction move when `center=True` to end exactly where it started.
+- `filetoimage.py`: Encodes arbitrary binary files into RGB images using 3 bits per pixel (one per channel) to help visualize firmware images or other data blobs.
+- `hexToRGB.py`: Turns CSV data of hex codes into a spectrogram-like image for quick visual inspection of streams.
 
-**Zig-Zag Bands and Bands**
+Under `patterntest/Single-Line-Portrait-Drawing-master/` I integrated an existing research-style pipeline that:
 
-For simpler geometric patterns:
-
-```python
-def ZigZagBand(amplitude, frequency, layer = 0, steps = STEPS):
-    queue = []
-    direction = 1
-    movement = 0
-    for i in range(steps):
-        if i % frequency == 0:
-            direction *= -1
-        movement += amplitude * direction / (frequency)
-        if abs(round(movement)) > 0:
-            print(f"moving {movement}")
-            queue.append(Command("move", (movement/2, 1), layer))
-            movement = 0
-        else:
-            queue.append(Command("move", (0, 1), layer))
-    return queue
-
-def Band(thickness = 1, steps = STEPS):
-    queue = []
-    for i in range(0, thickness):
-        queue.append(Command("move", (0, steps)))
-        queue.append(Command("move", (1, 0)))
-    queue.append(Command("move", (-thickness, 0)))
-    return queue
-```
-
-These primitives can be composed in `Production/Lathe Application/main.py` into more complex programs.
-
-### Application & GUI
-
-The main host application in `Production/Lathe Application/application.py` is a PyQt5 `MainWindow` that:
-
-- Holds a `Queue` of commands and a serial connection.
-- Provides a preview area (`QLabel`) where I can render simulated patterns.
-- Includes controls for connecting over serial and starting simulation:
-
-```python
-self.movementPanel = self.MovementControlPanel(self)
-self.executeButton = QPushButton("Connect")
-self.executeButton.clicked.connect(self.connectSerial)
-
-self.simulateButton = QPushButton("Simulate")
-self.simulateButton.clicked.connect(self.startSimulation)
-```
-
-I use a `QTimer` (`self.simulationTimer`) to step through the queue and draw each movement command in a simulated view (with pygame/turtle-style drawing) to approximate how the pattern will look on the egg before committing it to hardware.
-
-### Communication Utilities & Experiments
-
-Several supporting scripts explore serial and data visualization:
-
-- `init test/pyserial.py` and `init test/communication.py`  
-  Early experiments in sending motion commands (`moveLinear`, `rotateEgg`) and polling for status.
-
-- `seriallisten.py`  
-  Records numeric serial data, splits it into segments based on inactivity, and plots each segment with Matplotlib. Useful for monitoring sensors or motion traces.
-
-- `filetoimage.py` and `hexToRGB.py`  
-  Map arbitrary binary or hex data to RGB pixels and spectrogram-like images. I used these to visualize firmware binaries and other data streams.
-
-### Pattern-from-Image Prototypes
-
-Under `patterntest/Single-Line-Portrait-Drawing-master`, I included a third-party line-drawing pipeline as a reference:
-
-- Uses weighted Voronoi stippling to generate dot distributions from an image.
-- Converts stipples into single-line paths using either straight segments or Bézier curves.
-- Implemented with NumPy, Pillow, SciPy, and OpenGL.
-
-This served as a conceptual foundation for mapping 2D images to continuous toolpaths that could, in a later iteration, be wrapped onto the egg coordinate system.
+- Applies weighted Voronoi stippling to an input image.
+- Connects points via short straight segments or Bezier splines.
+- Produces single-line drawings that could be mapped to lathe movements in a future iteration.
 
 ## Results
 
-- Built a working, automated egg-decorating lathe combining custom hardware, firmware, and a desktop application.
-- Established a robust text-based serial protocol that reliably coordinates motion between host and microcontroller.
-- Implemented reusable pattern primitives (sine bands, circles, zig-zags, bands) that I can compose into more complex egg designs.
-- Created a simulation pipeline that mirrors the physical motion, enabling me to iterate on patterns without risking hardware or eggs.
-- Packaged fabrication assets (SVGs) so the hardware can be rebuilt or modified once the Fusion 360 design is updated.
+- Built a functioning prototype egg lathe with custom laser-cut hardware, stepper-driven axes, and a consistent mechanical setup.
+- Implemented a stable serial protocol and host-side queueing layer that can reliably stream hundreds of movements without desynchronization.
+- Generated complex patterns (multi-band sine, zig-zag, grids, and circles) in code and rendered them on eggs through the machine.
+- Achieved interactive control and preview via a PyQt GUI, including a simulation mode that reduces trial-and-error on physical eggs.
+- Established a foundation for future work on mapping 2D images to paths on curved egg geometry.
 
 ## Lessons Learned
 
-- **Design the protocol first.** Having a clear and minimal serial command set made both firmware and host application code much simpler to evolve.
-- **Quantization matters.** When generating smooth paths (e.g., circles), careful management of floating-point deltas vs. integer steps is crucial to avoid visible drift.
-- **Simulate aggressively.** A 2D simulation of toolpaths caught mistakes long before they could damage hardware or produce bad patterns.
-- **Small CNCs are full-stack projects.** Even a “simple” egg lathe touches CAD, control theory, firmware, UI, and data visualization; keeping boundaries between layers explicit pays off.
-- **Leaning on existing research is powerful.** Adapting ideas from stippling and single-line drawing research opened up more ambitious pattern-generation possibilities.
+- **Precision vs. integer hardware**: Accumulating floating-point movement and only emitting integer steps (with overflow correction) is critical for closed shapes like circles.
+- **Protocol simplicity pays off**: A small, well-structured command set with explicit completion markers is much easier to debug than a more “feature-rich” protocol.
+- **Simulate early**: Having Turtle/Pygame and PyQt previews saved hardware, time, and a lot of broken eggs.
+- **Layered abstractions help experimentation**: Separating pattern generation from serial transport made it easy to add new patterns or swap in simulations.
+- **Mechanical constraints drive software design**: Backlash, step resolution, and physical clearances all fed back into how I discretized movement and tuned resolutions.
 
 ## Links
 
-- [GitHub Repository](https://github.com/IsaiahJMurray/Egg-Lathe)
-- Demo / Video (coming soon)
+- GitHub: [https://github.com/IsaiahJMurray/Egg-Lathe](https://github.com/IsaiahJMurray/Egg-Lathe)
+- Demo (TBD): _link to video or live demo here_
