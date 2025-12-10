@@ -40,6 +40,7 @@
 </header>
 
 <style>
+  
   .header-container {
     background-color: #03030200;
     display: flex;
@@ -57,7 +58,7 @@
     align-items: center;
     width: 100%;
     height: 4em;
-    margin: 0 1em 0 0.5em;
+    margin: 0 1.25em 0 0.5em;
   }
 
   .brand {
@@ -78,27 +79,24 @@
     filter: brightness(0.5);
   }
 
-  .name-title {
-    color: #fefef9;
-    font: 700 1.25rem Inter, system-ui, -apple-system, BlinkMacSystemFont,
-      sans-serif;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
+
 
   .nav-links {
+    color: #fdf6d6;
     display: flex;
     gap: 20px;
     list-style: none;
     padding: 0;
     margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
+      sans-serif;
   }
 
   .nav-links li a {
-    color: #fefef9;
-    font: 400 0.95rem Inter, sans-serif;
+    color: #fdf6d6;
+    font-size: 1.5em;
     text-decoration: none;
-    transition: color 0.18s ease-in-out, transform 0.18s ease-in-out;
+    font-weight: 300;
   }
 
   .nav-links li a:hover {
@@ -155,9 +153,15 @@
     }
 
     .navigation-bar {
-      align-items: center;
+      align-items: flex-end;
+      margin: 1em;
+      height: 3em;
     }
+    
 
+    .brand {
+      align-items: flex-end;
+    }
     .menu-toggle {
       display: inline-flex;
     }
@@ -188,8 +192,9 @@
     }
 
     .nav-links li a {
-      font-size: 0.9rem;
-      padding: 0.15rem 0;
+      font-size: 1.5rem;
+      font-weight:300;
+      padding: 0 0;
     }
   }
 </style>
