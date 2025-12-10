@@ -94,6 +94,9 @@
     .content {
       padding: 0px;
       gap: 3rem;
+      margin: 1em;
+      width: auto;
+      padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
     }
   }
 </style>

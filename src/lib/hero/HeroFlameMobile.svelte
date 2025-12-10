@@ -480,13 +480,13 @@
   .hero {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 100svh;
     overflow: hidden;
   }
 
   .hero-canvas {
     width: 100%;
-    height: 100%;
+    height: 100svh;
     display: block;
     image-rendering: crisp-edges;
     image-rendering: pixelated;
