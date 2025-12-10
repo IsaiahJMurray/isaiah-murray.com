@@ -142,7 +142,7 @@
     }
 
     // Flame spec
-    const TRANSFORM_COUNT = 6; // 1 core + 5 random
+    const TRANSFORM_COUNT = 5; // 1 core + 5 random
     let transforms = [];
     let cumWeights = [];
 
@@ -224,7 +224,7 @@
         vars: {
           linear: 0.2,
           spherical: 0.8,
-          sinusoidal: 0.0
+          sinusoidal: 0
         }
       };
       transforms.push(core);
@@ -297,7 +297,7 @@
 
     function worldToPixel(x, y) {
       const aspect = canvas.width / canvas.height;
-      const worldScale = 2.0;
+      const worldScale = 3.0;
 
       x += cameraOffsetX;
       y += cameraOffsetY;
@@ -360,7 +360,7 @@
     const TARGET_FPS = 24;
     const TARGET_FRAME_MS = 1000 / TARGET_FPS;
     let iterationsPerFrame = 12000;
-    const MIN_ITERS = 4000;
+    const MIN_ITERS = 1000;
     const MAX_ITERS = 3_500_000;
 
     function adjustIterations(frameMs) {
