@@ -82,13 +82,13 @@
     };
 
     // ---------- Flame spec (core + symmetric arms) ----------
-    const ARM_COUNT = 6;
+    const ARM_COUNT = 1;
     let transforms = [];
     let cumWeights = [];
 
     function makeCoreTransform(baseHue) {
         // strong center fill, mostly linear, no big spherical push
-        const scale = 0.45;   // smaller scale keeps points near origin
+        const scale = 0.01;   // smaller scale keeps points near origin
         const a = scale;
         const b = 0;
         const c = 0;
@@ -96,16 +96,16 @@
         const e = 0;
         const f = 0;
 
-        const rotSpeed = 0.12;      // very slow rotation
+        const rotSpeed = 0.01;      // very slow rotation
         const offsetAmpX = 0.02;    // tiny wobble
         const offsetAmpY = 0.02;
-        const offsetFreqX = 0.25;
+        const offsetFreqX = 0.025;
         const offsetFreqY = 0.3;
 
         // make this bright to really light up center
         const hue = baseHue + jitter(0.005);
-        const sat = 0.55;
-        const val = 1.0;
+        const sat = 0.8;
+        const val = 1;
         const [r, g, bCol] = hsvToRgb(hue, sat, val);
 
         // IMPORTANT: mostly linear, almost no spherical
@@ -144,7 +144,7 @@
       const d = cs * scale;
 
       // small radial offset, but not too far
-      const radius = 0.18;
+      const radius = 0.01;
       const e = radius * cs + jitter(0.03);
       const f = radius * sn + jitter(0.03);
 
@@ -255,7 +255,7 @@
 
     function worldToPixel(x, y) {
       const aspect = canvas.width / canvas.height;
-      const worldScale = 1.3; // slightly tighter framing to fill center
+      const worldScale = 4; // slightly tighter framing to fill center
 
       x += cameraOffsetX;
       y += cameraOffsetY;

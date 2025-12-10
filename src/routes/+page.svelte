@@ -92,7 +92,7 @@
 
   @media (max-width: 768px) {
     .content {
-      padding: 2.5rem 1.5rem 3.5rem 1.5rem;
+      padding: 0px;
       gap: 3rem;
     }
   }
