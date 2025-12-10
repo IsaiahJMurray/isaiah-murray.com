@@ -8,12 +8,14 @@
   function closeMenu() {
     menuOpen = false;
   }
+
+  import logo from '$lib/favicon_light.png';
 </script>
 
 <header class="header-container">
   <nav class="navigation-bar">
     <a href="/" class="brand" on:click={closeMenu}>
-      <span class="name-title">Isaiah Murray</span>
+      <img src={logo} alt="Isaiah Murray Logo" class="logo" />
     </a>
 
     <!-- Mobile menu button -->
@@ -54,11 +56,26 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin: 1em 1em;
+    height: 4em;
+    margin: 0 1em 0 0.5em;
   }
 
   .brand {
+    height: 100%;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    border: none;
+  }
+
+  .brand img {
+    height: 2em;
+    aspect-ratio: 1;
+    transition: filter 0.18s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  }
+
+  .brand img:hover {
+    filter: brightness(0.5);
   }
 
   .name-title {

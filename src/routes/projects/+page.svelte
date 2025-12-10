@@ -1,118 +1,97 @@
 <script>
-  import { onMount } from 'svelte';
-  import Project from '$lib/components/Project.svelte';
-  import defaultProjects from '$lib/default_projects.json';
-
-  let projects = defaultProjects.map(proj => ({
-    title: proj.title,
-    category: proj.tags,
-    description: proj.description,
-    date: proj.date,
-    image: proj.imgSrc,
-    page: proj.page || null // handle optional page field
-  }));
-
-  let filters = [];
-
-  function toggleFilter(filter) {
-    const index = filters.indexOf(filter);
-    if (index === -1) {
-      filters = [...filters, filter];
-    } else {
-      filters = filters.filter(f => f !== filter);
-    }
-    updateProjects();
-  }
-
-  function isProjectVisible(project) {
-    return filters.length === 0 || filters.every(filter => project.category.includes(filter));
-  }
-
-  function updateProjects() {
-    projects = defaultProjects
-      .map(proj => ({
-        id: proj.url,
-        title: proj.title,
-        category: proj.tags,
-        description: proj.description,
-        date: proj.date,
-        image: proj.imgSrc,
-        page: proj.page || null // handle optional page field
-      }))
-      .filter(isProjectVisible);
-  }
-
-  $: filterStyle = (filter) => filters.includes(filter) ? 'none' : 'grayscale(100%) blur(0px)';
-
-  onMount(updateProjects);
+  export let data;
+  const { projects } = data;
 </script>
 
+<section class="section">
+  <h1 class="section-heading">Projects</h1>
+  <p class="section-subtitle">
+    Deep dives into the systems I’ve built: design decisions, failures, and what shipped.
+  </p>
+
+  <div class="projects-list">
+    {#each projects as project}
+      <a class="project-row" href={`/projects/${project.slug}`}>
+        <div class="project-main">
+          <h2>{project.title ?? project.slug}</h2>
+          {#if project.summary}
+            <p>{project.summary}</p>
+          {/if}
+          {#if project.tags}
+            <div class="tags">
+              {#each project.tags as tag}
+                <span class="tag">{tag}</span>
+              {/each}
+            </div>
+          {/if}
+        </div>
+        {#if project.date}
+          <span class="project-date">
+            {new Date(project.date).toLocaleDateString()}
+          </span>
+        {/if}
+      </a>
+    {/each}
+  </div>
+</section>
+
 <style>
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    grid-gap: 20px;
-    padding: 20px;
-    margin: 0 auto;
-  }
-
-  .filter-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-
-  .filter {
-    cursor: pointer;
-    transition: transform 0.2s;
-    background: transparent;
-    outline-color: transparent;
+  .projects-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    outline-width: 0;
+    gap: 1.2rem;
   }
 
-  .filter:hover {
-    transform: scale(1.1);
+  .project-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-radius: 0.75rem;
+    background: rgba(9, 10, 14, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.18s ease, transform 0.18s ease,
+      box-shadow 0.18s ease;
   }
 
-  .filtertext {
-    color: black;
+  .project-row:hover {
+    border-color: rgba(117, 189, 255, 0.6);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-1px);
   }
 
-  .filter img {
-    width: 100px;
-    height: 100px;
+  .project-main h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.05rem;
+    font-weight: 600;
   }
-  .filter-container button {
-    outline: none;
-    border: none;
-    background-color: transparent;
+
+  .project-main p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: rgba(244, 239, 214, 0.8);
+  }
+
+  .tags {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .project-date {
+    font-size: 0.78rem;
+    color: rgba(244, 239, 214, 0.6);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .project-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>
-
-<div>
-  <div class="filter-container">
-    {#each ['digital', 'experiential', 'physical'] as filter}
-      <button class="filter" on:click={() => toggleFilter(filter)} type="button">
-        <img src={`/images/${filter}.png`} alt={filter} style="filter: {filterStyle(filter)};">
-        <span class="filtertext">{filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
-      </button>
-    {/each}
-  </div>
-
-  <div class="grid-container">
-    {#each projects as project}
-      <div class="project-item">
-        {#if project.page}
-          <a href={`/projects/${project.page}`}>
-            <Project {project} />
-          </a>
-        {:else}
-          <Project {project} />
-        {/if}
-      </div>
-    {/each}
-  </div>
-</div>

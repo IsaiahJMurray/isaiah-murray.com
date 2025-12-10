@@ -31,6 +31,10 @@
     margin: 0;
     padding: 0;
     height: 100%;
+    color: #fdf6d6;
+    background-color: black;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
+      sans-serif;
   }
 
   .header-container {
@@ -45,7 +49,6 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #FEFEF9;
   }
 
   .content {
