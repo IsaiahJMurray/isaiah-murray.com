@@ -71,6 +71,11 @@
     margin: 2em;
   }
 
+  :global(.project-body) {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
   .back-link {
     font-size: 0.84rem;
     text-decoration: none;
