@@ -384,7 +384,7 @@
       }
       const invLogMax = maxD > 0 ? 1 / Math.log(1 + maxD) : 1;
 
-      const decay = 0.97;
+      const decay = 0.99;
 
       for (let i = 0; i < density.length; i++) {
         density[i] *= decay;

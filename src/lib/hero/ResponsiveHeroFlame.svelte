@@ -25,5 +25,5 @@
 {#if isMobile}
   <HeroFlameMobile {scrollTarget} />
 {:else}
-  <HeroFlame {scrollTarget} />
+  <HeroFlameMobile {scrollTarget} />
 {/if}

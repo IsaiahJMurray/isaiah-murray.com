@@ -22,6 +22,7 @@
 
   function updatePointerFromEvent(event) {
     if (!canvas) return;
+    return
     const rect = canvas.getBoundingClientRect();
     const nx = (event.clientX - rect.left) / rect.width - 0.5;
     const ny = (event.clientY - rect.top) / rect.height - 0.5;
@@ -142,7 +143,7 @@
     }
 
     // Flame spec
-    const TRANSFORM_COUNT = 5; // 1 core + 5 random
+    const TRANSFORM_COUNT = 5  ; // 1 core + 5 random
     let transforms = [];
     let cumWeights = [];
 
@@ -150,13 +151,13 @@
       const angle = rand() * Math.PI * 2.0;
       const cs = Math.cos(angle);
       const sn = Math.sin(angle);
-      const scale = 0.3 + 0.6 * rand();
+      const scale = 0.1 + 0.3 * rand();
       const shearX = jitter(0.25);
       const shearY = jitter(0.25);
 
-      const a = cs * scale + shearX * 0.5;
+      const a = cs * scale + shearX * 0.1;
       const b = -sn * scale + shearY;
-      const c = sn * scale - shearY * 0.5;
+      const c = sn * scale - shearY * 0.1;
       const d = cs * scale + shearX;
       const e = jitter(1.2);
       const f = jitter(1.2);
@@ -316,7 +317,7 @@
     let py = jitter(0.5);
 
     // phase driven by input motion
-    let transformPhase = 0;
+    let transformPhase = 1;
 
     function updateDynamicAffines(phase, motionFactor) {
       for (const T of transforms) {
@@ -495,12 +496,14 @@
         smoothedVelX *= VEL_DECAY;
         smoothedVelY *= VEL_DECAY;
       }
+      
+      smoothedVelX += 0.1
 
       const velMag = Math.sqrt(
         smoothedVelX * smoothedVelX + smoothedVelY * smoothedVelY
       );
-      const rawFactor = velMag * 0.02; // heavy dampening
-      const motionFactor = Math.max(0, Math.min(1, rawFactor));
+      const rawFactor = velMag * 1; // heavy dampening
+      const motionFactor = rawFactor;
 
       const phaseRate = 1.0;
       transformPhase += motionFactor * phaseRate * dt;
