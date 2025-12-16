@@ -5,9 +5,9 @@
 <section class="footer-container">
   <nav class="footer-nav">
     <a href="https://www.linkedin.com/in/isa-murray/" aria-label="LinkedIn" class="social-link fab fa-linkedin"></a>
-    <a href="https://github.com/LoveAsAConstruct" aria-label="Github" class="social-link fab fa-github"></a>
-    <a href="https://www.instagram.com/isa19837/" aria-label="Instagram" class="social-link fab fa-instagram"></a>
-    <a href="/" aria-label="Email" class="social-link fas fa-envelope"></a>
+    <a href="https://github.com/IsaiahJMurray" aria-label="Github" class="social-link fab fa-github"></a>
+    <a href="https://www.instagram.com/isaiah.murray1/" aria-label="Instagram" class="social-link fab fa-instagram"></a>
+    <a href="mailto:isaiah.j.murray@gmail.com" aria-label="Email" class="social-link fas fa-envelope"></a>
     <a href="https://cambridge.nuvustudio.com/users/isa-murray" aria-label="Profile" class="social-link fas fa-user"></a>
   </nav>
   <div class="build-info">
@@ -37,7 +37,7 @@
   }
 
   .social-link {
-    color: #FEFEF9;
+    color: #FDF6D6;
     font-size: 32px;
     text-decoration: none;
     transition: all 0.3s;

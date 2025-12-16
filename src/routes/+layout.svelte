@@ -20,10 +20,10 @@
   <Header /></div>
   
   <main class="content">
-    <slot></slot> <!-- This slot tag is crucial -->
+    <slot></slot>
   </main>
   
-  <Footer buildDate="May 28, 2024" />
+  <Footer buildDate="December 16th, 2025" />
 </div>
 
 <style>

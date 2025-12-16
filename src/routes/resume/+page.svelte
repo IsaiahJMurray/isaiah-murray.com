@@ -75,11 +75,10 @@
     </div>
 
     <div class="actions">
-      <!-- Optional: put your PDF in /static/resume.pdf and update href -->
-      <a class="btn" href="src/lib/Isaiah Murray - 2025 Resume - 1025.pdf" target="_blank" rel="noreferrer">
+      <a class="btn" href="/resume.pdf" target="_blank" rel="noreferrer">
         View PDF
       </a>
-      <button class="btn ghost" type="button" on:click={() => printPdf("src/lib/Isaiah Murray - 2025 Resume - 1025.pdf")}>
+      <button class="btn ghost" type="button" on:click={() => printPdf("/resume.pdf")}>
         Print
       </button>
     </div>
