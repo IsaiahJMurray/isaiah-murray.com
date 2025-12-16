@@ -270,7 +270,7 @@
      This is self-contained and will look good even without them. */
 
   .resume {
-    width: 100%;
+    width: fit-content !important;
     max-width: 1120px;
     margin: 0 auto;
     padding: 3.5rem 6vw 4.5rem 6vw;
@@ -489,6 +489,7 @@
     .resume {
       padding: 0;
       color: #111;
+      width: fit-content !important;
     }
     .card {
       box-shadow: none;

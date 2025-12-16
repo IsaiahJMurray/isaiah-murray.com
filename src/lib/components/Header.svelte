@@ -88,6 +88,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    backdrop-filter: blur(8px);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
       sans-serif;
   }
