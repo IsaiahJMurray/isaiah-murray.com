@@ -75,10 +75,10 @@
     </div>
 
     <div class="actions">
-      <a class="btn" href="/Isaiah Murray - 2025 Resume - 1025.pdf" target="_blank" rel="noreferrer">
+      <a class="btn" href="/Isaiah-Murray-2025-Resume-1025.pdf" target="_blank" rel="noreferrer">
         View PDF
       </a>
-      <button class="btn ghost" type="button" on:click={() => printPdf("/Isaiah Murray - 2025 Resume - 1025.pdf")}>
+      <button class="btn ghost" type="button" on:click={() => printPdf("/Isaiah-Murray-2025-Resume-1025.pdf")}>
         Print
       </button>
     </div>
