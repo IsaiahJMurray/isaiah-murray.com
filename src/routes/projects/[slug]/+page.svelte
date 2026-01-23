@@ -1,4 +1,6 @@
 <script>
+  import { onMount } from 'svelte';
+
   export let data;
   const { metadata, component: Doc, slug, heroImage } = data;
 
@@ -12,6 +14,95 @@
 
   const displayDate = metadata.updated || metadata.date || null;
   const accent = metadata.accent || '#7bdcff';
+
+  // Lightbox state
+  let lightboxOpen = false;
+  let lightboxSrc = '';
+  let lightboxAlt = '';
+
+  function openLightbox(src, alt) {
+    lightboxSrc = src;
+    lightboxAlt = alt || '';
+    lightboxOpen = true;
+  }
+
+  function closeLightbox() {
+    lightboxOpen = false;
+  }
+
+  onMount(() => {
+    const docBody = document.querySelector('.doc-body');
+    if (!docBody) return;
+
+    // Group consecutive image paragraphs into galleries
+    const children = Array.from(docBody.children);
+    let i = 0;
+
+    while (i < children.length) {
+      const node = children[i];
+
+      // Check if this is a paragraph containing only an image
+      if (isImageParagraph(node)) {
+        // Collect consecutive image paragraphs
+        const group = [node];
+        let j = i + 1;
+
+        while (j < children.length && isImageParagraph(children[j])) {
+          group.push(children[j]);
+          j++;
+        }
+
+        // Create gallery wrapper
+        const gallery = document.createElement('figure');
+        gallery.className = `image-gallery gallery-${Math.min(group.length, 4)}`;
+
+        // Insert gallery before first image
+        node.parentNode.insertBefore(gallery, node);
+
+        // Move images into gallery
+        group.forEach((p, idx) => {
+          const img = p.querySelector('img');
+          if (img) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'gallery-item';
+            
+            // Clone the image and add click handler
+            const clonedImg = img.cloneNode(true);
+            clonedImg.style.cursor = 'zoom-in';
+            wrapper.appendChild(clonedImg);
+            gallery.appendChild(wrapper);
+          }
+          p.remove();
+        });
+
+        // Add click handlers for lightbox
+        gallery.querySelectorAll('img').forEach(img => {
+          img.addEventListener('click', () => openLightbox(img.src, img.alt));
+        });
+
+        i = j;
+      } else {
+        i++;
+      }
+    }
+
+    // Also add lightbox to any remaining standalone images
+    docBody.querySelectorAll('img').forEach(img => {
+      if (!img.closest('.image-gallery')) {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', () => openLightbox(img.src, img.alt));
+      }
+    });
+  });
+
+  function isImageParagraph(node) {
+    if (node.tagName !== 'P') return false;
+    const img = node.querySelector('img');
+    if (!img) return false;
+    // Check if paragraph contains only the image (and maybe whitespace)
+    const textContent = node.textContent.trim();
+    return textContent === '' || textContent === img.alt;
+  }
 </script>
 <div class = "nav spacer"></div>
 <article class="project-page" style={`--accent:${accent}`}>
@@ -59,6 +150,17 @@
     </div>
   </section>
 </article>
+
+<!-- Lightbox Modal -->
+{#if lightboxOpen}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+  <div class="lightbox-overlay" on:click={closeLightbox}>
+    <button class="lightbox-close" on:click={closeLightbox} aria-label="Close">×</button>
+    <img src={lightboxSrc} alt={lightboxAlt} class="lightbox-image" on:click|stopPropagation />
+  </div>
+{/if}
 
 <style>
   .nav.spacer {
@@ -216,6 +318,199 @@
 
   .doc-body {
     max-width: 780px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     DYNAMIC IMAGE GALLERY SYSTEM
+     Automatically styled based on consecutive image count
+     ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Base image styling */
+  .doc-body :global(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    object-fit: cover;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  }
+
+  .doc-body :global(img:hover) {
+    transform: scale(1.015);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Gallery container base */
+  .doc-body :global(.image-gallery) {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.25rem 0;
+    border-radius: 0.6rem;
+    overflow: hidden;
+  }
+
+  .doc-body :global(.gallery-item) {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: radial-gradient(circle at 50% 0%, #171924, #050609);
+  }
+
+  .doc-body :global(.gallery-item img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  .doc-body :global(.gallery-item img:hover) {
+    transform: scale(1.03);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GALLERY-1: Single hero image — full width, prominent
+     ───────────────────────────────────────────────────────────────────────── */
+  .doc-body :global(.gallery-1) {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-body :global(.gallery-1 .gallery-item) {
+    aspect-ratio: 16 / 9;
+    max-height: 420px;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GALLERY-2: Duo layout — balanced side by side
+     ───────────────────────────────────────────────────────────────────────── */
+  .doc-body :global(.gallery-2) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .doc-body :global(.gallery-2 .gallery-item) {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GALLERY-3: Trio layout — feature left, stack right
+     ───────────────────────────────────────────────────────────────────────── */
+  .doc-body :global(.gallery-3) {
+    grid-template-columns: 1.6fr 1fr;
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .doc-body :global(.gallery-3 .gallery-item:first-child) {
+    grid-row: 1 / 3;
+    aspect-ratio: auto;
+  }
+
+  .doc-body :global(.gallery-3 .gallery-item:nth-child(2)),
+  .doc-body :global(.gallery-3 .gallery-item:nth-child(3)) {
+    aspect-ratio: 16 / 10;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     GALLERY-4+: Grid/Masonry layout — flexible grid
+     ───────────────────────────────────────────────────────────────────────── */
+  .doc-body :global(.gallery-4) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .doc-body :global(.gallery-4 .gallery-item) {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* For 5+ images, use a more flexible approach */
+  .doc-body :global(.gallery-5),
+  .doc-body :global(.gallery-6) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .doc-body :global(.gallery-5 .gallery-item),
+  .doc-body :global(.gallery-6 .gallery-item) {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     Responsive adjustments
+     ───────────────────────────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .doc-body :global(.gallery-2),
+    .doc-body :global(.gallery-3),
+    .doc-body :global(.gallery-4) {
+      grid-template-columns: 1fr;
+    }
+
+    .doc-body :global(.gallery-3 .gallery-item:first-child) {
+      grid-row: auto;
+    }
+
+    .doc-body :global(.gallery-item) {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     LIGHTBOX
+     ═══════════════════════════════════════════════════════════════════════════ */
+  :global(.lightbox-overlay) {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: lightbox-fade-in 0.2s ease;
+  }
+
+  @keyframes lightbox-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  :global(.lightbox-image) {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    animation: lightbox-zoom-in 0.25s ease;
+  }
+
+  @keyframes lightbox-zoom-in {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  :global(.lightbox-close) {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  :global(.lightbox-close:hover) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
   }
 
   /* basic markdown styling */
