@@ -1,25 +1,82 @@
 ---
 title: Egg Lathe
-subtitle: An automated CNC-style lathe for decorating Ukrainian pysanky eggs, combining
-  custom hardware, firmware, and a desktop controller app. Built for makers and digital
-  artists, it turns parametric patterns and single-line image algorithms into precise
-  motion commands over serial to an STM32-based motion system.
+subtitle: >
+  Egg Lathe is a CNC-style automation system for traditional Ukrainian egg dyeing
+  (Pysanky). The project combines custom mechanical hardware, embedded firmware,
+  and a Python control application to enable precise, repeatable patterning on the
+  curved surface of an egg.
 slug: egg-lathe
-date: '2024-03-26'
+date: '2023-04-01'
 updated: '2025-10-12'
 tags:
-- c
-- cpp
-- python
-- shell
+- hardware
+- cnc
+- mechatronics
+- arduino
 - stm32
-- embedded
-- simulation
+- firmware
+- python
+- robotics
+- fabrication
 maturity: production
-featured: false
+featured: true
 visibility: public
-heroImage: /generated/logos/egg-lathe.png
+heroImage: \images\projects\egg_lathe\4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg
 ---
+
+## Overview
+
+The **Egg Lathe** is an automated take on traditional Ukrainian egg dyeing (Pysanky).
+The system allows intricate, repeatable designs to be “printed” onto the surface of
+an egg using a CNC-style workflow.
+
+The project spans three tightly integrated domains:
+- Mechanical hardware
+- Embedded firmware
+- Desktop software
+
+---
+
+## Hardware
+
+The frame is primarily constructed from laser-cut wood (4.175 mm draftboard and
+plywood) secured with M2.5 and M3 fasteners. Additional components are 3D printed
+using a Prusa MK3S+ with PLA filament.
+
+Two NEMA-11 stepper motors provide 2-axis motion:
+- **Rotary axis**: rotates the egg axially
+- **Linear axis**: moves the tool carriage parallel to the egg’s axis via a belt drive
+
+The egg is held between two 3D-printed friction mounts:
+- One fixed to the rotary motor shaft
+- One free-spinning mount supported by bearings
+
+The free mount is spring-loaded along an 8 mm aluminum rod, allowing adjustable
+holding pressure for eggs of varying sizes.
+
+Electronics are driven by an Arduino/STM32-class microcontroller, chosen for
+simplicity, cost, and available IO.
+
+---
+
+## Firmware
+
+The firmware runs on a microcontroller and exposes a small, explicit command
+protocol over USB serial. It handles:
+
+- Stepper motor control (rotary + linear)
+- Calibration and homing
+- Execution of queued motion commands
+- Reporting command completion back to the host
+
+This layer abstracts low-level motion while remaining deterministic and debuggable.
+
+
+---
+
+## Desktop Software & Control Stack
+
+
 ## Overview
 
 Egg-Lathe is my end-to-end attempt to automate Ukrainian egg dying (Pysanky) using a custom-built CNC-style lathe. The project spans hardware design, embedded firmware, and a desktop control application that can both simulate and drive the physical machine to draw programmable patterns around an egg.
