@@ -27,9 +27,14 @@
 </div>
 
 <style>
+  :global(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
   :global(html, body) {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
     height: 100%;
     color: #fdf6d6;
     background-color: black;
@@ -40,7 +45,8 @@
   .header-container {
     position: absolute;
     top: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
     z-index: 10;
     padding: 0px;
   }

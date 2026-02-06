@@ -7,3 +7,10 @@
     <p>{text}</p>
   </div>
 </div>
+
+<style>
+  .full-text {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+</style>

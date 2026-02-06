@@ -57,7 +57,10 @@ The motivation was to solve a fundamental challenge in SLA printing: there's cur
 
 SLA 3D printing relies on precise UV curing of liquid photopolymer resin, but there's no real-time feedback on cure quality during printing. Failed prints are only discovered after completion, wasting time, materials, and energy.
 
-![Undercured sample removal showing liquid resin layer](/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5176.MOV)
+<video controls playsinline preload="metadata">
+  <source src="/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5176.mp4" type="video/mp4" />
+  Undercured sample removal showing liquid resin layer
+</video>
 
 Critical issues include:
 
@@ -123,7 +126,10 @@ Our experiments produced several breakthrough results using a systematic approac
 
 **Sample Preparation**: Glass slides were carefully applied over resin drops on the PCB to create uniform thickness samples for cure testing, ensuring consistent contact between the resin and electrode sensors.
 
-![Glass slide application process](/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5169.MOV)
+<video controls playsinline preload="metadata">
+  <source src="/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5169.mp4" type="video/mp4" />
+  Glass slide application process
+</video>
 
 **Cured vs Uncured Differentiation**: Clear amplitude differences of ~0.0078V mean between fully cured and uncured resin samples across the frequency spectrum, with peak differentiation around 200-300kHz.
 
@@ -170,9 +176,3 @@ The work proved that dielectric sensing can reliably differentiate cure states a
 **Commercial Viability**: The strong industry interest validated our technical approach but also highlighted the importance of IP considerations and commercial development pathways in R&D projects.
 
 ---
-
-## Links
-
-- **Repository**: Currently private due to commercial sensitivity
-- **FormLabs Partnership**: Ongoing research collaboration
-- **Future Work**: UV-permeable sensor development and oxidation layer detection planned for Spring 2026

@@ -270,7 +270,7 @@
      This is self-contained and will look good even without them. */
 
   .resume {
-    width: fit-content !important;
+    width: 100%;
     max-width: 1120px;
     margin: 0 auto;
     padding: 3.5rem 6vw 4.5rem 6vw;
@@ -400,6 +400,7 @@
     justify-content: space-between;
     gap: 0.75rem;
     align-items: baseline;
+    flex-wrap: wrap;
   }
 
   .itemTop h3 {
@@ -484,12 +485,21 @@
     }
   }
 
+  @media (max-width: 640px) {
+    .kv {
+      grid-template-columns: 1fr;
+    }
+    .resume {
+      padding: 2.5rem 1rem 3rem 1rem;
+    }
+  }
+
   /* Print */
   @media print {
     .resume {
       padding: 0;
       color: #111;
-      width: fit-content !important;
+      width: 100%;
     }
     .card {
       box-shadow: none;

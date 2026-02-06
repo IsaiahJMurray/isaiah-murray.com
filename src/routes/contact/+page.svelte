@@ -124,7 +124,7 @@
 
 <style>
   .contact {
-    width: auto;
+    width: 100%;
     max-width: 1120px;
     margin: 0 auto;
     padding: 3.5rem 6vw 4.5rem 6vw;

@@ -13,3 +13,14 @@
     <img src={image} alt="" />
   </div>
 </div>
+
+<style>
+  div {
+    overflow: hidden;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>

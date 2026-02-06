@@ -83,7 +83,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
-    margin: 2em;
+    padding: 0 2em;
+    width: 100%;
   }
 
   .section-header {
@@ -107,7 +108,7 @@
 
   .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap: 1.4rem;
   }
 

@@ -170,9 +170,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    margin: 2em;
-    max-width: 100%;
-    box-sizing: border-box;
+    padding: 0 2em;
+    width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   :global(.project-body) {
@@ -321,7 +322,8 @@
   .doc-body {
     max-width: 780px;
     width: 100%;
-    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -339,6 +341,16 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
     object-fit: cover;
     transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  }
+
+  .doc-body :global(video) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #050609;
   }
 
   .doc-body :global(img:hover) {
@@ -604,7 +616,7 @@
 
   @media (max-width: 640px) {
     .project-page {
-      margin: 1.1rem;
+      padding: 0 1rem;
     }
 
     :global(.project-body) {
