@@ -1,4 +1,6 @@
 <script>
+  import MiniRadar from '$lib/components/MiniRadar.svelte';
+
   export let data;
   const { projects } = data;
 
@@ -54,6 +56,9 @@
             loading="lazy"
             class="card-image"
           />
+          <div class="card-radar">
+            <MiniRadar slug={project.slug} size={26} />
+          </div>
         </div>
 
         <div class="card-body">
@@ -173,6 +178,14 @@
     aspect-ratio: 4 / 3;
     overflow: hidden;
     background: radial-gradient(circle at 50% 0%, #161820, #050609);
+  }
+
+  .card-radar {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    z-index: 2;
+    pointer-events: none;
   }
 
   .card-image {

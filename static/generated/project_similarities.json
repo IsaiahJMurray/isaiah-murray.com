@@ -3,133 +3,133 @@
     "advanced-resin-cure-monitoring-with-formlabs": [
       {
         "slug": "boxed-memories",
-        "score": 0.5842546421639145
+        "score": 0.5842507882291239
       },
       {
         "slug": "pinhole-cameras",
-        "score": 0.5681872063021143
+        "score": 0.5682657466082355
       },
       {
         "slug": "clasp",
-        "score": 0.5338137862378617
+        "score": 0.5338039873593032
       }
     ],
     "binaric": [
       {
         "slug": "egg-lathe",
-        "score": 0.5265925858119377
+        "score": 0.5265792266482834
       },
       {
         "slug": "virtue",
-        "score": 0.5147305285177606
+        "score": 0.5146857791407763
       },
       {
         "slug": "gmail-categorization",
-        "score": 0.5145178829944318
+        "score": 0.5121526852188456
       }
     ],
     "boxed-memories": [
       {
         "slug": "code-cruiser",
-        "score": 0.6747850629825232
+        "score": 0.6748008187477825
       },
       {
         "slug": "bragi",
-        "score": 0.6457486772174726
+        "score": 0.6457509679761876
       },
       {
         "slug": "desk-projector",
-        "score": 0.6243682447508112
+        "score": 0.624382405844926
       }
     ],
     "bragi": [
       {
         "slug": "boxed-memories",
-        "score": 0.6457486772174726
+        "score": 0.6457509679761876
       },
       {
         "slug": "virtue",
-        "score": 0.6299689537075251
+        "score": 0.6299081534935245
       },
       {
-        "slug": "code-cruiser",
-        "score": 0.5626888215085875
+        "slug": "limen",
+        "score": 0.5628095347880608
       }
     ],
     "pcb-business-card": [
       {
         "slug": "clasp",
-        "score": 0.6204316329381456
+        "score": 0.620428894023585
       },
       {
         "slug": "egg-lathe",
-        "score": 0.5447747253367183
+        "score": 0.5447789502300077
       },
       {
         "slug": "code-cruiser",
-        "score": 0.5432949003022922
+        "score": 0.5433236812108633
       }
     ],
     "c": [
       {
-        "slug": "exoticproducepackingoptimization",
-        "score": 0.5016915504261457
-      },
-      {
         "slug": "scrapperstar",
-        "score": 0.48945506076776785
+        "score": 0.4894223336954289
       },
       {
         "slug": "egg-lathe",
-        "score": 0.48795628680139136
+        "score": 0.48805218026926794
+      },
+      {
+        "slug": "exoticproducepackingoptimization",
+        "score": 0.48551820484569325
       }
     ],
     "calendar-plugin": [
       {
         "slug": "vibes-button",
-        "score": 0.6866447742681417
+        "score": 0.6867893654958951
       },
       {
         "slug": "limen",
-        "score": 0.6015566621629291
+        "score": 0.5900307975063428
       },
       {
         "slug": "rowing-planner",
-        "score": 0.5895800095789885
+        "score": 0.5896836389028631
       }
     ],
     "clasp": [
       {
         "slug": "pcb-business-card",
-        "score": 0.6204316329381456
+        "score": 0.620428894023585
       },
       {
         "slug": "advanced-resin-cure-monitoring-with-formlabs",
-        "score": 0.5338137862378617
+        "score": 0.5338039873593032
       },
       {
         "slug": "boxed-memories",
-        "score": 0.46044089480604444
+        "score": 0.4604503447222488
       }
     ],
     "code-cruiser": [
       {
         "slug": "boxed-memories",
-        "score": 0.6747850629825232
+        "score": 0.6748008187477825
       },
       {
         "slug": "egg-lathe",
-        "score": 0.638469033369558
+        "score": 0.6383796238940087
       },
       {
         "slug": "bragi",
-        "score": 0.5626888215085875
+        "score": 0.5627242747538669
       }
     ],
     "curator": [
       {
         "slug": "virtue",
-        "score": 0.6169461238847351
+        "score": 0.6169412456313242
       },
       {
         "slug": "vibes-button",
@@ -137,259 +137,259 @@
       },
       {
         "slug": "github-grader",
-        "score": 0.5822037671949353
+        "score": 0.5783826443227815
       }
     ],
     "desk-projector": [
       {
         "slug": "egg-lathe",
-        "score": 0.6522442631229425
+        "score": 0.6521377863959972
       },
       {
         "slug": "boxed-memories",
-        "score": 0.6243682447508112
+        "score": 0.624382405844926
       },
       {
         "slug": "pinhole-cameras",
-        "score": 0.5929060592008577
+        "score": 0.5929575127667475
       }
     ],
     "digikeydisplay": [
       {
         "slug": "exoticproducepackingoptimization",
-        "score": 0.5042901672848079
+        "score": 0.5092680776499183
       },
       {
         "slug": "desk-projector",
-        "score": 0.4856753543627944
+        "score": 0.4857325887616036
       },
       {
         "slug": "rowing-planner",
-        "score": 0.47757106726602655
+        "score": 0.47762747643305575
       }
     ],
     "egg-lathe": [
       {
         "slug": "desk-projector",
-        "score": 0.6522442631229425
+        "score": 0.6521377863959972
       },
       {
         "slug": "code-cruiser",
-        "score": 0.638469033369558
+        "score": 0.6383796238940087
       },
       {
         "slug": "virtue",
-        "score": 0.5514511623837662
+        "score": 0.5514816763909891
       }
     ],
     "exoticproducepackingoptimization": [
       {
         "slug": "lego-sorter",
-        "score": 0.5140891669442905
-      },
-      {
-        "slug": "desk-projector",
-        "score": 0.505164251919073
+        "score": 0.5250947920935781
       },
       {
         "slug": "digikeydisplay",
-        "score": 0.5042901672848079
+        "score": 0.5092680776499183
+      },
+      {
+        "slug": "egg-lathe",
+        "score": 0.5029142288344409
       }
     ],
     "github-grader": [
       {
         "slug": "rowing-planner",
-        "score": 0.7355672227188779
+        "score": 0.7326403230359276
       },
       {
         "slug": "stranding",
-        "score": 0.6592770766720955
+        "score": 0.6516847887151584
       },
       {
         "slug": "vibes-button",
-        "score": 0.6394442588143028
+        "score": 0.634188420116401
       }
     ],
     "gmail-categorization": [
       {
         "slug": "virtue",
-        "score": 0.6080088378177286
+        "score": 0.5865064943703415
       },
       {
         "slug": "limen",
-        "score": 0.5745716214309023
+        "score": 0.5580353247408526
       },
       {
-        "slug": "curator",
-        "score": 0.5531584206631038
+        "slug": "lego-sorter",
+        "score": 0.5439425661472401
       }
     ],
     "lego-sorter": [
       {
         "slug": "code-cruiser",
-        "score": 0.5524961634040513
+        "score": 0.5600080947282917
       },
       {
         "slug": "boxed-memories",
-        "score": 0.5492189059871476
+        "score": 0.5580706274441515
       },
       {
-        "slug": "gmail-categorization",
-        "score": 0.5214665119518145
+        "slug": "plonk-pigeonholing",
+        "score": 0.5448490235170613
       }
     ],
     "limen": [
       {
         "slug": "virtue",
-        "score": 0.6784089745723276
+        "score": 0.6626567998376007
       },
       {
         "slug": "stranding",
-        "score": 0.6730541997765828
+        "score": 0.6623394800601053
       },
       {
         "slug": "vibes-button",
-        "score": 0.6251508477202834
+        "score": 0.6099077007902244
       }
     ],
     "pinhole-cameras": [
       {
         "slug": "desk-projector",
-        "score": 0.5929060592008577
+        "score": 0.5929575127667475
       },
       {
         "slug": "advanced-resin-cure-monitoring-with-formlabs",
-        "score": 0.5681872063021143
+        "score": 0.5682657466082355
       },
       {
         "slug": "boxed-memories",
-        "score": 0.5454439151562435
+        "score": 0.5455370874382577
       }
     ],
     "plonk-pigeonholing": [
       {
         "slug": "lego-sorter",
-        "score": 0.5212094641501662
+        "score": 0.5448490235170613
       },
       {
         "slug": "gmail-categorization",
-        "score": 0.5088663292861697
+        "score": 0.5262578940212883
       },
       {
         "slug": "exoticproducepackingoptimization",
-        "score": 0.49036424597591005
+        "score": 0.4895918227385491
       }
     ],
     "radar-calibration": [
       {
         "slug": "advanced-resin-cure-monitoring-with-formlabs",
-        "score": 0.5301215434949528
+        "score": 0.5301580235534397
       },
       {
         "slug": "desk-projector",
-        "score": 0.5004986206001066
+        "score": 0.5005323365069168
       },
       {
         "slug": "boxed-memories",
-        "score": 0.5002274420499896
+        "score": 0.5002768208336729
       }
     ],
     "rowing-form-detection": [
       {
         "slug": "rowing-planner",
-        "score": 0.6124850287840161
+        "score": 0.6125302025533443
       },
       {
         "slug": "bragi",
-        "score": 0.5491790467615044
+        "score": 0.5492259460591996
       },
       {
         "slug": "gmail-categorization",
-        "score": 0.5475557401311555
+        "score": 0.543566686369324
       }
     ],
     "rowing-planner": [
       {
         "slug": "github-grader",
-        "score": 0.7355672227188779
+        "score": 0.7326403230359276
       },
       {
         "slug": "stranding",
-        "score": 0.7010698338442535
+        "score": 0.7012017141810484
       },
       {
         "slug": "rowing-form-detection",
-        "score": 0.6124850287840161
+        "score": 0.6125302025533443
       }
     ],
     "scrapperstar": [
       {
         "slug": "stranding",
-        "score": 0.6128297314076135
+        "score": 0.612969460120684
       },
       {
         "slug": "topdownshootergame",
-        "score": 0.6108327803450556
+        "score": 0.6108254650602686
       },
       {
         "slug": "github-grader",
-        "score": 0.5743146497625666
+        "score": 0.5645002528953867
       }
     ],
     "stranding": [
       {
         "slug": "rowing-planner",
-        "score": 0.7010698338442535
+        "score": 0.7012017141810484
       },
       {
         "slug": "limen",
-        "score": 0.6730541997765828
+        "score": 0.6623394800601053
       },
       {
         "slug": "github-grader",
-        "score": 0.6592770766720955
+        "score": 0.6516847887151584
       }
     ],
     "topdownshootergame": [
       {
         "slug": "scrapperstar",
-        "score": 0.6108327803450556
+        "score": 0.6108254650602686
       },
       {
         "slug": "c",
-        "score": 0.4854449233484429
+        "score": 0.48547931341250716
       },
       {
         "slug": "stranding",
-        "score": 0.47999569546075166
+        "score": 0.4800364884210509
       }
     ],
     "vibes-button": [
       {
         "slug": "calendar-plugin",
-        "score": 0.6866447742681417
+        "score": 0.6867893654958951
       },
       {
         "slug": "virtue",
-        "score": 0.6616775360378004
+        "score": 0.6616259609974151
       },
       {
         "slug": "github-grader",
-        "score": 0.6394442588143028
+        "score": 0.634188420116401
       }
     ],
     "virtue": [
       {
         "slug": "limen",
-        "score": 0.6784089745723276
+        "score": 0.6626567998376007
       },
       {
         "slug": "vibes-button",
-        "score": 0.6616775360378004
+        "score": 0.6616259609974151
       },
       {
         "slug": "bragi",
-        "score": 0.6299689537075251
+        "score": 0.6299081534935245
       }
     ]
   }

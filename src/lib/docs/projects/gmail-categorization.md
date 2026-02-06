@@ -1,103 +1,112 @@
 ---
 title: Gmail Categorization
-subtitle: Semantic search engine over your Gmail archive that finds relevant emails
+subtitle: 'Semantic search engine over your Gmail archive that finds relevant emails
   by meaning, not just keywords. Built for power users who live in their inbox and
-  want fast retrieval and training data for AI email assistants. Uses SentenceTransformers
-  embeddings, FAISS vector indexing, and MBOX parsing with incremental index updates
-  and cleaned conversation threads.
+  want fast retrieval and training data for AI email assistants.
+
+  '
 slug: gmail-categorization
 date: '2025-03-05'
-updated: '2025-03-06'
+updated: '2026-02-06'
 tags:
 - python
+- machine-learning
+- nlp
+- faiss
+- email
 maturity: prototype
 featured: false
 visibility: public
 heroImage: /generated/logos/gmail-categorization.png
 ---
+
 ## Overview
 
-Gmail-Categorization is an experiment in building a local, privacy-preserving semantic search and categorization pipeline for my Gmail archive. Instead of relying on keyword search, I use sentence embeddings and a FAISS vector index to find relevant emails based on meaning, not just exact text matches. The project also includes tooling for parsing mbox files, threading conversations, cleaning email bodies, and generating training data for an email-response assistant tuned to my writing style.
+I built Gmail-Categorization as an experiment in local, privacy-preserving semantic search for my personal email archive. Instead of relying on keyword matching, I use sentence embeddings and FAISS vector indexing to find relevant emails based on meaning. The system parses MBOX files, threads conversations, cleans email bodies, and generates training data for personalized email assistants.
+
+The project emerged from my frustration with Gmail's search limitations. I often remember the gist of an email—"something about a project timeline" or "that introduction for an internship"—but not the exact keywords. Traditional search fails in these scenarios, so I wanted a system that understands semantic similarity rather than just lexical matches.
+
+Beyond search, I also wanted to extract structured conversation data from my email history to train AI models that could eventually draft replies in my voice and style.
+
+---
 
 ## Role & Context
 
-I built this project end-to-end as a personal productivity and ML-infrastructure exercise. My goals were to:
+I developed this project solo as both a productivity tool and machine learning infrastructure experiment. My primary goals were to index a large personal email corpus efficiently on my local machine, explore semantic search with transformer embeddings, and prototype dataset creation for personalized email assistance.
 
-- Index a large personal email corpus efficiently on my own machine.
-- Explore semantic search with sentence-transformer embeddings and FAISS.
-- Build utilities for ongoing ingestion (append-only) rather than one-off indexing.
-- Prototype dataset creation for a personalized email assistant using real email threads.
+The project represents my approach to building privacy-first ML tools—keeping sensitive data local while leveraging modern NLP techniques for practical applications.
 
-Everything from data extraction to indexing and querying is implemented in Python scripts in this repository.
+---
 
 ## Tech Stack
 
-- Python
-- FAISS (Facebook AI Similarity Search)
-- sentence-transformers (`all-MiniLM-L6-v2`)
-- pandas
-- NumPy
-- `mailbox` and `email` standard libraries
-- tqdm
+- **Python** — Core language for all components
+- **FAISS** — Facebook AI Similarity Search for vector indexing
+- **sentence-transformers** — Specifically `all-MiniLM-L6-v2` for embeddings
+- **pandas** — Data manipulation and CSV handling
+- **NumPy** — Numerical operations for embeddings
+- **mailbox & email** — Python standard libraries for MBOX parsing
+- **tqdm** — Progress bars for long-running operations
+
+---
 
 ## Problem
 
-Traditional email search is largely keyword-based and often fails in a few common situations:
+Traditional email search relies heavily on keyword matching, which fails in several common scenarios:
 
-- I vaguely remember an email “about a project timeline” but not the specific phrasing, sender, or subject.
-- I want to find “all emails where I promised to follow up” or “introductions I received for internships” which are more semantic than lexical.
-- I want to build ML models on top of my email history (for auto-replies or prioritization), which requires structured, de-duplicated, thread-aware data.
+- **Vague recollection**: I remember an email "about a project timeline" but not the specific phrasing, sender, or subject line
+- **Semantic queries**: Finding "all emails where I promised to follow up" or "introductions I received for internships" requires understanding meaning, not just text matching
+- **ML training data**: Building models on email history requires structured, de-duplicated, thread-aware datasets
 
-I wanted a local toolchain that:
+I needed a local toolchain that could ingest Gmail archives, clean and normalize content, index emails using semantic embeddings, support incremental updates, and generate conversation-level data suitable for fine-tuning language models.
 
-1. Ingests my Gmail archive in mbox format.
-2. Cleans and normalizes email content.
-3. Indexes emails using semantic embeddings to support natural-language queries.
-4. Incrementally updates the index as new emails arrive.
-5. Optionally generates conversation-level data suitable for fine-tuning an LLM to reply “like me.”
+---
 
 ## Approach / Architecture
 
-I designed the project as a collection of focused scripts rather than a monolithic app:
+I designed the system as a collection of focused scripts rather than a monolithic application, allowing each component to evolve independently:
 
-- **Ingestion & Indexing (`main.py`)**
-  - Read multiple mbox files (e.g., `Important`, `Sent`) using the `mailbox` module.
-  - Normalize each message into a tuple: `(Subject, Sender, Body, FullText)`.
-  - Encode `FullText` using a sentence-transformers model.
-  - Build a FAISS L2 index over the resulting vectors and save it alongside a CSV copy of the email metadata.
+**Ingestion & Indexing (`main.py`)**
+- Reads multiple MBOX files using Python's `mailbox` module
+- Normalizes messages into structured tuples: `(Subject, Sender, Body, FullText)`
+- Encodes full text using sentence-transformers
+- Builds FAISS L2 index and saves alongside CSV metadata
 
-- **Incremental Updates (`append.py`)**
-  - Parse new mbox data.
-  - De-duplicate against already indexed `FullText` entries.
-  - Encode only new messages and append their vectors to the existing FAISS index.
-  - Merge metadata and persist the updated CSV and index.
+**Incremental Updates (`append.py`)**
+- Parses new MBOX data and de-duplicates against existing entries
+- Encodes only new messages and appends vectors to existing index
+- Merges metadata and persists updated CSV and index files
 
-- **Semantic Search (`search.py`)**
-  - Load the saved FAISS index and the `emails.csv`.
-  - Encode a free-text query into the same embedding space.
-  - Use FAISS to retrieve top-k nearest emails and display their subject, sender, and a snippet.
+**Semantic Search (`search.py`)**
+- Loads saved FAISS index and email metadata
+- Encodes free-text queries into the same embedding space
+- Retrieves top-k nearest emails with subject, sender, and snippets
 
-- **Threading & Dataset Creation (`sample_emails.py`, `sample_chains.py`)**
-  - Parse mbox files into structured message objects, including threading fields like `Message-ID`, `In-Reply-To`, and `References`.
-  - Clean bodies by stripping quoted previous messages.
-  - Reconstruct threads and filter to those where I have at least one sent email.
-  - Export conversation snippets for use in a JSONL training file (`openai_training.jsonl`), with a fixed system prompt that captures my desired email tone.
+**Threading & Dataset Creation (`sample_emails.py`, `sample_chains.py`)**
+- Parses MBOX files into structured message objects with threading fields
+- Cleans bodies by stripping quoted previous messages
+- Reconstructs conversation threads and filters for those containing my replies
+- Exports conversation snippets as JSONL training data
 
-This architecture keeps responsibilities separated: parsing, indexing, querying, and dataset generation can all evolve independently.
+---
 
 ## Key Features
 
-- Semantic email search using sentence-transformer embeddings and FAISS.
-- Local, file-based index persisted as `email_index.faiss` plus a CSV metadata store.
-- Incremental index updates with de-duplication of already indexed messages.
-- Robust email parsing from mbox archives, including basic body decoding and normalization.
-- Thread reconstruction based on `In-Reply-To` and `References` headers.
-- Cleaning utilities to remove quoted reply chains from email bodies.
-- JSONL training samples for a personalized email-response assistant.
+- Semantic email search using transformer embeddings and FAISS indexing
+- Local, file-based persistence with `email_index.faiss` and CSV metadata
+- Incremental index updates with automatic de-duplication
+- Robust MBOX parsing with defensive handling of missing fields and encoding issues
+- Thread reconstruction using `In-Reply-To` and `References` headers
+- Email body cleaning to remove quoted reply chains
+- JSONL training sample generation for personalized email assistants
+
+---
 
 ## Technical Details
 
-The ingestion pipeline in `main.py` starts by defining a list of mbox paths:
+### Email Extraction and Normalization
+
+The ingestion pipeline starts by defining MBOX paths and loading the sentence transformer model:
 
 ```python
 MBOX_PATHS = ["raw_mail/Important.mbox", "raw_mail/Sent.mbox"]
@@ -105,38 +114,24 @@ MAX_EMAILS = 5000
 model = SentenceTransformer("all-MiniLM-L6-v2")
 ```
 
-### Email Extraction and Normalization
+I use Python's `mailbox.mbox` interface to iterate through messages, handling missing fields defensively:
 
-I use the `mailbox.mbox` interface to iterate through messages, handling missing fields and decoding bodies defensively:
+- Subject defaults to `"(No Subject)"` if absent
+- Sender defaults to `"Unknown Sender"`
+- Body extraction uses `msg.get_payload(decode=True)` with UTF-8 decoding and `errors="ignore"`
 
-- Subject defaults to `"(No Subject)"` if absent.
-- Sender defaults to `"Unknown Sender"`.
-- Body is taken from `msg.get_payload(decode=True)` and decoded as UTF-8 with `errors="ignore"`; on failure, the body falls back to an empty string.
-
-Each email is consolidated into a `FullText` block:
+Each email gets consolidated into a `FullText` block for embedding:
 
 ```python
 full_text = f"Subject: {subject}\nSender: {sender}\nBody: {body}"
 emails.append((subject, sender, body, full_text))
 ```
 
-To avoid unbounded memory growth and to keep the index small while prototyping, I:
+To manage memory and keep the prototype index manageable, I sample a maximum number of emails per MBOX file and use `random.sample` if any mailbox exceeds the quota.
 
-- Sample a maximum number of emails per mbox: `max_emails // len(mbox_paths)`.
-- Randomly subsample if a mailbox exceeds that quota (`random.sample`).
+### Embedding and Vector Indexing
 
-The emails are converted into a pandas DataFrame with columns:
-
-- `Subject`
-- `Sender`
-- `Body`
-- `FullText`
-
-and saved to `emails.csv`.
-
-### Embedding and Indexing
-
-I use `SentenceTransformer("all-MiniLM-L6-v2")` to encode the `FullText` column:
+I encode the `FullText` column using the sentence transformer and build a FAISS index:
 
 ```python
 email_vectors = model.encode(df["FullText"].tolist(), convert_to_numpy=True)
@@ -146,28 +141,28 @@ index.add(email_vectors)
 faiss.write_index(index, "email_index.faiss")
 ```
 
-The choice of `IndexFlatL2` trades off advanced recall/speed options for simplicity and predictable behavior. For this dataset size, brute-force L2 search is acceptable.
+I chose `IndexFlatL2` for its simplicity and predictable behavior. For this dataset size, brute-force L2 search provides acceptable performance while avoiding the complexity of approximate methods.
 
 ### Incremental Updates and De-duplication
 
-`append.py` handles appending new messages:
+The append workflow in `append.py` handles new messages efficiently:
 
-1. Load the existing index and CSV if present; otherwise, initialize empty structures.
-2. Parse a new mbox (`NEW_MBOX_PATH`) into email tuples similar to `main.py`.
-3. De-duplicate by checking whether each new email’s `FullText` is already in `existing_emails`.
+1. Load existing index and CSV if present, otherwise initialize empty structures
+2. Parse new MBOX file into email tuples
+3. De-duplicate by checking if each new email's `FullText` already exists:
 
 ```python
 filtered_emails = [email for email in new_emails if email[3] not in existing_emails]
 ```
 
-4. Encode only `filtered_emails` and add them to the FAISS index (`index.add(new_vectors)`).
-5. Concatenate `df_existing` and `df_new` and write back to `emails.csv`.
+4. Encode only filtered emails and add vectors to the FAISS index
+5. Concatenate existing and new DataFrames and persist to CSV
 
-This gives me an append-only workflow without needing to rebuild the index from scratch.
+This append-only approach avoids rebuilding the entire index for incremental updates.
 
-### Semantic Search
+### Semantic Search Interface
 
-`search.py` loads the shared model and index:
+The search component loads the shared model and index:
 
 ```python
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -175,7 +170,7 @@ index = faiss.read_index("email_index.faiss")
 df = pd.read_csv("emails.csv").fillna("")
 ```
 
-For any text query:
+For any text query, I encode it and search the vector space:
 
 ```python
 query_vector = model.encode([query], convert_to_numpy=True)
@@ -183,55 +178,47 @@ distances, indices = index.search(query_vector, top_n)
 results = df.iloc[indices[0]]
 ```
 
-I then print each result with:
+The interface runs as a simple REPL, displaying results with subject, sender, and the first 200 characters of the body as a snippet.
 
-- Subject
-- Sender
-- First 200 characters of the body as a snippet
+### Thread Reconstruction and Training Data
 
-This loop runs inside a simple REPL so I can iteratively refine queries interactively.
+The threading components extract structured conversation data:
 
-### Threading and Training Data
+- Parse headers including `Message-ID`, `In-Reply-To`, `References`, `From`, `To`, `Subject`, and `Date`
+- Clean email bodies using `clean_email_body` to strip quoted history
+- Remove lines starting with `>` or containing `"wrote:"`
+- Handle multipart messages by selecting `text/plain` parts
 
-`sample_emails.py` and `sample_chains.py` focus on structuring email conversations:
+The `build_threads` function uses `defaultdict(list)` to map messages by ID and attach replies using direct `in_reply_to` references or fallback scanning of `references` fields. I filter threads to include only those containing at least one of my sent messages.
 
-- Extract headers: `Message-ID`, `In-Reply-To`, `References`, `From`, `To`, `Subject`, `Date`.
-- Parse dates via `email.utils.parsedate_to_datetime`.
-- Use `clean_email_body` to get a text body stripped of quoted history:
-  - For multipart messages, walk parts and select `text/plain`.
-  - Remove quoted lines starting with `>` or containing `"wrote:"`.
+The resulting conversation structures export to `openai_training.jsonl` with each line containing:
+- A `system` message defining my email response style
+- A `user` message with the incoming email
+- An `assistant` message with my actual reply
 
-`build_threads` uses `defaultdict(list)` to:
-
-- Map each message by `message_id`.
-- Attach replies using:
-  - Direct `in_reply_to` references where possible.
-  - Fallback to scanning `references` fields for a known ID.
-- Filter threads to those containing at least one of my own sent messages, identified via a set of sent message IDs.
-- Sort threads by most recent message date.
-
-The resulting structures are suitable for conversion into OpenAI-style conversation examples, stored in `openai_training.jsonl` where each line has:
-
-- A `system` message with my email-response style.
-- A `user` message containing the incoming email.
-- An `assistant` message containing my real reply.
-
-This file can then be used to fine-tune or adapt an LLM to answer emails in my voice.
+---
 
 ## Results
 
-- Indexed thousands of personal emails into a FAISS vector store with minimal memory overhead.
-- Achieved intuitive semantic search behavior: I can type a natural-language description of an email and retrieve relevant messages even when phrasing and keywords differ.
-- Established a repeatable append workflow that keeps the index and CSV in sync as new mail is exported.
-- Generated a real-world, thread-aware dataset suitable for training a personalized email assistant.
+I successfully indexed thousands of personal emails into a FAISS vector store with minimal memory overhead. The semantic search delivers intuitive behavior—I can describe emails in natural language and retrieve relevant messages even when keywords and phrasing differ significantly from my query.
+
+The incremental update workflow maintains index and CSV synchronization as new mail exports become available. I've generated a real-world, thread-aware dataset suitable for training personalized email assistants using actual conversation patterns from my email history.
+
+---
 
 ## Lessons Learned
 
-- **Data hygiene matters:** Handling missing headers, inconsistent encodings, and multipart messages is critical before any ML work can be effective.
-- **Simple FAISS setups go a long way:** For modest corpus sizes, `IndexFlatL2` plus good embeddings is more than enough; complexity can be deferred.
-- **De-duplication strategy needs care:** Using `FullText` as a uniqueness key works initially but could be improved with message IDs or hashes for robustness.
-- **Thread reconstruction is subtle:** `In-Reply-To` and `References` can be incomplete or inconsistent; a conservative threading approach avoids mis-grouping but leaves room for refinement.
-- **Training data from real conversations is powerful:** Real-world email threads provide rich examples for modeling tone, structure, and reply patterns in a personalized assistant.
+**Data hygiene is critical** before any ML work can be effective. Handling missing headers, inconsistent encodings, and multipart messages requires defensive programming throughout the pipeline.
+
+**Simple FAISS configurations are often sufficient**. For modest corpus sizes, `IndexFlatL2` with good embeddings outperforms complex approximate methods while remaining easier to debug and reason about.
+
+**De-duplication strategy needs refinement**. Using `FullText` as a uniqueness key works initially but could be improved with message IDs or content hashes for better robustness.
+
+**Thread reconstruction is subtle**. Email headers like `In-Reply-To` and `References` can be incomplete or inconsistent. A conservative threading approach avoids mis-grouping conversations but leaves room for more sophisticated reconstruction algorithms.
+
+**Real conversation data is invaluable** for training personalized models. Actual email threads provide rich examples of tone, structure, and reply patterns that synthetic data cannot replicate.
+
+---
 
 ## Links
 

@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import ProjectScatterplot from '$lib/components/ProjectScatterplot.svelte';
+  import MiniRadar from '$lib/components/MiniRadar.svelte';
 
   let scrollProgress = 0;
   let galleryEl;
@@ -131,6 +132,9 @@
         </div>
 
         <div class="gallery-overlay">
+          <div class="overlay-radar">
+            <MiniRadar slug={project.slug} size={26} />
+          </div>
           <div class="overlay-content">
             <h3>{project.title}</h3>
             <div class="overlay-tags">
@@ -238,6 +242,18 @@
     background: linear-gradient(135deg, #161820, #0a0c12);
   }
 
+  .overlay-radar {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.65rem;
+    z-index: 2;
+  }
+
+  .gallery-item.alt .overlay-radar {
+    left: auto;
+    right: 0.65rem;
+  }
+
   .hero-image {
     position: absolute;
     inset: 0;
@@ -313,6 +329,8 @@
 
   .overlay-content {
     width: 100%;
+    position: relative;
+    z-index: 1;
   }
 
   .overlay-content h3 {

@@ -1,83 +1,94 @@
 ---
-title: Exoticproducepackingoptimization
-subtitle: MATLAB-based modeling and simulation of how to optimally pack three categories
-  of exotic produce under spatial and combinatorial constraints. Uses sparse Gaussian-weighted
-  adjacency matrices and exhaustive pattern enumeration to explore configuration spaces
-  that would be infeasible to reason about manually.
+title: Exotic Produce Packing Optimization
+subtitle: 'MATLAB-based modeling and simulation of optimal packing for three categories
+  of exotic produce under spatial and combinatorial constraints.
+
+  '
 slug: exoticproducepackingoptimization
 date: '2025-11-11'
-updated: '2025-11-11'
+updated: '2026-02-06'
 tags:
 - matlab
 - simulation
+- optimization
 maturity: prototype
 featured: false
 visibility: public
 heroImage: /generated/logos/exoticproducepackingoptimization.png
 ---
+
 ## Overview
 
-ExoticProducePackingOptimization is a MATLAB-based modeling and simulation project where I explore how to optimally pack and route exotic produce in a warehouse or distribution grid. I treat the warehouse as a 2D lattice, build spatial interaction weights with Gaussian kernels, and explore combinatorial packing patterns for different product categories. The focus is on translating an abstract logistics problem into concrete mathematical objects that I can simulate, analyze, and iterate on.
+I built a MATLAB-based modeling and simulation system to explore optimal packing strategies for exotic produce in warehouse environments. The system treats the warehouse as a 2D lattice and uses sparse Gaussian-weighted adjacency matrices to model spatial interactions between storage locations. I implemented exhaustive pattern enumeration to explore configuration spaces that would be infeasible to reason about manually.
+
+The project translates an abstract logistics problem into concrete mathematical objects that can be simulated, analyzed, and iterated on. I focused on building robust spatial interaction models and combinatorial pattern generators that could serve as the foundation for more complex optimization routines.
+
+---
 
 ## Role & Context
 
-I built this project as an individual contributor in the context of a modeling and simulation coursework assignment (“ModSim Project 2”). My goals were:
+I developed this project as a solo effort for a modeling and simulation coursework assignment. My primary goals were to frame a realistic logistics problem as a mathematical model, implement core computations using vectorized MATLAB methods, and experiment with how different neighborhood structures affect feasible packing configurations.
 
-- To frame a realistic logistics/packing problem as a mathematical model.
-- To implement the core computations in MATLAB using vectorized, numerically stable methods.
-- To experiment with how different neighborhood structures and product mixes affect feasible packing configurations.
+The work represents my approach to bridging theoretical optimization concepts with practical warehouse management challenges.
+
+---
 
 ## Tech Stack
 
 - MATLAB
 - MATLAB Project (.prj) structure
 - MATLAB sparse matrix utilities
+- Combinatorial optimization algorithms
+
+---
 
 ## Problem
 
-The high-level problem I wanted to study was:
+I wanted to study how to optimally pack multiple categories of exotic produce in a grid-like storage area. The core challenges were:
 
-> Given a grid-like storage or packing area and multiple categories of exotic produce, how can we:
-> - Represent spatial interactions between locations (e.g., cooling influence, handling proximity, cross-contamination risk)?
-> - Enumerate or sample viable packing patterns under categorical constraints?
-> - Prepare a structure that could be used for further optimization (e.g., minimizing damage risk, travel time, or temperature variance)?
+- Representing spatial interactions between locations (cooling influence, handling proximity, cross-contamination risk)
+- Enumerating viable packing patterns under categorical constraints
+- Building a structure suitable for optimization objectives like minimizing damage risk or temperature variance
 
-In particular, I needed:
+I needed a robust way to build spatial weight matrices that decay smoothly with distance and can be truncated beyond a practical radius, plus a method to generate all possible category assignments for fixed slot counts.
 
-- A robust way to build spatial weight matrices that decay smoothly with distance and can be truncated beyond a practical radius.
-- A way to generate all possible category assignments for a fixed number of slots, given fixed counts per category (e.g., equal counts of three produce types).
+---
 
 ## Approach / Architecture
 
 I decomposed the problem into two core modeling components:
 
-1. **Spatial interaction modeling**
+**Spatial Interaction Modeling**
+- Represent the warehouse as an `Nside × Nside` grid
+- Construct a Gaussian-based weight matrix `W` defining interaction strength between cells
+- Apply distance-based decay and radius truncation for computational efficiency
+- Normalize weights row-wise for probabilistic interpretation
 
-   - Represent the warehouse (or packing surface) as an `Nside × Nside` grid.
-   - Construct a Gaussian-based weight matrix `W` defining how strongly each cell interacts with its neighbors, with distance-based decay and radius truncation.
-   - Normalize the weights row-wise so they can represent probabilities or influence coefficients.
+**Combinatorial Packing Patterns**
+- Model scenarios with three produce categories and `n` items of each type
+- Encode packing configurations as label vectors of length `3n`
+- Generate complete pattern sets using combinatorics while respecting count constraints
 
-2. **Combinatorial packing patterns**
+The entire project uses MATLAB Project structure to maintain organized environments and support reproducible simulations.
 
-   - Model a packing scenario with three categories (e.g., three types of produce) and `n` items of each category.
-   - Encode each possible packing configuration as a vector of labels of length `3n`.
-   - Generate the full set of patterns using combinatorics (`nchoosek`) such that each pattern respects the required counts for each category.
-
-The project is wrapped in a MATLAB Project (`.prj`), which keeps the environment, paths, and metadata organized for reproducible runs and easy extension into more complex simulations (e.g., objective functions, optimization loops, or Monte Carlo experiments).
+---
 
 ## Key Features
 
-- Gaussian-based spatial weight matrix generator with distance truncation and normalization.
-- Efficient use of sparse matrices for large grid-based interaction networks.
-- Exhaustive pattern generator for equal-count tri-category packing (`(3n)! / (n!)^3` configurations).
-- Clear separation between spatial modeling (layout) and combinatorial modeling (category assignments).
-- MATLAB Project structure for reproducible, IDE-integrated workflows.
+- Gaussian-based spatial weight matrix generator with distance truncation
+- Efficient sparse matrix implementation for large grid networks
+- Exhaustive pattern generator for equal-count tri-category packing
+- Clear separation between spatial modeling and combinatorial assignments
+- MATLAB Project integration for reproducible workflows
+- Scalable architecture supporting future optimization extensions
+
+---
 
 ## Technical Details
 
-### Spatial Weight Matrix: `makeW_gaussian.m`
+### Spatial Weight Matrix Generation
 
-The `makeW_gaussian` function constructs a normalized, sparse interaction matrix `W` over a 2D grid:
+I implemented `makeW_gaussian.m` to construct normalized, sparse interaction matrices over 2D grids:
 
 ```matlab
 function W = makeW_gaussian(Nside, r, sigma)
@@ -96,17 +107,21 @@ function W = makeW_gaussian(Nside, r, sigma)
 end
 ```
 
-Key design choices:
+### Grid Encoding Strategy
 
-- **Grid encoding**: I flatten the 2D grid into `N = Nside^2` nodes, while still storing their `(i, j)` coordinates in `xy`. This allows me to compute pairwise Euclidean distances using `pdist2` once, then reuse them for building interaction kernels.
-- **Gaussian kernel**: `A_ij = exp(-(d_ij / sigma)^2)` yields smooth decay with distance. `sigma` controls how quickly influence drops off.
-- **Radius truncation**: For computational efficiency and realism, I set entries where `D > r` to zero. This gives a banded, local-interaction structure matching physical intuition (cells far apart do not meaningfully interact).
-- **Sparsity**: After truncation, `A` is sparse. Converting to `sparse(A)` is crucial when `Nside` grows, dramatically reducing memory footprint and improving performance for matrix operations.
-- **Row normalization**: I normalize each row so that `sum_j W_ij = 1`, whenever there are neighbors. This supports multiple interpretations (e.g., as a stochastic matrix, influence weights, or convex combination coefficients), and I guard against empty rows via `max(rowSum,1)` to avoid division by zero.
+I flatten the 2D grid into `N = Nside^2` nodes while preserving coordinate information in the `xy` matrix. This allows efficient pairwise distance computation using `pdist2` and supports reusable interaction kernels.
 
-### Pattern Enumeration: `patterns3.m`
+### Gaussian Kernel Design
 
-The `patterns3` function enumerates all possible assignments of three labels with equal counts:
+The interaction strength follows `A_ij = exp(-(d_ij / sigma)^2)`, providing smooth distance-based decay. The `sigma` parameter controls influence dropoff rate, while radius truncation (`D > r`) creates realistic local-interaction patterns and improves computational efficiency.
+
+### Sparsity and Normalization
+
+After truncation, I convert to sparse format to dramatically reduce memory usage for large grids. Row normalization ensures `sum_j W_ij = 1` for interpretability as stochastic matrices or influence weights, with division-by-zero protection via `max(rowSum,1)`.
+
+### Pattern Enumeration System
+
+The `patterns3.m` function generates all possible tri-category assignments with equal counts:
 
 ```matlab
 function P = patterns3(n)
@@ -131,50 +146,46 @@ end
 end
 ```
 
-Key aspects:
+### Combinatorial Construction
 
-- **Combinatorial basis**: I construct all patterns by:
-  - First choosing which positions get label `1` (`idx1`).
-  - Then, for each such choice, choosing which of the remaining positions get label `2` (`idx2`).
-  - All remaining positions default to label `3`.
-- **Memory awareness**: The combinatorial explosion is explicit in `K = (3n)! / (n!)^3`. This makes the function very useful for small `n` (e.g., to validate optimization heuristics or constraints) while also highlighting when exhaustive enumeration becomes infeasible.
-- **Compact storage**: Using `uint8` for labels keeps memory usage down and is sufficient for categorical IDs.
+I build patterns by first selecting positions for label 1 using `nchoosek`, then choosing label 2 positions from remaining slots. All other positions default to label 3. This systematic approach ensures complete enumeration while making the combinatorial explosion explicit through `K = (3n)! / (n!)^3`.
 
-Conceptually, each column of `P` is a full packing configuration across `3n` slots, where the counts of each type are fixed to `n`. This structure is flexible: I can later map labels `{1,2,3}` to specific produce types, handling constraints like “do not place type 1 adjacent to type 2 under a given `W`.”
+### Memory Optimization
 
-### MATLAB Project Structure
+Using `uint8` for categorical labels minimizes memory usage while supporting sufficient label ranges. Each column in the output matrix `P` represents a complete packing configuration across `3n` slots with fixed type counts.
 
-The `.prj` file and associated `resources/project/*.xml` files:
-
-- Capture project metadata (name, root, and categories such as `design`, `derived`, and `artifact`).
-- Allow MATLAB to restore the project environment, making it easier to extend the work into:
-  - Scripted simulations over different `Nside`, `r`, and `sigma`.
-  - Integration with optimization routines (e.g., `fmincon`, custom heuristics, or metaheuristics).
+---
 
 ## Results
 
-This project produced:
+The project delivered two reusable components:
 
-- A reusable, parameterized **spatial interaction generator** that can be applied to:
-  - Packing and layout problems.
-  - Diffusion-like simulations or Markov processes on grids.
-- A **combinatorial pattern generator** that enumerates feasible tri-category layouts with fixed counts, suitable as:
-  - A ground-truth basis for validating heuristic or approximate optimization solutions.
-  - A way to benchmark how layout interacts with the spatial coupling represented by `W`.
+**Spatial Interaction Generator**
+- Parameterized system applicable to packing, layout, and diffusion problems
+- Support for Markov processes on grid structures
+- Flexible kernel parameters for different physical scenarios
 
-Even at this stage, I can combine these components to:
+**Combinatorial Pattern Generator**
+- Complete enumeration of feasible tri-category layouts
+- Ground-truth basis for validating optimization heuristics
+- Benchmark capability for studying layout-neighborhood interactions
 
-- Inspect how different radius and `sigma` values change the effective “neighborhood” of each slot.
-- Study how specific packing patterns (e.g., clustering vs. mixing of produce types) might interact with that neighborhood, paving the way for future objective functions (e.g., minimizing “risk” computed from `W` and pattern labels).
+I can now combine these components to analyze how different radius and sigma values affect neighborhood structures, and study how specific packing patterns interact with spatial coupling for future objective function development.
+
+---
 
 ## Lessons Learned
 
-- **Sparse linear algebra is essential**: For grid-based models, applying sparsity early (and explicitly) keeps simulations tractable and fast.
-- **Kernel parameters matter**: The choice of `sigma` and truncation radius `r` fundamentally changes the structure of the system. Modeling assumptions should be clearly tied to physical intuition (e.g., cooling radius, handling radius).
-- **Enumeration vs. optimization**: Exhaustively listing patterns via combinatorics is powerful for understanding the search space but becomes infeasible quickly; in a production setting, this pushes you toward optimization or sampling approaches.
-- **Project structure helps scalability**: Using MATLAB Project infrastructure, even for a small assignment, makes it easier to grow the codebase into a more complex simulation framework.
+**Sparse Linear Algebra is Critical** - For grid-based models, applying sparsity early keeps simulations tractable and maintains performance at scale.
+
+**Kernel Parameters Drive System Behavior** - The choice of `sigma` and truncation radius `r` fundamentally changes system structure. Modeling assumptions must tie clearly to physical intuition like cooling or handling radii.
+
+**Enumeration vs. Optimization Tradeoffs** - Exhaustive pattern listing provides complete search space understanding but becomes computationally infeasible quickly, pushing toward optimization or sampling approaches in production.
+
+**Project Structure Enables Growth** - Using MATLAB Project infrastructure, even for small assignments, significantly eases expansion into complex simulation frameworks.
+
+---
 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/ExoticProducePackingOptimization)
-- Demo / write-up: _TBD_

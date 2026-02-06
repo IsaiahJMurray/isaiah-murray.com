@@ -15,7 +15,33 @@
       ],
       "heroImage": "/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5213_929d9e.png",
       "x": 0.0,
-      "y": 0.31664452256997144
+      "y": 0.6891428401245708,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.6545680156383423
+        },
+        {
+          "label": "Software",
+          "value": 0.32766218983304646
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.8471486495046554
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.5456764199037122
+        },
+        {
+          "label": "Research",
+          "value": 1.0
+        },
+        {
+          "label": "Creative",
+          "value": 0.45657327957143856
+        }
+      ]
     },
     {
       "slug": "binaric",
@@ -27,8 +53,34 @@
         "ml"
       ],
       "heroImage": "/generated/logos/binaric.png",
-      "x": 0.5570576205976563,
-      "y": 0.6479900184267859
+      "x": 0.5364587857051931,
+      "y": 0.3757048825435226,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.310633121428346
+        },
+        {
+          "label": "Software",
+          "value": 0.42542209960551713
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.16564061312320774
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.624029258043901
+        },
+        {
+          "label": "Research",
+          "value": 0.04935157059268102
+        },
+        {
+          "label": "Creative",
+          "value": 0.0
+        }
+      ]
     },
     {
       "slug": "boxed-memories",
@@ -44,8 +96,34 @@
         "installation-art"
       ],
       "heroImage": "/images/projects/boxed_memories/island_final_image_presentation_good_looking_no_user.webp",
-      "x": 0.21195195541671874,
-      "y": 0.41204508661011174
+      "x": 0.21813125934394142,
+      "y": 0.618916907162481,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.49124151436252134
+        },
+        {
+          "label": "Software",
+          "value": 0.6419638806888023
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.6613310046351408
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.7531033456794277
+        },
+        {
+          "label": "Research",
+          "value": 0.6954142299175156
+        },
+        {
+          "label": "Creative",
+          "value": 1.0
+        }
+      ]
     },
     {
       "slug": "bragi",
@@ -69,8 +147,34 @@
         "voice-recognition"
       ],
       "heroImage": "/images/projects/bragi_master/low_quality_mapping_demo3_with_bbox.png",
-      "x": 0.5974453044238319,
-      "y": 0.41500200119499236
+      "x": 0.6043600496415847,
+      "y": 0.5661267538093542,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.3004936555424739
+        },
+        {
+          "label": "Software",
+          "value": 0.7927671700056951
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.4663063072429545
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.8720411338569424
+        },
+        {
+          "label": "Research",
+          "value": 0.49935198073099696
+        },
+        {
+          "label": "Creative",
+          "value": 0.6712642964220633
+        }
+      ]
     },
     {
       "slug": "pcb-business-card",
@@ -90,8 +194,34 @@
         "low-power"
       ],
       "heroImage": "/images/projects/pcb_card/IMG_4365.jpeg",
-      "x": 0.17195067836590497,
-      "y": 0.14616347694478035
+      "x": 0.1729915257898719,
+      "y": 0.896488250077262,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 1.0
+        },
+        {
+          "label": "Software",
+          "value": 0.5160187887793196
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.9022372697253341
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.48283154582109966
+        },
+        {
+          "label": "Research",
+          "value": 0.8807114330055795
+        },
+        {
+          "label": "Creative",
+          "value": 0.4203386377898722
+        }
+      ]
     },
     {
       "slug": "c",
@@ -99,8 +229,34 @@
       "subtitle": "High-performance Boids flocking simulation in C++ and SFML, rendering 1,000 agents navigating a 2D space with wrap-around boundaries. Designed for graphics and game dev enthusiasts exploring emergent behavior, it adds obstacle-aware steering, leader boids, and tunable separation/alignment/cohesion radii and coefficients.",
       "tags": [],
       "heroImage": "/generated/logos/c.png",
-      "x": 0.523828936982012,
-      "y": 0.560197153339129
+      "x": 0.5099316175315837,
+      "y": 0.5321726955545482,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.1727726971547883
+        },
+        {
+          "label": "Software",
+          "value": 0.20699238957453633
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.32298443107012015
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.4702945537425134
+        },
+        {
+          "label": "Research",
+          "value": 0.23578186157409198
+        },
+        {
+          "label": "Creative",
+          "value": 0.037202333529746556
+        }
+      ]
     },
     {
       "slug": "calendar-plugin",
@@ -111,8 +267,34 @@
         "javascript"
       ],
       "heroImage": "/generated/logos/calendar-plugin.png",
-      "x": 0.9303826630401639,
-      "y": 0.4195956320148125
+      "x": 0.9228470693145103,
+      "y": 0.5730984483893831,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.07713431951755007
+        },
+        {
+          "label": "Software",
+          "value": 0.7146426272563203
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.3149850852755664
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.22613836485412295
+        },
+        {
+          "label": "Research",
+          "value": 0.1622796868358339
+        },
+        {
+          "label": "Creative",
+          "value": 0.3196122254519185
+        }
+      ]
     },
     {
       "slug": "clasp",
@@ -128,8 +310,34 @@
         "electronics"
       ],
       "heroImage": "/images/projects/clasp/IMG_4305-min.jpg",
-      "x": 0.2144019300489819,
-      "y": 0.0
+      "x": 0.2277412108866576,
+      "y": 1.0,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.8242874854297741
+        },
+        {
+          "label": "Software",
+          "value": 0.39243857100200136
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.7315532345705608
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.3648917064616894
+        },
+        {
+          "label": "Research",
+          "value": 0.8226752995326396
+        },
+        {
+          "label": "Creative",
+          "value": 0.2575057710615635
+        }
+      ]
     },
     {
       "slug": "code-cruiser",
@@ -143,8 +351,34 @@
         "physical-computing"
       ],
       "heroImage": "/images/projects/code_cruiser/title_image.jpg",
-      "x": 0.2654069188309937,
-      "y": 0.38145588012267334
+      "x": 0.2736600225554669,
+      "y": 0.6497452041522525,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.5311727527429135
+        },
+        {
+          "label": "Software",
+          "value": 0.7220663934378069
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.7326369968989023
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.45243364783452816
+        },
+        {
+          "label": "Research",
+          "value": 0.7558330678143481
+        },
+        {
+          "label": "Creative",
+          "value": 0.6542483790685987
+        }
+      ]
     },
     {
       "slug": "curator",
@@ -159,8 +393,34 @@
         "sveltekit"
       ],
       "heroImage": "/generated/logos/curator.png",
-      "x": 0.8734825057685088,
-      "y": 0.6441720926421785
+      "x": 0.8576331841353776,
+      "y": 0.3689081595470335,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.0994432471085015
+        },
+        {
+          "label": "Software",
+          "value": 0.5377663070049387
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.4096768670505804
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.40438479804330313
+        },
+        {
+          "label": "Research",
+          "value": 0.3723073180494233
+        },
+        {
+          "label": "Creative",
+          "value": 0.395363233036812
+        }
+      ]
     },
     {
       "slug": "desk-projector",
@@ -170,8 +430,34 @@
         "python"
       ],
       "heroImage": "/generated/logos/desk-projector.png",
-      "x": 0.30411193188236196,
-      "y": 0.5711169946793575
+      "x": 0.2900331165309094,
+      "y": 0.4750135901263973,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.3369631306449907
+        },
+        {
+          "label": "Software",
+          "value": 0.39433296943561336
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.6223813346280335
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.5906290097837349
+        },
+        {
+          "label": "Research",
+          "value": 0.5647141890748695
+        },
+        {
+          "label": "Creative",
+          "value": 0.6101566361868624
+        }
+      ]
     },
     {
       "slug": "digikeydisplay",
@@ -182,8 +468,34 @@
         "visualization"
       ],
       "heroImage": "/generated/logos/digikeydisplay.png",
-      "x": 0.4417550365035695,
-      "y": 0.6883900465014738
+      "x": 0.41965662893658634,
+      "y": 0.355980528167261,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.30418660833757144
+        },
+        {
+          "label": "Software",
+          "value": 0.27336029931149197
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.34987297259722394
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.4903716712448322
+        },
+        {
+          "label": "Research",
+          "value": 0.0
+        },
+        {
+          "label": "Creative",
+          "value": 0.13259313691132163
+        }
+      ]
     },
     {
       "slug": "egg-lathe",
@@ -201,25 +513,78 @@
         "fabrication"
       ],
       "heroImage": "\\images\\projects\\egg_lathe\\4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg",
-      "x": 0.38374063453453044,
-      "y": 0.47349695998260194
+      "x": 0.37226646759659004,
+      "y": 0.563169544130996,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.4533060158721622
+        },
+        {
+          "label": "Software",
+          "value": 0.6291748417271313
+        },
+        {
+          "label": "Mechanics",
+          "value": 1.0
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.5988196364265839
+        },
+        {
+          "label": "Research",
+          "value": 0.7532197976556514
+        },
+        {
+          "label": "Creative",
+          "value": 0.4789612975662878
+        }
+      ]
     },
     {
       "slug": "exoticproducepackingoptimization",
-      "title": "Exoticproducepackingoptimization",
-      "subtitle": "MATLAB-based modeling and simulation of how to optimally pack three categories of exotic produce under spatial and combinatorial constraints. Uses sparse Gaussian-weighted adjacency matrices and exhaustive pattern enumeration to explore configuration spaces that would be infeasible to reason about manually.",
+      "title": "Exotic Produce Packing Optimization",
+      "subtitle": "MATLAB-based modeling and simulation of optimal packing for three categories of exotic produce under spatial and combinatorial constraints.\n",
       "tags": [
         "matlab",
-        "simulation"
+        "simulation",
+        "optimization"
       ],
       "heroImage": "/generated/logos/exoticproducepackingoptimization.png",
-      "x": 0.42153725763239264,
-      "y": 0.8801612347366742
+      "x": 0.32888044211303236,
+      "y": 0.18914115532561088,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.20822198618455154
+        },
+        {
+          "label": "Software",
+          "value": 0.2996091254770518
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.4708773873712088
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.6836888289605957
+        },
+        {
+          "label": "Research",
+          "value": 0.5456619111940908
+        },
+        {
+          "label": "Creative",
+          "value": 0.21824787617100133
+        }
+      ]
     },
     {
       "slug": "github-grader",
       "title": "Github Grader",
-      "subtitle": "An Apple Fitness\u2013style dashboard for developers that visualizes your GitHub activity, daily coding stats, and repository health. Built with SvelteKit, it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata into interactive SVG \u201cactivity rings\u201d and stat cards.",
+      "subtitle": "An Apple Fitness\u2013style dashboard for developers that visualizes your GitHub activity, daily coding stats, and repository health. Built with SvelteKit, it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata into interactive SVG \"activity rings\" and stat cards.\n",
       "tags": [
         "html",
         "javascript",
@@ -227,43 +592,154 @@
         "sveltekit"
       ],
       "heroImage": "/generated/logos/github-grader.png",
-      "x": 0.9250696920019843,
-      "y": 0.2593681407465718
+      "x": 0.908660581638352,
+      "y": 0.7375701029407772,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.217731110884084
+        },
+        {
+          "label": "Software",
+          "value": 0.8749076630494904
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.2761800428171276
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.3757122361035845
+        },
+        {
+          "label": "Research",
+          "value": 0.2870428253832692
+        },
+        {
+          "label": "Creative",
+          "value": 0.4211612061172275
+        }
+      ]
     },
     {
       "slug": "gmail-categorization",
       "title": "Gmail Categorization",
-      "subtitle": "Semantic search engine over your Gmail archive that finds relevant emails by meaning, not just keywords. Built for power users who live in their inbox and want fast retrieval and training data for AI email assistants. Uses SentenceTransformers embeddings, FAISS vector indexing, and MBOX parsing with incremental index updates and cleaned conversation threads.",
+      "subtitle": "Semantic search engine over your Gmail archive that finds relevant emails by meaning, not just keywords. Built for power users who live in their inbox and want fast retrieval and training data for AI email assistants.\n",
       "tags": [
-        "python"
+        "python",
+        "machine-learning",
+        "nlp",
+        "faiss",
+        "email"
       ],
       "heroImage": "/generated/logos/gmail-categorization.png",
-      "x": 0.785115522359339,
-      "y": 0.8516020271293748
+      "x": 0.6898452130803817,
+      "y": 0.13934693833405315,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.18903757025584253
+        },
+        {
+          "label": "Software",
+          "value": 0.394807538115193
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.36857459770978385
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.9073064482205971
+        },
+        {
+          "label": "Research",
+          "value": 0.3841543358739135
+        },
+        {
+          "label": "Creative",
+          "value": 0.02383271243670561
+        }
+      ]
     },
     {
       "slug": "lego-sorter",
       "title": "Lego Sorter",
-      "subtitle": "A configurable CNN-based image classifier that learns to distinguish between different LEGO pieces from photos. Built for students and ML practitioners exploring TensorFlow pipelines, it supports randomized architecture generation, automated training/evaluation, and rich logging of run histories for comparative experiments.",
+      "subtitle": "A configurable CNN-based image classifier that learns to distinguish between different LEGO pieces from photos. Built for students and ML practitioners exploring TensorFlow pipelines, it supports randomized architecture generation, automated training/evaluation, and rich logging of run histories for comparative experiments.\n",
       "tags": [
         "python",
         "simulation",
         "ml"
       ],
       "heroImage": "/generated/logos/lego-sorter.png",
-      "x": 0.3205623354946932,
-      "y": 0.8300491605445118
+      "x": 0.31167519347838313,
+      "y": 0.19504223119942202,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.16739078434509888
+        },
+        {
+          "label": "Software",
+          "value": 0.0
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.344306956300318
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.8023147383951834
+        },
+        {
+          "label": "Research",
+          "value": 0.6379334588615158
+        },
+        {
+          "label": "Creative",
+          "value": 0.1424132703330388
+        }
+      ]
     },
     {
       "slug": "limen",
       "title": "Limen",
-      "subtitle": "A SwiftUI iOS client for orchestrating AI assistant \u201csessions\u201d that send user queries to a configurable backend and render dynamic responses. Built for developers integrating tool-calling/async workflows, it features a flexible `CodableValue` model for arbitrary JSON payloads and a clean MVVM structure around `SessionViewModel`.",
+      "subtitle": "A SwiftUI iOS client for orchestrating AI assistant \"sessions\" that send user queries to a configurable backend and render dynamic responses. Built for developers integrating tool-calling/async workflows, it features a flexible `CodableValue` model for arbitrary JSON payloads and a clean MVVM structure around `SessionViewModel`.\n",
       "tags": [
-        "swift"
+        "swift",
+        "swiftui",
+        "ios",
+        "ai"
       ],
       "heroImage": "/generated/logos/limen.png",
-      "x": 0.9697735371989593,
-      "y": 0.39641280522300293
+      "x": 0.9396860347479337,
+      "y": 0.5786215284785058,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.09377319665318476
+        },
+        {
+          "label": "Software",
+          "value": 0.777434510028173
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.23693403250416975
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.45425884000688654
+        },
+        {
+          "label": "Research",
+          "value": 0.41919731134083754
+        },
+        {
+          "label": "Creative",
+          "value": 0.23616367249213652
+        }
+      ]
     },
     {
       "slug": "pinhole-cameras",
@@ -278,8 +754,34 @@
         "film-photography"
       ],
       "heroImage": "/images/projects/pinhole_cameras/final_camera_fabricated.jpg",
-      "x": 0.1244024956263556,
-      "y": 0.4261245858480596
+      "x": 0.12261007283316627,
+      "y": 0.6125885201731432,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.44355313277379976
+        },
+        {
+          "label": "Software",
+          "value": 0.24345106301693062
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.7639622539246255
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.38316488910796453
+        },
+        {
+          "label": "Research",
+          "value": 0.8338492307145672
+        },
+        {
+          "label": "Creative",
+          "value": 0.7687891092472706
+        }
+      ]
     },
     {
       "slug": "plonk-pigeonholing",
@@ -295,8 +797,34 @@
         "comparative-study"
       ],
       "heroImage": "/images/projects/plonk_pigeonholing/6620dbf523d48_TUlJyrQ3Z.png",
-      "x": 0.4766876736572095,
-      "y": 1.0
+      "x": 0.4543406610388954,
+      "y": 0.0,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.09484276234663508
+        },
+        {
+          "label": "Software",
+          "value": 0.09715338203365918
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.0
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.7395606575273469
+        },
+        {
+          "label": "Research",
+          "value": 0.1757810536943481
+        },
+        {
+          "label": "Creative",
+          "value": 0.02326391997304974
+        }
+      ]
     },
     {
       "slug": "radar-calibration",
@@ -312,8 +840,34 @@
         "embedded"
       ],
       "heroImage": "/images/projects/radar-calibration/image.png",
-      "x": 0.03389659375308414,
-      "y": 0.45699910746603173
+      "x": 0.020193938392848863,
+      "y": 0.5786057824342715,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.5631043229211975
+        },
+        {
+          "label": "Software",
+          "value": 0.44225732864058054
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.7771786532382249
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.5748164207964315
+        },
+        {
+          "label": "Research",
+          "value": 0.6412027594184238
+        },
+        {
+          "label": "Creative",
+          "value": 0.14463274080677938
+        }
+      ]
     },
     {
       "slug": "rowing-form-detection",
@@ -321,8 +875,34 @@
       "subtitle": "Neural-network-powered \u201cdigital coach\u201d that analyzes rowing videos to grade form and surface detailed pose feedback. Uses Google Cloud Video Intelligence person detection and pose landmarks to extract keypoints and timestamps, forming the foundation for automated technique assessment and real-time coaching insights.",
       "tags": [],
       "heroImage": "/generated/logos/rowing-form-detection.png",
-      "x": 0.6333598134260322,
-      "y": 0.5548072496430367
+      "x": 0.6240166995004183,
+      "y": 0.43866274501602687,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.1570352026509822
+        },
+        {
+          "label": "Software",
+          "value": 0.3890391786326086
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.35862891899354166
+        },
+        {
+          "label": "Data/AI",
+          "value": 1.0
+        },
+        {
+          "label": "Research",
+          "value": 0.37293384947975927
+        },
+        {
+          "label": "Creative",
+          "value": 0.17406534068015977
+        }
+      ]
     },
     {
       "slug": "rowing-planner",
@@ -335,8 +915,34 @@
         "sveltekit"
       ],
       "heroImage": "/generated/logos/rowing-planner.png",
-      "x": 0.9332464681748559,
-      "y": 0.2790363355413687
+      "x": 0.9355558515768639,
+      "y": 0.7188976115694921,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.11125269842046509
+        },
+        {
+          "label": "Software",
+          "value": 1.0
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.360950695600483
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.25276041927795667
+        },
+        {
+          "label": "Research",
+          "value": 0.5544877501001724
+        },
+        {
+          "label": "Creative",
+          "value": 0.36090892034690497
+        }
+      ]
     },
     {
       "slug": "scrapperstar",
@@ -344,8 +950,34 @@
       "subtitle": "A Unity-based project tentatively set up for building a game or interactive experience called ScrapperStar. Aimed at players or prototypes needing rapid iteration, it\u2019s structured with a clean Unity-specific .gitignore for streamlined collaboration and build management.",
       "tags": [],
       "heroImage": "/generated/logos/scrapperstar.png",
-      "x": 0.7076914815657583,
-      "y": 0.370282088370706
+      "x": 0.7034852885878129,
+      "y": 0.7087455041201399,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.25884368933637325
+        },
+        {
+          "label": "Software",
+          "value": 0.44399438880566977
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.36266969415342043
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.35204098314604937
+        },
+        {
+          "label": "Research",
+          "value": 0.9685122711164322
+        },
+        {
+          "label": "Creative",
+          "value": 0.41577601274183446
+        }
+      ]
     },
     {
       "slug": "stranding",
@@ -355,8 +987,34 @@
         "swift"
       ],
       "heroImage": "/generated/logos/stranding.png",
-      "x": 0.9184583076718332,
-      "y": 0.17374422066667813
+      "x": 0.9214426497389356,
+      "y": 0.8499575578020095,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.0
+        },
+        {
+          "label": "Software",
+          "value": 0.4503986575728878
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.058350132757464
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.062450498378252645
+        },
+        {
+          "label": "Research",
+          "value": 0.6377815375884885
+        },
+        {
+          "label": "Creative",
+          "value": 0.3422725209934569
+        }
+      ]
     },
     {
       "slug": "topdownshootergame",
@@ -364,8 +1022,34 @@
       "subtitle": "A lighthearted top-down shooter built in Unity for fast, chaotic matches with friends. Focused on arcade-style gameplay and quick iteration, it explores input handling, 2D movement, and shooting mechanics from a top-down perspective.",
       "tags": [],
       "heroImage": "/generated/logos/topdownshootergame.png",
-      "x": 0.5819135148777811,
-      "y": 0.29381973265961364
+      "x": 0.5908258597513142,
+      "y": 0.8247339446517521,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.17091778945311625
+        },
+        {
+          "label": "Software",
+          "value": 0.27181005562523713
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.2916520932924766
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.0
+        },
+        {
+          "label": "Research",
+          "value": 0.11724842972525847
+        },
+        {
+          "label": "Creative",
+          "value": 0.2026765961336327
+        }
+      ]
     },
     {
       "slug": "vibes-button",
@@ -381,7 +1065,33 @@
       ],
       "heroImage": "/generated/logos/vibes-button.png",
       "x": 1.0,
-      "y": 0.37679225868744437
+      "y": 0.6016621408256833,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.10990932455901169
+        },
+        {
+          "label": "Software",
+          "value": 0.8861667301861995
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.2867624336861842
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.3950904920003044
+        },
+        {
+          "label": "Research",
+          "value": 0.2137469180909053
+        },
+        {
+          "label": "Creative",
+          "value": 0.38001765312485236
+        }
+      ]
     },
     {
       "slug": "virtue",
@@ -392,8 +1102,34 @@
         "simulation"
       ],
       "heroImage": "/generated/logos/virtue.png",
-      "x": 0.8669695455217606,
-      "y": 0.5092319912257376
+      "x": 0.8578460601120904,
+      "y": 0.4902057122606923,
+      "semanticAxes": [
+        {
+          "label": "Hardware",
+          "value": 0.22804498732756737
+        },
+        {
+          "label": "Software",
+          "value": 0.6203620903663896
+        },
+        {
+          "label": "Mechanics",
+          "value": 0.45490036816800394
+        },
+        {
+          "label": "Data/AI",
+          "value": 0.7051413198090297
+        },
+        {
+          "label": "Research",
+          "value": 0.52688351551558
+        },
+        {
+          "label": "Creative",
+          "value": 0.42465920415248076
+        }
+      ]
     }
   ]
 }

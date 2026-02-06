@@ -4,9 +4,9 @@ Vectorize Project Markdown Files
 ================================
 Generates embeddings for all project markdown files using OpenAI's text-embedding-3-small model.
 Outputs:
-  - static/generated/project_embeddings.json: Full embeddings + metadata
-  - static/generated/project_vectors_2d.json: PCA-reduced 2D coords for scatterplot
-  - static/generated/project_similarities.json: Top 3 similar projects per project
+    - static/generated/project_embeddings.json: Full embeddings + metadata
+    - static/generated/project_vectors_2d.json: PCA-reduced 2D coords + semantic axis vectors
+    - static/generated/project_similarities.json: Top 3 similar projects per project
 
 Usage:
     pip install openai numpy scikit-learn pyyaml
@@ -32,6 +32,34 @@ DOCS_DIR = Path(__file__).resolve().parent.parent / "src" / "lib" / "docs" / "pr
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "static" / "generated"
 EMBEDDING_MODEL = "text-embedding-3-small"  # OpenAI
 EMBED_DIM = 1536  # text-embedding-3-small dimension
+
+# Semantic axes used for radar visualization (label -> prompt)
+SEMANTIC_AXES = [
+    {
+        "label": "Hardware",
+        "prompt": "hardware electronics circuits pcb sensors microcontrollers embedded devices"
+    },
+    {
+        "label": "Software",
+        "prompt": "software engineering backend frontend web development programming"
+    },
+    {
+        "label": "Mechanics",
+        "prompt": "mechanical design fabrication cnc manufacturing mechatronics robotics"
+    },
+    {
+        "label": "Data/AI",
+        "prompt": "data science machine learning computer vision signal processing"
+    },
+    {
+        "label": "Research",
+        "prompt": "research experimentation prototyping testing analysis"
+    },
+    {
+        "label": "Creative",
+        "prompt": "art design installation experiential storytelling"
+    }
+]
 
 # ---------- Utilities ----------
 
@@ -184,6 +212,65 @@ def compute_similarities(embeddings: np.ndarray, slugs: list[str], top_k: int = 
     return similarities
 
 
+def compute_top_features(embeddings: np.ndarray, top_k: int = 20) -> list[list[dict]]:
+    """Return top-k absolute embedding dimensions (min-max normalized across projects)."""
+    if embeddings.size == 0:
+        return []
+
+    abs_matrix = np.abs(embeddings)
+    dim_min = abs_matrix.min(axis=0)
+    dim_max = abs_matrix.max(axis=0)
+    dim_range = dim_max - dim_min
+    dim_range[dim_range == 0] = 1
+
+    top_features = []
+    for abs_vals in abs_matrix:
+        if abs_vals.size == 0:
+            top_features.append([])
+            continue
+
+        idxs = np.argsort(abs_vals)[::-1][:top_k]
+        features = [
+            {
+                "index": int(idx),
+                "value": float((abs_vals[idx] - dim_min[idx]) / dim_range[idx])
+            }
+            for idx in idxs
+        ]
+        top_features.append(features)
+
+    return top_features
+
+
+def compute_semantic_axes(
+    project_embeddings: np.ndarray,
+    axis_embeddings: np.ndarray,
+    axis_labels: list[str]
+) -> list[list[dict]]:
+    """Compute min-max normalized cosine similarity to semantic axes."""
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    sim_matrix = cosine_similarity(project_embeddings, axis_embeddings)
+    # Normalize each axis across projects to 0..1
+    axis_min = sim_matrix.min(axis=0)
+    axis_max = sim_matrix.max(axis=0)
+    axis_range = axis_max - axis_min
+    axis_range[axis_range == 0] = 1
+    norm_matrix = (sim_matrix - axis_min) / axis_range
+
+    semantic_axes = []
+    for i in range(norm_matrix.shape[0]):
+        semantic_axes.append([
+            {
+                "label": axis_labels[j],
+                "value": float(norm_matrix[i, j])
+            }
+            for j in range(norm_matrix.shape[1])
+        ])
+
+    return semantic_axes
+
+
 # ---------- Main ----------
 
 def main():
@@ -214,6 +301,11 @@ def main():
     texts = [p["embed_text"] for p in projects]
     embeddings = get_openai_embeddings(texts)
     print(f"   Embedding shape: {embeddings.shape}")
+
+    # Semantic axis embeddings
+    axis_prompts = [axis["prompt"] for axis in SEMANTIC_AXES]
+    axis_labels = [axis["label"] for axis in SEMANTIC_AXES]
+    axis_embeddings = get_openai_embeddings(axis_prompts)
     
     # Reduce to 2D
     print("\n3. Reducing to 2D with PCA...")
@@ -226,10 +318,11 @@ def main():
     coords_range[coords_range == 0] = 1  # Avoid division by zero
     coords_2d_norm = (coords_2d - coords_min) / coords_range
     
-    # Compute similarities
-    print("\n4. Computing project similarities...")
+    # Compute similarities + semantic axes
+    print("\n4. Computing project similarities and semantic axes...")
     slugs = [p["slug"] for p in projects]
     similarities = compute_similarities(embeddings, slugs, top_k=3)
+    semantic_axes = compute_semantic_axes(embeddings, axis_embeddings, axis_labels)
     
     # Build output data
     print("\n5. Saving output files...")
@@ -248,7 +341,7 @@ def main():
         ]
     }
     
-    # 2D coordinates for scatterplot
+    # 2D coordinates for scatterplot + semantic axes
     vectors_2d = {
         "projects": [
             {
@@ -259,6 +352,7 @@ def main():
                 "heroImage": p["heroImage"],
                 "x": float(coords_2d_norm[i, 0]),
                 "y": float(coords_2d_norm[i, 1]),
+                "semanticAxes": semantic_axes[i],
             }
             for i, p in enumerate(projects)
         ]

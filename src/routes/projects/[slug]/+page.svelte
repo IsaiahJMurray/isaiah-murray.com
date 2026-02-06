@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import SimilarProjects from '$lib/components/SimilarProjects.svelte';
+  import ProjectVectorStar from '$lib/components/ProjectVectorStar.svelte';
 
   export let data;
   const { metadata, component: Doc, slug, heroImage } = data;
@@ -180,6 +181,10 @@
         </div>
       {/if}
     </div>
+
+    <div class="hero-radar-col">
+      <ProjectVectorStar slug={slug} size={170} compact={false} showLabels={true} label="" />
+    </div>
   </header>
 
   <section class="project-body">
@@ -239,9 +244,16 @@
 
   .project-hero {
     display: grid;
-    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr) auto;
     gap: 1.6rem;
     align-items: center;
+  }
+
+  .hero-radar-col {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.4rem 0;
   }
 
   .hero-media {
@@ -342,7 +354,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-top: 0.2rem;
+    margin-top: 0;
   }
 
   .tag {
@@ -643,9 +655,14 @@
     border-bottom-color: var(--accent);
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 960px) {
     .project-hero {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero-radar-col {
+      order: 3;
+      justify-self: center;
     }
 
     .hero-media {
