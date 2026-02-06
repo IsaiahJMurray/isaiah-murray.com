@@ -1,11 +1,11 @@
 ---
-title: Bragi Master
+title: Bragi
 subtitle: 'An immersive Spanish learning platform using Quest 3 XR to overlay vocabulary
   flashcards  on real-world objects, with Google Cloud TTS/STT for pronunciation training
   and YOLOv5  object detection for contextual language learning.
 
   '
-slug: bragi-master
+slug: bragi
 date: '2024-04-10'
 updated: '2024-12-19'
 tags:

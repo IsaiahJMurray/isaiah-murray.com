@@ -17,7 +17,7 @@ tags:
 - typescript
 - sveltekit
 maturity: polished
-featured: true
+featured: false
 visibility: public
 heroImage: /generated/logos/curator.png
 accent: '#5ed0ff'

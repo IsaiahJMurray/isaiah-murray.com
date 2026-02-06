@@ -17,7 +17,7 @@ tags:
 - escape-room
 - installation-art
 maturity: production
-featured: true
+featured: false
 visibility: public
 heroImage: /images/projects/boxed_memories/island_final_image_presentation_good_looking_no_user.webp
 accent: '#8B4513'
