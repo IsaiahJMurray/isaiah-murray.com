@@ -10,6 +10,26 @@
     archived: 'Archived'
   };
 </script>
+
+<svelte:head>
+  <title>Projects · Isaiah Murray</title>
+  <meta name="description" content="A curated selection of systems, tools, and experiments by Isaiah Murray." />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Projects · Isaiah Murray" />
+  <meta property="og:description" content="A curated selection of systems, tools, and experiments by Isaiah Murray." />
+  <meta property="og:url" content="https://isaiah-murray.com/projects" />
+  <meta property="og:image" content="https://isaiah-murray.com/faceshot.jpg" />
+  <meta property="og:site_name" content="Isaiah Murray" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Projects · Isaiah Murray" />
+  <meta name="twitter:description" content="A curated selection of systems, tools, and experiments by Isaiah Murray." />
+  <meta name="twitter:image" content="https://isaiah-murray.com/faceshot.jpg" />
+</svelte:head>
+
 <div class = "nav spacer"></div>
 <section class="section projects-page">
   <header class="section-header">

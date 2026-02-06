@@ -4,6 +4,20 @@
     name="description"
     content="Contact Isaiah Murray — email and social links."
   />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Contact · Isaiah Murray" />
+  <meta property="og:description" content="Contact Isaiah Murray — email and social links." />
+  <meta property="og:url" content="https://isaiah-murray.com/contact" />
+  <meta property="og:image" content="https://isaiah-murray.com/faceshot.jpg" />
+  <meta property="og:site_name" content="Isaiah Murray" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Contact · Isaiah Murray" />
+  <meta name="twitter:description" content="Contact Isaiah Murray — email and social links." />
+  <meta name="twitter:image" content="https://isaiah-murray.com/faceshot.jpg" />
 </svelte:head>
 
 <script>

@@ -4,6 +4,12 @@
   export let data;
   const { metadata, component: Doc, slug, heroImage } = data;
 
+  const siteBase = 'https://isaiah-murray.com';
+  const pageUrl = `${siteBase}/projects/${slug}`;
+  const ogImage = heroImage?.startsWith('http') ? heroImage : `${siteBase}${heroImage}`;
+  const ogTitle = `${metadata.title} · Isaiah Murray`;
+  const ogDescription = metadata.subtitle || metadata.description || `A project by Isaiah Murray.`;
+
   const maturityLabels = {
     production: 'Production',
     polished: 'Polished',
@@ -104,6 +110,37 @@
     return textContent === '' || textContent === img.alt;
   }
 </script>
+
+<svelte:head>
+  <title>{ogTitle}</title>
+  <meta name="description" content={ogDescription} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content="Isaiah Murray" />
+  {#if metadata.date}
+    <meta property="article:published_time" content={metadata.date} />
+  {/if}
+  {#if metadata.updated}
+    <meta property="article:modified_time" content={metadata.updated} />
+  {/if}
+  {#if metadata.tags}
+    {#each metadata.tags as tag}
+      <meta property="article:tag" content={tag} />
+    {/each}
+  {/if}
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={ogTitle} />
+  <meta name="twitter:description" content={ogDescription} />
+  <meta name="twitter:image" content={ogImage} />
+</svelte:head>
+
 <div class = "nav spacer"></div>
 <article class="project-page" style={`--accent:${accent}`}>
   <a href="/projects" class="back-link">← Back to projects</a>

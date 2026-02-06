@@ -4,6 +4,20 @@
     name="description"
     content="Resume for Isaiah Murray — Electrical & Computer Engineering student at Olin College of Engineering."
   />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Resume · Isaiah Murray" />
+  <meta property="og:description" content="Resume for Isaiah Murray — Electrical & Computer Engineering student at Olin College of Engineering." />
+  <meta property="og:url" content="https://isaiah-murray.com/resume" />
+  <meta property="og:image" content="https://isaiah-murray.com/faceshot.jpg" />
+  <meta property="og:site_name" content="Isaiah Murray" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Resume · Isaiah Murray" />
+  <meta name="twitter:description" content="Resume for Isaiah Murray — Electrical & Computer Engineering student at Olin College of Engineering." />
+  <meta name="twitter:image" content="https://isaiah-murray.com/faceshot.jpg" />
 </svelte:head>
 <script>
   import { onDestroy } from "svelte";
