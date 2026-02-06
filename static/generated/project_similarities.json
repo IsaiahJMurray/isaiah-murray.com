@@ -1,0 +1,396 @@
+{
+  "similarities": {
+    "advanced-resin-cure-monitoring-with-formlabs": [
+      {
+        "slug": "boxed-memories",
+        "score": 0.5842546421639145
+      },
+      {
+        "slug": "pinhole-cameras",
+        "score": 0.5681872063021143
+      },
+      {
+        "slug": "clasp",
+        "score": 0.5338137862378617
+      }
+    ],
+    "binaric": [
+      {
+        "slug": "egg-lathe",
+        "score": 0.5265925858119377
+      },
+      {
+        "slug": "virtue",
+        "score": 0.5147305285177606
+      },
+      {
+        "slug": "gmail-categorization",
+        "score": 0.5145178829944318
+      }
+    ],
+    "boxed-memories": [
+      {
+        "slug": "code-cruiser",
+        "score": 0.6747850629825232
+      },
+      {
+        "slug": "bragi",
+        "score": 0.6457486772174726
+      },
+      {
+        "slug": "desk-projector",
+        "score": 0.6243682447508112
+      }
+    ],
+    "bragi": [
+      {
+        "slug": "boxed-memories",
+        "score": 0.6457486772174726
+      },
+      {
+        "slug": "virtue",
+        "score": 0.6299689537075251
+      },
+      {
+        "slug": "code-cruiser",
+        "score": 0.5626888215085875
+      }
+    ],
+    "pcb-business-card": [
+      {
+        "slug": "clasp",
+        "score": 0.6204316329381456
+      },
+      {
+        "slug": "egg-lathe",
+        "score": 0.5447747253367183
+      },
+      {
+        "slug": "code-cruiser",
+        "score": 0.5432949003022922
+      }
+    ],
+    "c": [
+      {
+        "slug": "exoticproducepackingoptimization",
+        "score": 0.5016915504261457
+      },
+      {
+        "slug": "scrapperstar",
+        "score": 0.48945506076776785
+      },
+      {
+        "slug": "egg-lathe",
+        "score": 0.48795628680139136
+      }
+    ],
+    "calendar-plugin": [
+      {
+        "slug": "vibes-button",
+        "score": 0.6866447742681417
+      },
+      {
+        "slug": "limen",
+        "score": 0.6015566621629291
+      },
+      {
+        "slug": "rowing-planner",
+        "score": 0.5895800095789885
+      }
+    ],
+    "clasp": [
+      {
+        "slug": "pcb-business-card",
+        "score": 0.6204316329381456
+      },
+      {
+        "slug": "advanced-resin-cure-monitoring-with-formlabs",
+        "score": 0.5338137862378617
+      },
+      {
+        "slug": "boxed-memories",
+        "score": 0.46044089480604444
+      }
+    ],
+    "code-cruiser": [
+      {
+        "slug": "boxed-memories",
+        "score": 0.6747850629825232
+      },
+      {
+        "slug": "egg-lathe",
+        "score": 0.638469033369558
+      },
+      {
+        "slug": "bragi",
+        "score": 0.5626888215085875
+      }
+    ],
+    "curator": [
+      {
+        "slug": "virtue",
+        "score": 0.6169461238847351
+      },
+      {
+        "slug": "vibes-button",
+        "score": 0.5943334390102585
+      },
+      {
+        "slug": "github-grader",
+        "score": 0.5822037671949353
+      }
+    ],
+    "desk-projector": [
+      {
+        "slug": "egg-lathe",
+        "score": 0.6522442631229425
+      },
+      {
+        "slug": "boxed-memories",
+        "score": 0.6243682447508112
+      },
+      {
+        "slug": "pinhole-cameras",
+        "score": 0.5929060592008577
+      }
+    ],
+    "digikeydisplay": [
+      {
+        "slug": "exoticproducepackingoptimization",
+        "score": 0.5042901672848079
+      },
+      {
+        "slug": "desk-projector",
+        "score": 0.4856753543627944
+      },
+      {
+        "slug": "rowing-planner",
+        "score": 0.47757106726602655
+      }
+    ],
+    "egg-lathe": [
+      {
+        "slug": "desk-projector",
+        "score": 0.6522442631229425
+      },
+      {
+        "slug": "code-cruiser",
+        "score": 0.638469033369558
+      },
+      {
+        "slug": "virtue",
+        "score": 0.5514511623837662
+      }
+    ],
+    "exoticproducepackingoptimization": [
+      {
+        "slug": "lego-sorter",
+        "score": 0.5140891669442905
+      },
+      {
+        "slug": "desk-projector",
+        "score": 0.505164251919073
+      },
+      {
+        "slug": "digikeydisplay",
+        "score": 0.5042901672848079
+      }
+    ],
+    "github-grader": [
+      {
+        "slug": "rowing-planner",
+        "score": 0.7355672227188779
+      },
+      {
+        "slug": "stranding",
+        "score": 0.6592770766720955
+      },
+      {
+        "slug": "vibes-button",
+        "score": 0.6394442588143028
+      }
+    ],
+    "gmail-categorization": [
+      {
+        "slug": "virtue",
+        "score": 0.6080088378177286
+      },
+      {
+        "slug": "limen",
+        "score": 0.5745716214309023
+      },
+      {
+        "slug": "curator",
+        "score": 0.5531584206631038
+      }
+    ],
+    "lego-sorter": [
+      {
+        "slug": "code-cruiser",
+        "score": 0.5524961634040513
+      },
+      {
+        "slug": "boxed-memories",
+        "score": 0.5492189059871476
+      },
+      {
+        "slug": "gmail-categorization",
+        "score": 0.5214665119518145
+      }
+    ],
+    "limen": [
+      {
+        "slug": "virtue",
+        "score": 0.6784089745723276
+      },
+      {
+        "slug": "stranding",
+        "score": 0.6730541997765828
+      },
+      {
+        "slug": "vibes-button",
+        "score": 0.6251508477202834
+      }
+    ],
+    "pinhole-cameras": [
+      {
+        "slug": "desk-projector",
+        "score": 0.5929060592008577
+      },
+      {
+        "slug": "advanced-resin-cure-monitoring-with-formlabs",
+        "score": 0.5681872063021143
+      },
+      {
+        "slug": "boxed-memories",
+        "score": 0.5454439151562435
+      }
+    ],
+    "plonk-pigeonholing": [
+      {
+        "slug": "lego-sorter",
+        "score": 0.5212094641501662
+      },
+      {
+        "slug": "gmail-categorization",
+        "score": 0.5088663292861697
+      },
+      {
+        "slug": "exoticproducepackingoptimization",
+        "score": 0.49036424597591005
+      }
+    ],
+    "radar-calibration": [
+      {
+        "slug": "advanced-resin-cure-monitoring-with-formlabs",
+        "score": 0.5301215434949528
+      },
+      {
+        "slug": "desk-projector",
+        "score": 0.5004986206001066
+      },
+      {
+        "slug": "boxed-memories",
+        "score": 0.5002274420499896
+      }
+    ],
+    "rowing-form-detection": [
+      {
+        "slug": "rowing-planner",
+        "score": 0.6124850287840161
+      },
+      {
+        "slug": "bragi",
+        "score": 0.5491790467615044
+      },
+      {
+        "slug": "gmail-categorization",
+        "score": 0.5475557401311555
+      }
+    ],
+    "rowing-planner": [
+      {
+        "slug": "github-grader",
+        "score": 0.7355672227188779
+      },
+      {
+        "slug": "stranding",
+        "score": 0.7010698338442535
+      },
+      {
+        "slug": "rowing-form-detection",
+        "score": 0.6124850287840161
+      }
+    ],
+    "scrapperstar": [
+      {
+        "slug": "stranding",
+        "score": 0.6128297314076135
+      },
+      {
+        "slug": "topdownshootergame",
+        "score": 0.6108327803450556
+      },
+      {
+        "slug": "github-grader",
+        "score": 0.5743146497625666
+      }
+    ],
+    "stranding": [
+      {
+        "slug": "rowing-planner",
+        "score": 0.7010698338442535
+      },
+      {
+        "slug": "limen",
+        "score": 0.6730541997765828
+      },
+      {
+        "slug": "github-grader",
+        "score": 0.6592770766720955
+      }
+    ],
+    "topdownshootergame": [
+      {
+        "slug": "scrapperstar",
+        "score": 0.6108327803450556
+      },
+      {
+        "slug": "c",
+        "score": 0.4854449233484429
+      },
+      {
+        "slug": "stranding",
+        "score": 0.47999569546075166
+      }
+    ],
+    "vibes-button": [
+      {
+        "slug": "calendar-plugin",
+        "score": 0.6866447742681417
+      },
+      {
+        "slug": "virtue",
+        "score": 0.6616775360378004
+      },
+      {
+        "slug": "github-grader",
+        "score": 0.6394442588143028
+      }
+    ],
+    "virtue": [
+      {
+        "slug": "limen",
+        "score": 0.6784089745723276
+      },
+      {
+        "slug": "vibes-button",
+        "score": 0.6616775360378004
+      },
+      {
+        "slug": "bragi",
+        "score": 0.6299689537075251
+      }
+    ]
+  }
+}

@@ -1,0 +1,399 @@
+{
+  "projects": [
+    {
+      "slug": "advanced-resin-cure-monitoring-with-formlabs",
+      "title": "Advanced Resin Cure Monitoring with FormLabs",
+      "subtitle": "Real-time dielectric sensing system for monitoring UV resin cure state during SLA 3D printing, developed during a 3-day hackathon at FormLabs headquarters.\n",
+      "tags": [
+        "dielectric-sensing",
+        "sla-printing",
+        "impedance-analysis",
+        "resin-chemistry",
+        "real-time-monitoring",
+        "pcb-design",
+        "signal-processing"
+      ],
+      "heroImage": "/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5213_929d9e.png",
+      "x": 0.0,
+      "y": 0.31664452256997144
+    },
+    {
+      "slug": "binaric",
+      "title": "Binaric",
+      "subtitle": "Audio-based data transmission protocol that turns files and messages into structured tone sequences, inspired by dial\u2011up but built for modern devices. Aimed at developers and researchers exploring acoustic modems, offline communication, or playful data-over-sound channels. Technically, it features layered modulation, Manchester-clocked multi-tone encoding, adaptive error correction, and spectrogram-driven decoding tools in Python.",
+      "tags": [
+        "python",
+        "simulation",
+        "ml"
+      ],
+      "heroImage": "/generated/logos/binaric.png",
+      "x": 0.5570576205976563,
+      "y": 0.6479900184267859
+    },
+    {
+      "slug": "boxed-memories",
+      "title": "Boxed Memories",
+      "subtitle": "An AR sandbox-powered escape room installation that challenges players to recreate terrain maps through physical sand manipulation, unlocking digital codes when landscape similarity thresholds are met.\n",
+      "tags": [
+        "computer-vision",
+        "arduino",
+        "opencv",
+        "kinect",
+        "augmented-reality",
+        "escape-room",
+        "installation-art"
+      ],
+      "heroImage": "/images/projects/boxed_memories/island_final_image_presentation_good_looking_no_user.webp",
+      "x": 0.21195195541671874,
+      "y": 0.41204508661011174
+    },
+    {
+      "slug": "bragi",
+      "title": "Bragi",
+      "subtitle": "An immersive Spanish learning platform using Quest 3 XR to overlay vocabulary flashcards  on real-world objects, with Google Cloud TTS/STT for pronunciation training and YOLOv5  object detection for contextual language learning.\n",
+      "tags": [
+        "unity",
+        "quest3",
+        "spanish-learning",
+        "google-cloud-tts",
+        "google-cloud-stt",
+        "yolov5",
+        "computer-vision",
+        "language-learning",
+        "immersive-education",
+        "sveltekit",
+        "python",
+        "c#",
+        "lidar",
+        "object-detection",
+        "voice-recognition"
+      ],
+      "heroImage": "/images/projects/bragi_master/low_quality_mapping_demo3_with_bbox.png",
+      "x": 0.5974453044238319,
+      "y": 0.41500200119499236
+    },
+    {
+      "slug": "pcb-business-card",
+      "title": "PCB Business Card",
+      "subtitle": "An interactive PCB business card that combines low-cost hardware design with embedded firmware to create a pocket-sized demo platform. The card integrates an NFC interface, an 8\u00d78 LED matrix, and a Bosch BMA400 accelerometer, using a coin-cell-powered microcontroller to drive tilt- and shake-responsive visual effects such as a gravity-based \u201csand\u201d simulation. Designed to showcase manufacturable PCB layout, sensor integration over I2C, GPIO-multiplexed displays, and system-level tradeoffs in power, cost, and form factor.\n",
+      "tags": [
+        "hardware",
+        "pcb",
+        "embedded",
+        "cpp",
+        "arduino",
+        "firmware",
+        "i2c",
+        "sensors",
+        "simulation",
+        "electronics",
+        "low-power"
+      ],
+      "heroImage": "/images/projects/pcb_card/IMG_4365.jpeg",
+      "x": 0.17195067836590497,
+      "y": 0.14616347694478035
+    },
+    {
+      "slug": "c",
+      "title": "C Boids",
+      "subtitle": "High-performance Boids flocking simulation in C++ and SFML, rendering 1,000 agents navigating a 2D space with wrap-around boundaries. Designed for graphics and game dev enthusiasts exploring emergent behavior, it adds obstacle-aware steering, leader boids, and tunable separation/alignment/cohesion radii and coefficients.",
+      "tags": [],
+      "heroImage": "/generated/logos/c.png",
+      "x": 0.523828936982012,
+      "y": 0.560197153339129
+    },
+    {
+      "slug": "calendar-plugin",
+      "title": "Calendar Plugin",
+      "subtitle": "A Chrome extension that pulls upcoming events from Google Calendar and enriches them with attendee context from Gmail and LinkedIn. Built for busy professionals who want quick meeting summaries and profiles without leaving their browser, it showcases OAuth flows across multiple providers, secure token handling with chrome.identity and storage APIs, and a lightweight HTML/JavaScript popup UI.",
+      "tags": [
+        "html",
+        "javascript"
+      ],
+      "heroImage": "/generated/logos/calendar-plugin.png",
+      "x": 0.9303826630401639,
+      "y": 0.4195956320148125
+    },
+    {
+      "slug": "clasp",
+      "title": "CLASP",
+      "subtitle": "CLASP is a Bluetooth Low Energy (BLE) wearable project exploring proximity-based interaction logging through a bracelet form factor. Built around Nordic Semiconductor nRF52-series hardware, the system investigates low-power RF design, PCB iteration, enclosure design, and future synchronization with a mobile app to visualize real-world social connections over time.\n",
+      "tags": [
+        "hardware",
+        "pcb",
+        "embedded",
+        "ble",
+        "rf",
+        "wearables",
+        "electronics"
+      ],
+      "heroImage": "/images/projects/clasp/IMG_4305-min.jpg",
+      "x": 0.2144019300489819,
+      "y": 0.0
+    },
+    {
+      "slug": "code-cruiser",
+      "title": "Code Cruiser",
+      "subtitle": "A screen-free educational robot that teaches children coding concepts through color-coded tiles and physical movement, designed to make programming tangible for young learners.\n",
+      "tags": [
+        "arduino",
+        "education",
+        "robotics",
+        "color-sensing",
+        "physical-computing"
+      ],
+      "heroImage": "/images/projects/code_cruiser/title_image.jpg",
+      "x": 0.2654069188309937,
+      "y": 0.38145588012267334
+    },
+    {
+      "slug": "curator",
+      "title": "Curator",
+      "subtitle": "Curator is a portfolio documentation orchestrator that crawls your GitHub repos, asks targeted follow-up questions, and generates rich project writeups via the OpenAI Responses API. It\u2019s built for developers and technical creatives who want production-grade, auto-updating documentation, with a Flask backend tied into GitHub, Cloud SQL, and GCS plus a SvelteKit frontend scaffold for a future UI.",
+      "tags": [
+        "html",
+        "javascript",
+        "python",
+        "svelte",
+        "typescript",
+        "sveltekit"
+      ],
+      "heroImage": "/generated/logos/curator.png",
+      "x": 0.8734825057685088,
+      "y": 0.6441720926421785
+    },
+    {
+      "slug": "desk-projector",
+      "title": "Desk Projector",
+      "subtitle": "Interactive desk-mounted projection system that aligns a depth camera and projector to turn your tabletop into a responsive surface. Built for makers and HCI tinkerers exploring augmented workspaces, it features custom homography calibration, OpenCV-based perspective correction, and PyQt-driven projection feedback loops.",
+      "tags": [
+        "python"
+      ],
+      "heroImage": "/generated/logos/desk-projector.png",
+      "x": 0.30411193188236196,
+      "y": 0.5711169946793575
+    },
+    {
+      "slug": "digikeydisplay",
+      "title": "Digikeydisplay",
+      "subtitle": "A tiny Python tool that turns DigiKey cart CSVs into a treemap so you can instantly see where your budget is going. Ideal for hardware engineers and hobbyists optimizing BOM costs, it uses pandas, matplotlib, and squarify to visualize line-item spend by description.",
+      "tags": [
+        "python",
+        "visualization"
+      ],
+      "heroImage": "/generated/logos/digikeydisplay.png",
+      "x": 0.4417550365035695,
+      "y": 0.6883900465014738
+    },
+    {
+      "slug": "egg-lathe",
+      "title": "Egg Lathe",
+      "subtitle": "Egg Lathe is a CNC-style automation system for traditional Ukrainian egg dyeing (Pysanky). The project combines custom mechanical hardware, embedded firmware, and a Python control application to enable precise, repeatable patterning on the curved surface of an egg.\n",
+      "tags": [
+        "hardware",
+        "cnc",
+        "mechatronics",
+        "arduino",
+        "stm32",
+        "firmware",
+        "python",
+        "robotics",
+        "fabrication"
+      ],
+      "heroImage": "\\images\\projects\\egg_lathe\\4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg",
+      "x": 0.38374063453453044,
+      "y": 0.47349695998260194
+    },
+    {
+      "slug": "exoticproducepackingoptimization",
+      "title": "Exoticproducepackingoptimization",
+      "subtitle": "MATLAB-based modeling and simulation of how to optimally pack three categories of exotic produce under spatial and combinatorial constraints. Uses sparse Gaussian-weighted adjacency matrices and exhaustive pattern enumeration to explore configuration spaces that would be infeasible to reason about manually.",
+      "tags": [
+        "matlab",
+        "simulation"
+      ],
+      "heroImage": "/generated/logos/exoticproducepackingoptimization.png",
+      "x": 0.42153725763239264,
+      "y": 0.8801612347366742
+    },
+    {
+      "slug": "github-grader",
+      "title": "Github Grader",
+      "subtitle": "An Apple Fitness\u2013style dashboard for developers that visualizes your GitHub activity, daily coding stats, and repository health. Built with SvelteKit, it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata into interactive SVG \u201cactivity rings\u201d and stat cards.",
+      "tags": [
+        "html",
+        "javascript",
+        "svelte",
+        "sveltekit"
+      ],
+      "heroImage": "/generated/logos/github-grader.png",
+      "x": 0.9250696920019843,
+      "y": 0.2593681407465718
+    },
+    {
+      "slug": "gmail-categorization",
+      "title": "Gmail Categorization",
+      "subtitle": "Semantic search engine over your Gmail archive that finds relevant emails by meaning, not just keywords. Built for power users who live in their inbox and want fast retrieval and training data for AI email assistants. Uses SentenceTransformers embeddings, FAISS vector indexing, and MBOX parsing with incremental index updates and cleaned conversation threads.",
+      "tags": [
+        "python"
+      ],
+      "heroImage": "/generated/logos/gmail-categorization.png",
+      "x": 0.785115522359339,
+      "y": 0.8516020271293748
+    },
+    {
+      "slug": "lego-sorter",
+      "title": "Lego Sorter",
+      "subtitle": "A configurable CNN-based image classifier that learns to distinguish between different LEGO pieces from photos. Built for students and ML practitioners exploring TensorFlow pipelines, it supports randomized architecture generation, automated training/evaluation, and rich logging of run histories for comparative experiments.",
+      "tags": [
+        "python",
+        "simulation",
+        "ml"
+      ],
+      "heroImage": "/generated/logos/lego-sorter.png",
+      "x": 0.3205623354946932,
+      "y": 0.8300491605445118
+    },
+    {
+      "slug": "limen",
+      "title": "Limen",
+      "subtitle": "A SwiftUI iOS client for orchestrating AI assistant \u201csessions\u201d that send user queries to a configurable backend and render dynamic responses. Built for developers integrating tool-calling/async workflows, it features a flexible `CodableValue` model for arbitrary JSON payloads and a clean MVVM structure around `SessionViewModel`.",
+      "tags": [
+        "swift"
+      ],
+      "heroImage": "/generated/logos/limen.png",
+      "x": 0.9697735371989593,
+      "y": 0.39641280522300293
+    },
+    {
+      "slug": "pinhole-cameras",
+      "title": "Modular Pinhole Cameras",
+      "subtitle": "Laser-cut wooden pinhole cameras with modular lens assemblies,  film cartridge systems, and panoramic capabilities.\n",
+      "tags": [
+        "photography",
+        "fabrication",
+        "laser-cutting",
+        "optics",
+        "woodworking",
+        "film-photography"
+      ],
+      "heroImage": "/images/projects/pinhole_cameras/final_camera_fabricated.jpg",
+      "x": 0.1244024956263556,
+      "y": 0.4261245858480596
+    },
+    {
+      "slug": "plonk-pigeonholing",
+      "title": "Plonk Pigeonholing",
+      "subtitle": "A comparative study of classical TF-IDF and transformer-based approaches for wine variety classification, exploring the tradeoffs between interpretability and performance in domain-specific text analysis.\n",
+      "tags": [
+        "machine-learning",
+        "nlp",
+        "text-classification",
+        "transformers",
+        "svd",
+        "wine",
+        "comparative-study"
+      ],
+      "heroImage": "/images/projects/plonk_pigeonholing/6620dbf523d48_TUlJyrQ3Z.png",
+      "x": 0.4766876736572095,
+      "y": 1.0
+    },
+    {
+      "slug": "radar-calibration",
+      "title": "Radar Calibration Automation",
+      "subtitle": "An internal calibration automation project focused on phased-array radar systems. The work replaced manual antenna gain and phase tuning with a programmatic workflow driven by FPGA control, spectrum analysis, and algorithmic optimization\u2014reducing calibration time from hours to minutes while significantly improving array efficiency.\n",
+      "tags": [
+        "rf",
+        "radar",
+        "calibration",
+        "fpga",
+        "signal-processing",
+        "automation",
+        "embedded"
+      ],
+      "heroImage": "/images/projects/radar-calibration/image.png",
+      "x": 0.03389659375308414,
+      "y": 0.45699910746603173
+    },
+    {
+      "slug": "rowing-form-detection",
+      "title": "Rowing Form Detection",
+      "subtitle": "Neural-network-powered \u201cdigital coach\u201d that analyzes rowing videos to grade form and surface detailed pose feedback. Uses Google Cloud Video Intelligence person detection and pose landmarks to extract keypoints and timestamps, forming the foundation for automated technique assessment and real-time coaching insights.",
+      "tags": [],
+      "heroImage": "/generated/logos/rowing-form-detection.png",
+      "x": 0.6333598134260322,
+      "y": 0.5548072496430367
+    },
+    {
+      "slug": "rowing-planner",
+      "title": "Rowing Planner",
+      "subtitle": "Interactive web tool for rowers and coaches to plan multi-segment pieces with customizable distance, split, and stroke rate. Built with SvelteKit and shared stores to drive a live segment timeline, aggregate metrics, and a Spotify-powered playlist generator tuned to workout intensity.",
+      "tags": [
+        "html",
+        "javascript",
+        "svelte",
+        "sveltekit"
+      ],
+      "heroImage": "/generated/logos/rowing-planner.png",
+      "x": 0.9332464681748559,
+      "y": 0.2790363355413687
+    },
+    {
+      "slug": "scrapperstar",
+      "title": "Scrapperstar",
+      "subtitle": "A Unity-based project tentatively set up for building a game or interactive experience called ScrapperStar. Aimed at players or prototypes needing rapid iteration, it\u2019s structured with a clean Unity-specific .gitignore for streamlined collaboration and build management.",
+      "tags": [],
+      "heroImage": "/generated/logos/scrapperstar.png",
+      "x": 0.7076914815657583,
+      "y": 0.370282088370706
+    },
+    {
+      "slug": "stranding",
+      "title": "Stranding",
+      "subtitle": "Stranding is an early-stage SwiftUI iOS app exploring a \u201cstrand-based\u201d approach to structuring workouts and exercise routines. It\u2019s set up with unit and UI test targets, making it a foundation for experimenting with fitness-focused interactions, UI, and architecture in native Swift.",
+      "tags": [
+        "swift"
+      ],
+      "heroImage": "/generated/logos/stranding.png",
+      "x": 0.9184583076718332,
+      "y": 0.17374422066667813
+    },
+    {
+      "slug": "topdownshootergame",
+      "title": "Topdownshootergame",
+      "subtitle": "A lighthearted top-down shooter built in Unity for fast, chaotic matches with friends. Focused on arcade-style gameplay and quick iteration, it explores input handling, 2D movement, and shooting mechanics from a top-down perspective.",
+      "tags": [],
+      "heroImage": "/generated/logos/topdownshootergame.png",
+      "x": 0.5819135148777811,
+      "y": 0.29381973265961364
+    },
+    {
+      "slug": "vibes-button",
+      "title": "Vibes Button",
+      "subtitle": "A Chrome extension that overlays any webpage with cheerful, AI-generated affirmations tailored to the page\u2019s URL. Built for desktop Chrome users, it pairs a Flask backend (with user auth, usage logging, and API key management) with a Manifest V3 extension that streams OpenAI completions into a lightweight in-page UI.",
+      "tags": [
+        "css",
+        "html",
+        "javascript",
+        "python",
+        "simulation",
+        "ml"
+      ],
+      "heroImage": "/generated/logos/vibes-button.png",
+      "x": 1.0,
+      "y": 0.37679225868744437
+    },
+    {
+      "slug": "virtue",
+      "title": "Virtue",
+      "subtitle": "A modular Python framework for building an always-on, multimodal personal assistant that can see, hear, speak, and control devices. It integrates OpenAI Assistants with Google STT, ElevenLabs TTS, LIFX smart lighting, webcam eye-contact triggers, and real-time Pygame visualizations into a single event-driven system.",
+      "tags": [
+        "python",
+        "simulation"
+      ],
+      "heroImage": "/generated/logos/virtue.png",
+      "x": 0.8669695455217606,
+      "y": 0.5092319912257376
+    }
+  ]
+}

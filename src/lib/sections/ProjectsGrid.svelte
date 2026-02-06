@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import ProjectScatterplot from '$lib/components/ProjectScatterplot.svelte';
 
   let scrollProgress = 0;
   let galleryEl;
@@ -145,6 +146,10 @@
 
   <div class="see-more">
     <a href="/projects" class="see-more-link">Explore All Projects →</a>
+  </div>
+
+  <div class="scatterplot-section">
+    <ProjectScatterplot />
   </div>
 </section>
 
@@ -422,5 +427,10 @@
     }
 
     .scroll-progress { height: 2px; }
+  }
+
+  /* ——— Scatterplot section ——— */
+  .scatterplot-section {
+    margin-top: 2.5rem;
   }
 </style>

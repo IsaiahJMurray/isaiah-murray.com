@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import SimilarProjects from '$lib/components/SimilarProjects.svelte';
 
   export let data;
   const { metadata, component: Doc, slug, heroImage } = data;
@@ -184,6 +185,7 @@
   <section class="project-body">
     <div class="doc-body">
       <Doc />
+      <SimilarProjects currentSlug={slug} />
     </div>
   </section>
 </article>
