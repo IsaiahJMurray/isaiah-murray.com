@@ -30,7 +30,7 @@
       tags: ['BLE', 'Hardware', 'PCB']
     },
     {
-      slug: 'pcb_business_card',
+      slug: 'pcb-business-card',
       title: 'PCB Business Card',
       heroImage: '/images/projects/pcb_card/IMG_4365.jpeg',
       docImages: [
@@ -40,7 +40,7 @@
       tags: ['PCB', 'Electronics', 'Design']
     },
     {
-      slug: 'radar_calibration',
+      slug: 'radar-calibration',
       title: 'Radar Calibration',
       heroImage: '/images/projects/radar-calibration/image.png',
       docImages: [
