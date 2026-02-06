@@ -171,6 +171,8 @@
     flex-direction: column;
     gap: 1.5rem;
     margin: 2em;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   :global(.project-body) {
@@ -318,6 +320,8 @@
 
   .doc-body {
     max-width: 780px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -561,6 +565,16 @@
     background: rgba(8, 10, 16, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.06);
     overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .doc-body :global(table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
   }
 
   .doc-body :global(pre code) {
@@ -585,6 +599,20 @@
 
     .hero-media {
       max-width: 420px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-page {
+      margin: 1.1rem;
+    }
+
+    :global(.project-body) {
+      justify-content: center;
+    }
+
+    .doc-body {
+      max-width: 100%;
     }
   }
 </style>
