@@ -19,7 +19,7 @@ tags:
 maturity: polished
 featured: true
 visibility: public
-heroImage: /images/projects/plonk_pigeonholing/robot_wine.jpg
+heroImage: /images/projects/plonk_pigeonholing/6620dbf523d48_TUlJyrQ3Z.png
 accent: '#8B0000'
 ---
 
