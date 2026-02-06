@@ -37,4 +37,7 @@ vite.config.ts.timestamp-*
 
 favicon.png
 
+# Image compression cache (originals backup)
+.image-cache/
+
 curator
