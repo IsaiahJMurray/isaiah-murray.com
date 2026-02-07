@@ -47,7 +47,7 @@
     <h2 class="similar-heading">Similar Projects</h2>
     <div class="similar-grid">
       {#each similarProjects as project}
-        <a href="/projects/{project.slug}" class="similar-card">
+        <a href={`/projects/${project.slug}`} class="similar-card" sveltekit:reload>
           <div class="similar-image">
             <img 
               src={project.heroImage} 
