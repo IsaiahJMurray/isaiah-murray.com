@@ -552,6 +552,10 @@
         <a href="https://olin.edu" target="_blank" rel="noreferrer">
           Olin College of Engineering
         </a>
+        <br>
+        <a href="https://formlabs.com/" target="_blank" style="color: #ff5a00" rel="noreferrer">
+          Formlabs
+        </a>  Materials Intern
       </p>
     </div>
 
