@@ -43,6 +43,8 @@ export async function load() {
         visibility,
         accent: meta.accent || null,
         cardImage,
+        // explicit manual placement; unset projects fall back to featured/maturity/date sort
+        _order: typeof meta.order === 'number' ? meta.order : null,
         _maturityRank: maturityRank[maturity] ?? 99
       };
     })
@@ -51,6 +53,15 @@ export async function load() {
   const projects = raw
     .filter(Boolean)
     .sort((a, b) => {
+      // explicit order takes priority over everything else
+      if (a._order !== null || b._order !== null) {
+        // unordered projects fall in the middle: after any explicit low order
+        // (promoted), before any explicit high order (demoted below the fold)
+        const aOrder = a._order ?? 500;
+        const bOrder = b._order ?? 500;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+
       // featured first
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;

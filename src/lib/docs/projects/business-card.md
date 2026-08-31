@@ -27,6 +27,7 @@ maturity: polished
 featured: true
 visibility: public
 heroImage: /images/projects/pcb_card/IMG_4365.jpeg
+order: 4
 ---
 ## Overview
 

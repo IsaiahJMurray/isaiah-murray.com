@@ -19,7 +19,8 @@ maturity: polished
 featured: true
 visibility: public
 heroImage: /images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5213_929d9e.png
-accent: '#FF6B35'
+accent: '#ff5a00'
+order: 5
 ---
 
 ## Overview

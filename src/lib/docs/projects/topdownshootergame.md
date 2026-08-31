@@ -9,7 +9,7 @@ updated: '2024-01-21'
 tags: []
 maturity: prototype
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/topdownshootergame.png
 ---
 ## Overview

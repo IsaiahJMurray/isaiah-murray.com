@@ -4,8 +4,21 @@
   export let scrollTarget = "#overview";
 
   let canvas;
+  let scrollHintOpacity = 1;
+
+  const SCROLL_HINT_FADE_DISTANCE = 120;
+
+  function updateScrollHintOpacity() {
+    scrollHintOpacity = Math.max(
+      0,
+      1 - window.scrollY / SCROLL_HINT_FADE_DISTANCE
+    );
+  }
 
   onMount(() => {
+    updateScrollHintOpacity();
+    window.addEventListener("scroll", updateScrollHintOpacity, { passive: true });
+
     const ctx = canvas.getContext("2d");
     if (!ctx) {
       console.error("2D canvas not supported");
@@ -450,6 +463,7 @@
 
     return () => {
       window.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", updateScrollHintOpacity);
       if (frameId) cancelAnimationFrame(frameId);
     };
   });
@@ -466,14 +480,16 @@
         <a href="https://olin.edu" target="_blank" rel="noreferrer">
           Olin College of Engineering
         </a>
-        <br>
-        <a href="https://formlabs.com/" target="_blank" style="color: #ff5a00" rel="noreferrer">
-          Formlabs
-        </a>  Materials Intern
       </p>
     </div>
 
-    <a href={scrollTarget} class="scroll-hint" aria-label="Scroll to explore">
+    <a
+      href={scrollTarget}
+      class="scroll-hint"
+      aria-label="Scroll to explore"
+      aria-hidden={scrollHintOpacity <= 0.05}
+      style="opacity: {scrollHintOpacity}; pointer-events: {scrollHintOpacity <= 0.05 ? 'none' : 'auto'};"
+    >
       <span>Scroll to explore</span>
       <span class="chevron">⌄</span>
     </a>
@@ -557,8 +573,8 @@
     letter-spacing: 0.18em;
     color: rgba(244, 239, 214, 0.78);
     text-decoration: none;
-    opacity: 0.85;
     animation: float 2.6s ease-in-out infinite;
+    transition: opacity 0.15s linear;
   }
 
   .scroll-hint span:first-child {
@@ -575,11 +591,9 @@
     0%,
     100% {
       transform: translateY(0);
-      opacity: 0.7;
     }
     50% {
       transform: translateY(-3px);
-      opacity: 1;
     }
   }
 

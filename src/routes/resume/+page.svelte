@@ -85,14 +85,21 @@
         <a href="https://isaiah-murray.com" target="_blank" rel="noreferrer">
           isaiah-murray.com
         </a>
+        <span class="sep">|</span>
+        <a href="https://github.com/IsaiahJMurray" target="_blank" rel="noreferrer">
+          github.com/IsaiahJMurray
+        </a>
+      </p>
+      <p class="meta subline">
+        Sophomore, Class of 2029 · U.S. Citizen · Embedded systems, instrumentation, and perception for physical hardware
       </p>
     </div>
 
     <div class="actions">
-      <a class="btn" href="/Isaiah-Murray-2025-Resume-1025.pdf" target="_blank" rel="noreferrer">
+      <a class="btn" href="/Isaiah_Murray_Resume.pdf" target="_blank" rel="noreferrer">
         View PDF
       </a>
-      <button class="btn ghost" type="button" on:click={() => printPdf("/Isaiah-Murray-2025-Resume-1025.pdf")}>
+      <button class="btn ghost" type="button" on:click={() => printPdf("/Isaiah_Murray_Resume.pdf")}>
         Print
       </button>
     </div>
@@ -107,22 +114,72 @@
       <div class="items">
         <section class="item">
           <div class="itemTop">
-            <h3>CHERISH HEALTH — Engineering Team</h3>
+            <h3>Formlabs — Electrical Engineering Intern, SLS &amp; Materials R&amp;D</h3>
+            <div class="right">
+              <span class="date">Mar 2026 – Aug 2026</span>
+              <span class="loc">Somerville, MA</span>
+            </div>
+          </div>
+          <ul>
+            <li>Built end-to-end powder-bed defect detection pipeline — GPU-accelerated classical CV region proposal feeding a ResNet-18 classifier over a nine-class taxonomy — replacing a binary detector with classified, severity-ranked results; surfaced order-of-magnitude defect-rate differences between machines running identical material.</li>
+            <li>Designed fleet-wide heater fault detection from first-principles physics after establishing no labeled fault data existed; root-caused a 9% false-positive rate to PWM phase jitter between hardware channels and restructured the check to 0% on healthy fleet data — caught a wiring fault on a unit 12h from shipping to a beta customer.</li>
+            <li>Replaced a manual filter-swap characterization procedure with a controlled-evaporation sweep producing a continuous pressure–flow surface in one run; built the resulting virtual flow sensor and validated it closed-loop against an independent sensor outside the control loop.</li>
+            <li>Built in-situ dielectric cure monitoring rig (PyQt6, VISA impedance analyzer, SSH-triggered exposure); identified cross-machine timing as the data-quality limit and added a dedicated fire-time recorder, enabling ~40 Hz transient capture across 300+ runs. Correlated ionic viscosity with FTIR, enabling FTIR emulation at ~300 Hz.</li>
+            <li>Built browser-native lifetime test runner (acoustic cycle detection, crash-safe resumable state, automatic Word/PDF report generation) and ran five qualification campaigns — longest logged 515 insertion cycles.</li>
+          </ul>
+        </section>
+
+        <section class="item">
+          <div class="itemTop">
+            <h3>Cherish Health — Engineering Team</h3>
             <div class="right">
               <span class="date">2024–2025</span>
               <span class="loc">Cambridge, MA</span>
             </div>
           </div>
           <ul>
-            <li>Returned full-time during gap year prior to college.</li>
-            <li>Calibrated phased radar arrays; reduced side lobe interference by 20% (TX) and 30% (RX).</li>
-            <li>Sped up state annotation; built internal interface for storing/comparing radar characterization data.</li>
-            <li>Organized contractors for MFP; CAM’ed and manufactured injection-molded and machined components.</li>
-            <li>Tools: GCloud, Gitlab, SolidWorks, KeyShot.</li>
+            <li>Automated phased-array radar calibration; replaced manual gain/phase tuning with an FPGA-controlled workflow using spectrum analysis and algorithmic optimization, cutting calibration from hours to minutes and reducing side lobe interference 20% (TX) / 30% (RX).</li>
+            <li>Built internal tooling for storing and comparing radar characterization data; accelerated state annotation throughput.</li>
+            <li>Sourced alternative LED supplier and coordinated contractors for molded fiber packaging, reducing BOM cost by 5%.</li>
+            <li>CAM'ed and manufactured injection-molded and machined components.</li>
           </ul>
         </section>
 
         <section class="item">
+          <div class="itemTop">
+            <h3>MIT Chem-E — Strano Group, Laboratory Assistant</h3>
+            <div class="right">
+              <span class="date">May 2023 – Aug 2023</span>
+              <span class="loc">Cambridge, MA</span>
+            </div>
+          </div>
+          <ul>
+            <li>Selected for MIT's HIP-SAT summer research program (Strano Lab); investigated graphene nanostructure additives in octadecane-based phase change materials to improve thermal conductivity and raise thermal resonator output voltage.</li>
+            <li>Presented findings at HIP-SAT Symposium and Boston Mammalian Synthetic Biology Symposium.</li>
+          </ul>
+        </section>
+
+        <section class="item">
+          <div class="itemTop">
+            <h3>Cherish Health — ML Intern</h3>
+            <div class="right">
+              <span class="date">2022–2023</span>
+              <span class="loc">Cambridge, MA</span>
+            </div>
+          </div>
+          <ul>
+            <li>Trained detection models and built data collection tooling in Python/TensorFlow.</li>
+            <li>Ran technical demos for CEO and CTO supporting a successful Series A round.</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="cardHeader subhead">
+        <h2>Additional Experience</h2>
+      </div>
+
+      <div class="items">
+        <section class="item tight">
           <div class="itemTop">
             <h3>Access Sport America — Coach</h3>
             <div class="right">
@@ -130,57 +187,12 @@
               <span class="loc">Dorchester, MA</span>
             </div>
           </div>
-          <ul>
-            <li>Coach through two summers across Malibu and Scituate locations.</li>
-            <li>Provided accessible watersports (paddleboarding, windsurfing, outrigger canoeing) to disabled individuals.</li>
-            <li>Collaborated with Flutey, Options, and Kids are People; focus on individuals with nonverbal autism.</li>
-          </ul>
+          <p class="p">
+            Adaptive watersports programming for athletes with disabilities; specialized in nonverbal autism support.
+          </p>
         </section>
 
-        <section class="item">
-          <div class="itemTop">
-            <h3>MIT Chem-E (Strano Research Group) — Laboratory Assistant</h3>
-            <div class="right">
-              <span class="date">2023</span>
-              <span class="loc">Cambridge, MA</span>
-            </div>
-          </div>
-          <ul>
-            <li>MIT HIP-SAT program: refined power output of thermal resonators.</li>
-            <li>Tested and developed phase change materials (PCMs).</li>
-            <li>Presented final HIP-SAT Symposium talk and a poster at the Boston Mammalian Synthetic Biology Symposium.</li>
-          </ul>
-        </section>
-
-        <section class="item">
-          <div class="itemTop">
-            <h3>Mathnasium — Mathematics Tutor</h3>
-            <div class="right">
-              <span class="date">2022–2024</span>
-              <span class="loc">Cohasset, MA</span>
-            </div>
-          </div>
-          <ul>
-            <li>Tutored students from 3rd grade through 10th grade; employed starting at age 14.</li>
-            <li>Worked with owner to build life skills beyond tutoring.</li>
-          </ul>
-        </section>
-
-        <section class="item">
-          <div class="itemTop">
-            <h3>CHERISH HEALTH — Summer Machine Learning Intern</h3>
-            <div class="right">
-              <span class="date">2022</span>
-              <span class="loc">Cambridge, MA</span>
-            </div>
-          </div>
-          <ul>
-            <li>Supported CEO/CTO with user demos during successful Series A round.</li>
-            <li>Supported ML data collection and network training; developed skills in product demos, CAD, Python, TensorFlow.</li>
-          </ul>
-        </section>
-
-        <section class="item">
+        <section class="item tight">
           <div class="itemTop">
             <h3>Center for Student Coastal Research — Student Researcher</h3>
             <div class="right">
@@ -188,10 +200,10 @@
               <span class="loc">Cohasset, MA</span>
             </div>
           </div>
-          <ul>
-            <li>Shellfish survey, water quality, drifter teams; received Marjot grant to study Zostera marina.</li>
-            <li>Analyzed recovery conditions for Labyrinthula zosterae; built and tested an automated artificial environment.</li>
-          </ul>
+          <p class="p">
+            Won Marjot grant to study Zostera marina; built automated environment chamber testing recovery in
+            Labyrinthula zosterae-infected specimens.
+          </p>
         </section>
       </div>
     </article>
@@ -199,18 +211,59 @@
     <aside class="side">
       <article class="card">
         <div class="cardHeader">
+          <h2>Projects</h2>
+        </div>
+        <div class="items">
+          <section class="item tight">
+            <p class="p">
+              <a href="/projects/autonomous-swarm">Autonomous Swarm</a> <em>(in progress)</em> · Multi-vehicle autonomy stack
+              (Isaac Sim, Pegasus, PX4 SITL, MAVSDK-Python); four-vehicle concurrent autonomous flight in sim, hardware
+              build underway on an STM32H743 FC.
+            </p>
+            <p class="p">
+              <a href="/projects/canopy">Olin Baja Racing</a> — Ride-height suspension sensor for damper tuning, CAN-based
+              data acquisition &amp; diagnostic canopy.
+            </p>
+            <p class="p">
+              <a href="/projects/clasp">CLASP</a> — BLE proximity-logging wearable on Nordic nRF52: custom PCB across
+              multiple revisions, low-power RF design.
+            </p>
+            <p class="p">
+              <a href="/projects/bragi">Bragi</a> — Real-time Quest 3 XR perception pipeline: YOLOv5 detection driving
+              contextual overlays, Google Cloud STT/TTS.
+            </p>
+            <p class="p">
+              <a href="/projects/binaric">Binaric</a> — Acoustic data transmission protocol: layered modulation,
+              Manchester-clocked multi-tone encoding, adaptive error correction.
+            </p>
+          </section>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="cardHeader">
           <h2>Skills</h2>
         </div>
 
         <div class="kv">
-          <div class="k">CAD Software</div>
+          <div class="k">Languages</div>
           <div class="v">
-            Fusion 360, SolidWorks, Onshape, KiCad, Altium Designer, Prusa Slicer, Mastercam, KeyShot, Blender
+            Python, C, C++, MATLAB, SQL, JavaScript
           </div>
 
-          <div class="k">Programming</div>
+          <div class="k">ML / CV</div>
           <div class="v">
-            C, C++, C#, Java, JavaScript, Swift, Python, Rust, MATLAB, Wolfram, LaTeX
+            PyTorch, OpenCV, Kornia, scikit-learn, NumPy, Pandas, SciPy, TensorFlow
+          </div>
+
+          <div class="k">Hardware &amp; Instrumentation</div>
+          <div class="v">
+            KiCad, Altium, PyVISA, USB DAQ, thermal imaging, nRF52, STM32, CAN, PX4/MAVLink
+          </div>
+
+          <div class="k">Tools &amp; Infrastructure</div>
+          <div class="v">
+            BigQuery, Grafana, FastAPI, SQLite, Git, SolidWorks, Fusion 360, Blender, INAV, Docker, Linux
           </div>
         </div>
       </article>
@@ -225,29 +278,28 @@
             <div class="itemTop">
               <h3>Franklin W. Olin College of Engineering</h3>
               <div class="right">
-                <span class="date">2025–present</span>
+                <span class="date">2025–2029</span>
                 <span class="loc">Needham, MA</span>
               </div>
             </div>
             <p class="p">
-              Pursuing ECE through project-based classes (DESNAT, QEA1, MODSIM). Baja off-road racing team
-              electronics division: ride height sensor for suspension tuning; CAN-based data collection and diagnostic
-              sensor canopy. Rugby and MMA through Babson; involved with Babson Mazda Miata racing team.
+              B.S. Engineering, Electrical &amp; Computer Engineering concentration · Expected May 2029 · GPA 3.75.
+              Built a facial recognition program, compared epidemiology models, and applied biomimicry to
+              weight-efficient jumping mechanisms through project-based coursework.
             </p>
           </section>
 
           <section class="item tight">
             <div class="itemTop">
-              <h3>NuVu Innovation School</h3>
+              <h3>NuVu Innovation School — 8th–12th grades</h3>
               <div class="right">
                 <span class="date">2020–2024</span>
                 <span class="loc">Cambridge, MA</span>
               </div>
             </div>
             <p class="p">
-              Project-based studios and seminars. Johns Hopkins CTY courses (Bio, Chem, AP Chem, Essay Writing).
-              AoPS math (Intermediate Algebra, Precalculus, AP Calculus). Additional coursework: Multivariable Calc,
-              Differential Equations, Linear Algebra, PSYC-21, CS-50, CSCI-E80 (Harvard Extension).
+              Project-based studios; Harvard Extension coursework in multivariable calculus, differential equations,
+              linear algebra, CS50.
             </p>
           </section>
         </div>
@@ -255,24 +307,10 @@
 
       <article class="card">
         <div class="cardHeader">
-          <h2>Community</h2>
+          <h2>Interests</h2>
         </div>
         <p class="p">
-          Member of Cohasset Middle School and High School Robotics teams, Cohasset Maritime Institute Rowing,
-          Cohasset Sailing Club, CSCR, Hingham Sailing Club, and volunteering activities through the Cohasset UU
-          Youth Program. Participate in service trips to Appalachia through ASP.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="cardHeader">
-          <h2>Personal</h2>
-        </div>
-        <p class="p">
-          Enjoy software development and industrial design. Studied classical guitar (ages 4–15). Play squash and
-          rugby; enjoy tennis, pickleball, and golf. Proficient across C# / C++ / C, JavaScript, LaTeX, Python, Rust,
-          Ruby, MATLAB, Java, Swift, Wolfram, NRF embedded firmware, and Intel Quartus Prime FPGA software;
-          familiar with RISC-V and ARM chip architecture.
+          Rugby and MMA (Babson) · Babson Mazda Miata racing team · Classical guitar · Delta Tau Delta Alumni Chair
         </p>
       </article>
     </aside>
@@ -392,6 +430,18 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(244, 239, 214, 0.86);
+  }
+
+  /* mid-card sub-heading (e.g. "Additional Experience" within the Experience card) */
+  .cardHeader.subhead {
+    padding: 0.6rem 1rem 0.5rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    background: none;
+  }
+
+  .cardHeader.subhead h2 {
+    font-size: 0.8rem;
+    opacity: 0.8;
   }
 
   .items {

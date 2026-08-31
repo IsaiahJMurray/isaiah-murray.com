@@ -21,6 +21,7 @@ featured: true
 visibility: public
 heroImage: /images/projects/plonk_pigeonholing/6620dbf523d48_TUlJyrQ3Z.png
 accent: '#8B0000'
+order: 903
 ---
 
 ## Overview

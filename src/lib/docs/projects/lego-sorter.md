@@ -17,6 +17,7 @@ maturity: production
 featured: false
 visibility: public
 heroImage: /generated/logos/lego-sorter.png
+order: 902
 ---
 
 ## Overview

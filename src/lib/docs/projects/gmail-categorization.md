@@ -16,7 +16,7 @@ tags:
 - email
 maturity: prototype
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/gmail-categorization.png
 ---
 

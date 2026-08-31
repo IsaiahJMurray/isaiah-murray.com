@@ -57,20 +57,9 @@
   }
 
   .what-card {
-    border-radius: 1rem;
     padding: 1.2rem 1.3rem;
-    border: 1px solid rgba(120, 135, 160, 0.5);
-    background: radial-gradient(
-        circle at 0% 0%,
-        rgba(33, 181, 255, 0.12),
-        transparent 55%
-      ),
-      radial-gradient(
-        circle at 100% 100%,
-        rgba(255, 140, 0, 0.1),
-        rgba(6, 8, 12, 0.96) 55%
-      );
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    border-left: 2px solid rgba(120, 135, 160, 0.55);
+    background: rgba(255, 255, 255, 0.02);
   }
 
   .what-card h3 {

@@ -11,7 +11,7 @@ tags:
 - swift
 maturity: prototype
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/stranding.png
 ---
 ## Overview

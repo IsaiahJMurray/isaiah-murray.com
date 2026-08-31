@@ -21,7 +21,8 @@ tags:
 maturity: production
 featured: true
 visibility: public
-heroImage: \images\projects\egg_lathe\4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg
+heroImage: /images/projects/egg_lathe/4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg
+order: 901
 ---
 
 ## Overview

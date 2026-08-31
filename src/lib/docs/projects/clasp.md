@@ -21,6 +21,7 @@ maturity: polished
 featured: true
 visibility: public
 heroImage: /images/projects/clasp/IMG_4305-min.jpg
+order: 3
 ---
 
 ## Overview

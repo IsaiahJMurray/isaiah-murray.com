@@ -10,7 +10,7 @@ updated: '2023-08-22'
 tags: []
 maturity: prototype
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/scrapperstar.png
 ---
 ## Overview

@@ -17,7 +17,7 @@ tags:
 - ml
 maturity: production
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/vibes-button.png
 ---
 ## Overview
@@ -235,7 +235,7 @@ I split the project into two primary components:
   - Shared `layout.html` with Bootstrap and custom `styles.css`.
   - `index.html`: dashboard of API calls.
   - `login.html`, `register.html`: simple centered forms with the “Vibes Button :)” branding.
-  - `navbar.html`: includes links to “Switch API Key” and “Logout”, plus a “Welcome {{ username }}” badge.
+  - `navbar.html`: includes links to “Switch API Key” and “Logout”, plus a “Welcome `{{ username }}`” badge.
   - `options.html`: a styled card with:
     - API key input.
     - Save button with loading state.

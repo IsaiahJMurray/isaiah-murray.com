@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-  <title>Isaiah Murray</title>
+  <title>Isaiah Murray – Embedded Systems & Robotics Engineer</title>
   <meta
     name="description"
     content="Isaiah Murray – Electrical and Computer Engineering student at Olin College of Engineering. - Materials Intern at Formlabs."
@@ -14,7 +14,7 @@
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Isaiah Murray" />
+  <meta property="og:title" content="Isaiah Murray – Embedded Systems & Robotics Engineer" />
   <meta property="og:description" content="ECE @ Olin College of Engineering | Materials Intern @ Formlabs" />
   <meta property="og:url" content="https://isaiah-murray.com" />
   <meta property="og:image" content="https://isaiah-murray.com/faceshot.jpg" />

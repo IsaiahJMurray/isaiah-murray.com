@@ -13,7 +13,7 @@ tags:
 - javascript
 maturity: prototype
 featured: false
-visibility: public
+visibility: unlisted
 heroImage: /generated/logos/calendar-plugin.png
 ---
 ## Overview

@@ -45,7 +45,12 @@
   :global(html, body) {
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+    /* overflow-x: hidden here would force overflow-y to auto per the CSS
+       overflow spec, splitting html/body into two independent scroll
+       containers and breaking SvelteKit's scroll-to-top-on-navigate (which
+       only resets window/documentElement scroll, not body's). clip avoids
+       creating that second scroll container. */
+    overflow-x: clip;
     height: 100%;
     color: #fdf6d6;
     background-color: black;
