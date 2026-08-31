@@ -72,10 +72,6 @@
     ],
     "c": [
       {
-        "slug": "scrapperstar",
-        "score": 0.4894223336954289
-      },
-      {
         "slug": "egg-lathe",
         "score": 0.48805218026926794
       },
@@ -322,20 +318,6 @@
         "score": 0.6125302025533443
       }
     ],
-    "scrapperstar": [
-      {
-        "slug": "stranding",
-        "score": 0.612969460120684
-      },
-      {
-        "slug": "topdownshootergame",
-        "score": 0.6108254650602686
-      },
-      {
-        "slug": "github-grader",
-        "score": 0.5645002528953867
-      }
-    ],
     "stranding": [
       {
         "slug": "rowing-planner",
@@ -351,10 +333,6 @@
       }
     ],
     "topdownshootergame": [
-      {
-        "slug": "scrapperstar",
-        "score": 0.6108254650602686
-      },
       {
         "slug": "c",
         "score": 0.48547931341250716

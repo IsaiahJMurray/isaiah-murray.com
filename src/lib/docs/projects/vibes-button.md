@@ -272,7 +272,7 @@ I split the project into two primary components:
 ## Lessons Learned
 
 - **Extension–page communication is subtle.**
-  - Mixing content scripts, `window.postMessage`, and background scripts introduces timing and security nuances. My 1-second delay workaround underscored how important a robust handshake design is.
+  - Mixing content scripts, `window.postMessage`, and background scripts introduces timing and security nuances. My 1-second delay workaround was a hack — it should be a proper handshake instead of a fixed delay.
 
 - **State duplication is easy to get wrong.**
   - Keeping `session['user_id']` (Flask) and `userId` (Chrome storage) in sync required careful thinking. Introducing a special “guest” value (`-1`) simplified a lot of edge cases.

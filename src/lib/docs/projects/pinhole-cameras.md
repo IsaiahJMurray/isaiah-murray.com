@@ -27,7 +27,7 @@ accent: '#8B4513'
 
 I designed and built a series of modular pinhole cameras from laser-cut wood, evolving from simple prototypes to sophisticated systems with removable lens assemblies and reusable film cartridges. Working alongside Schuyler Johnson and Trevor McDonald, I developed cameras capable of multiple exposures with panoramic format options, combining traditional analog photography with modern digital fabrication techniques.
 
-The project resulted in a collection of striking photographs that showcase the unique aesthetic qualities of pinhole photography—infinite depth of field, soft focus, and distinctive perspective distortions. Each camera iteration solved specific technical challenges around light sealing, film transport, and modular connectivity.
+The project produced a collection of photographs with pinhole photography's characteristic look—near-infinite depth of field, soft focus, and distinctive perspective distortion. Each camera iteration solved specific technical challenges around light sealing, film transport, and modular connectivity.
 
 ![Final modular camera design](/images/projects/pinhole_cameras/final_camera_fabricated.jpg)
 
@@ -167,7 +167,7 @@ The final camera incorporates an internal sliding shutter mechanism that elimina
 
 ## Results
 
-The camera system successfully produced a diverse portfolio of photographs demonstrating excellent exposure control and minimal light leakage. The images showcase the full range of pinhole photography aesthetics, from sharp architectural studies to dreamy portraits.
+The camera system produced photographs with good exposure control and minimal light leakage, ranging from architectural studies to portraits.
 
 ### Portrait Photography
 

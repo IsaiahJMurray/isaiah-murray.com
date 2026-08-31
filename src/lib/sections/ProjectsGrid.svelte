@@ -10,14 +10,24 @@
 
   const featuredProjects = [
     {
-      slug: 'egg-lathe',
-      title: 'Egg Lathe',
-      heroImage: '/images/projects/egg_lathe/4042049F-4E5C-4FE2-90E5-DB033294D7C5_1_105_c.jpeg',
+      slug: 'autonomous-swarm',
+      title: 'Autonomous Swarm',
+      heroImage: '/images/projects/autonomous-swarm/final-prototype-side.jpg',
       docImages: [
-        '/images/projects/egg_lathe/413E6CA7-410C-4811-B012-0264FC44B8B6_1_105_c.jpeg',
-        '/images/projects/egg_lathe/07E0E0C1-4AAA-49F0-9761-DE9BF86FBBAB_1_105_c.jpeg'
+        '/images/projects/autonomous-swarm/midstage-prototype-rigid10k-guard.jpg',
+        '/images/projects/autonomous-swarm/final-prototype-bottom.jpg'
       ],
-      tags: ['CNC', 'Mechatronics', 'Fabrication']
+      tags: ['Autonomy', 'Embedded', 'PX4']
+    },
+    {
+      slug: 'canopy',
+      title: 'Canopy',
+      heroImage: '/images/projects/canopy/carrier-both-cards-inserted.png',
+      docImages: [
+        '/images/projects/canopy/compute-card.png',
+        '/images/projects/canopy/lora-board-render.png'
+      ],
+      tags: ['CAN Bus', 'Embedded', 'Telemetry']
     },
     {
       slug: 'clasp',
@@ -38,15 +48,6 @@
         '/images/projects/pcb_card/Screenshot_2024-09-27_at_9.23.11_AM.png'
       ],
       tags: ['PCB', 'Electronics', 'Design']
-    },
-    {
-      slug: 'radar-calibration',
-      title: 'Radar Calibration',
-      heroImage: '/images/projects/radar-calibration/image.png',
-      docImages: [
-        '/images/projects/radar-calibration/Screenshot_(3).png'
-      ],
-      tags: ['Signal Processing', 'Hardware', 'Automation']
     }
   ];
 

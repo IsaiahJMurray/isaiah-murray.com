@@ -29,7 +29,7 @@ I led a four-person team in developing a real-time dielectric sensing system to 
 
 Our system successfully identified specific printing phases including layer start times, plunge cycles, cure progression, and print completion by analyzing phase offset and amplitude changes in a 245kHz test signal. The work demonstrated clear differentiation between cured and uncured resin states with voltage amplitude differences of up to 0.3V across the frequency spectrum.
 
-The research garnered significant interest from FormLabs leadership, who are now supporting continued development of this technology for potential integration into their SLA printer ecosystem. This represents a novel approach to process monitoring that could enable real-time print quality control and failure detection.
+FormLabs leadership showed real interest in the results and is supporting continued development, with an eye toward integrating this into their SLA printers for real-time print quality control and failure detection.
 
 ---
 

@@ -5,7 +5,7 @@ subtitle: >
   embedded firmware to create a pocket-sized demo platform. The card integrates
   an NFC interface, an 8×8 LED matrix, and a Bosch BMA400 accelerometer, using a
   coin-cell-powered microcontroller to drive tilt- and shake-responsive visual
-  effects such as a gravity-based “sand” simulation. Designed to showcase
+  effects such as a gravity-based “sand” simulation. Demonstrates
   manufacturable PCB layout, sensor integration over I2C, GPIO-multiplexed
   displays, and system-level tradeoffs in power, cost, and form factor.
 slug: pcb-business-card

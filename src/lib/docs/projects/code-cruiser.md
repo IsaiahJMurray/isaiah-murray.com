@@ -23,7 +23,7 @@ accent: '#4CAF50'
 
 ## Overview
 
-Code Cruiser is an educational robot designed to teach children valuable coding and logic skills through a completely screen-free approach. In today's digital era, while it's crucial to equip children with essential coding skills, jumping directly into digital programming can be overwhelming for young minds. Most children end up wasting hours on screens without developing meaningful problem-solving abilities.
+Code Cruiser is an educational robot that teaches kids coding and logic skills through a completely screen-free approach.
 
 Drawing from Piaget's theory of development—that direct manipulation of objects supports thought development in young children—Code Cruiser takes a tactile approach. Children create programs by arranging hand-painted color tiles in sequences, which the robot reads using color sensors and then executes as movement commands.
 

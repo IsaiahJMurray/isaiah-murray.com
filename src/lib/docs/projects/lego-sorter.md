@@ -79,7 +79,7 @@ I split the project into three main pieces:
 1. **Data pipeline**
    - Use `tf.keras.utils.image_dataset_from_directory` to load images from a directory-structured dataset
    - Apply a train/validation split via `validation_split` and `subset`, with a fixed seed for reproducibility
-   - Standardize input shape using global constants (`HEIGHT`, `WIDTH`, `DEPTH`) and leverage dataset caching, shuffling, and prefetching
+   - Standardize input shape using global constants (`HEIGHT`, `WIDTH`, `DEPTH`) and use dataset caching, shuffling, and prefetching
 
 2. **Model search via randomization**
    - Implement `generate_random_model` to programmatically build CNNs with randomized hyperparameters (number of conv layers, filters, kernel sizes, pooling, dense layers, dropout)

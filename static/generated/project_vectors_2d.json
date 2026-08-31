@@ -46,7 +46,7 @@
     {
       "slug": "binaric",
       "title": "Binaric",
-      "subtitle": "Audio-based data transmission protocol that turns files and messages into structured tone sequences, inspired by dial\u2011up but built for modern devices. Aimed at developers and researchers exploring acoustic modems, offline communication, or playful data-over-sound channels. Technically, it features layered modulation, Manchester-clocked multi-tone encoding, adaptive error correction, and spectrogram-driven decoding tools in Python.",
+      "subtitle": "Audio-based data transmission protocol that turns files and messages into structured tone sequences, inspired by dial‑up but built for modern devices. Aimed at developers and researchers exploring acoustic modems, offline communication, or playful data-over-sound channels. Technically, it features layered modulation, Manchester-clocked multi-tone encoding, adaptive error correction, and spectrogram-driven decoding tools in Python.",
       "tags": [
         "python",
         "simulation",
@@ -179,7 +179,7 @@
     {
       "slug": "pcb-business-card",
       "title": "PCB Business Card",
-      "subtitle": "An interactive PCB business card that combines low-cost hardware design with embedded firmware to create a pocket-sized demo platform. The card integrates an NFC interface, an 8\u00d78 LED matrix, and a Bosch BMA400 accelerometer, using a coin-cell-powered microcontroller to drive tilt- and shake-responsive visual effects such as a gravity-based \u201csand\u201d simulation. Designed to showcase manufacturable PCB layout, sensor integration over I2C, GPIO-multiplexed displays, and system-level tradeoffs in power, cost, and form factor.\n",
+      "subtitle": "An interactive PCB business card that combines low-cost hardware design with embedded firmware to create a pocket-sized demo platform. The card integrates an NFC interface, an 8×8 LED matrix, and a Bosch BMA400 accelerometer, using a coin-cell-powered microcontroller to drive tilt- and shake-responsive visual effects such as a gravity-based “sand” simulation. Designed to showcase manufacturable PCB layout, sensor integration over I2C, GPIO-multiplexed displays, and system-level tradeoffs in power, cost, and form factor.\n",
       "tags": [
         "hardware",
         "pcb",
@@ -383,7 +383,7 @@
     {
       "slug": "curator",
       "title": "Curator",
-      "subtitle": "Curator is a portfolio documentation orchestrator that crawls your GitHub repos, asks targeted follow-up questions, and generates rich project writeups via the OpenAI Responses API. It\u2019s built for developers and technical creatives who want production-grade, auto-updating documentation, with a Flask backend tied into GitHub, Cloud SQL, and GCS plus a SvelteKit frontend scaffold for a future UI.",
+      "subtitle": "Curator is a portfolio documentation orchestrator that crawls your GitHub repos, asks targeted follow-up questions, and generates rich project writeups via the OpenAI Responses API. It’s built for developers and technical creatives who want production-grade, auto-updating documentation, with a Flask backend tied into GitHub, Cloud SQL, and GCS plus a SvelteKit frontend scaffold for a future UI.",
       "tags": [
         "html",
         "javascript",
@@ -584,7 +584,7 @@
     {
       "slug": "github-grader",
       "title": "Github Grader",
-      "subtitle": "An Apple Fitness\u2013style dashboard for developers that visualizes your GitHub activity, daily coding stats, and repository health. Built with SvelteKit, it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata into interactive SVG \"activity rings\" and stat cards.\n",
+      "subtitle": "An Apple Fitness–style dashboard for developers that visualizes your GitHub activity, daily coding stats, and repository health. Built with SvelteKit, it uses GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata into interactive SVG \"activity rings\" and stat cards.\n",
       "tags": [
         "html",
         "javascript",
@@ -829,7 +829,7 @@
     {
       "slug": "radar-calibration",
       "title": "Radar Calibration Automation",
-      "subtitle": "An internal calibration automation project focused on phased-array radar systems. The work replaced manual antenna gain and phase tuning with a programmatic workflow driven by FPGA control, spectrum analysis, and algorithmic optimization\u2014reducing calibration time from hours to minutes while significantly improving array efficiency.\n",
+      "subtitle": "An internal calibration automation project focused on phased-array radar systems. The work replaced manual antenna gain and phase tuning with a programmatic workflow driven by FPGA control, spectrum analysis, and algorithmic optimization—reducing calibration time from hours to minutes while significantly improving array efficiency.\n",
       "tags": [
         "rf",
         "radar",
@@ -872,7 +872,7 @@
     {
       "slug": "rowing-form-detection",
       "title": "Rowing Form Detection",
-      "subtitle": "Neural-network-powered \u201cdigital coach\u201d that analyzes rowing videos to grade form and surface detailed pose feedback. Uses Google Cloud Video Intelligence person detection and pose landmarks to extract keypoints and timestamps, forming the foundation for automated technique assessment and real-time coaching insights.",
+      "subtitle": "Neural-network-powered “digital coach” that analyzes rowing videos to grade form and surface detailed pose feedback. Uses Google Cloud Video Intelligence person detection and pose landmarks to extract keypoints and timestamps, forming the foundation for automated technique assessment and real-time coaching insights.",
       "tags": [],
       "heroImage": "/generated/logos/rowing-form-detection.png",
       "x": 0.6240166995004183,
@@ -945,44 +945,9 @@
       ]
     },
     {
-      "slug": "scrapperstar",
-      "title": "Scrapperstar",
-      "subtitle": "A Unity-based project tentatively set up for building a game or interactive experience called ScrapperStar. Aimed at players or prototypes needing rapid iteration, it\u2019s structured with a clean Unity-specific .gitignore for streamlined collaboration and build management.",
-      "tags": [],
-      "heroImage": "/generated/logos/scrapperstar.png",
-      "x": 0.7034852885878129,
-      "y": 0.7087455041201399,
-      "semanticAxes": [
-        {
-          "label": "Hardware",
-          "value": 0.25884368933637325
-        },
-        {
-          "label": "Software",
-          "value": 0.44399438880566977
-        },
-        {
-          "label": "Mechanics",
-          "value": 0.36266969415342043
-        },
-        {
-          "label": "Data/AI",
-          "value": 0.35204098314604937
-        },
-        {
-          "label": "Research",
-          "value": 0.9685122711164322
-        },
-        {
-          "label": "Creative",
-          "value": 0.41577601274183446
-        }
-      ]
-    },
-    {
       "slug": "stranding",
       "title": "Stranding",
-      "subtitle": "Stranding is an early-stage SwiftUI iOS app exploring a \u201cstrand-based\u201d approach to structuring workouts and exercise routines. It\u2019s set up with unit and UI test targets, making it a foundation for experimenting with fitness-focused interactions, UI, and architecture in native Swift.",
+      "subtitle": "Stranding is an early-stage SwiftUI iOS app exploring a “strand-based” approach to structuring workouts and exercise routines. It’s set up with unit and UI test targets, making it a foundation for experimenting with fitness-focused interactions, UI, and architecture in native Swift.",
       "tags": [
         "swift"
       ],
@@ -1054,7 +1019,7 @@
     {
       "slug": "vibes-button",
       "title": "Vibes Button",
-      "subtitle": "A Chrome extension that overlays any webpage with cheerful, AI-generated affirmations tailored to the page\u2019s URL. Built for desktop Chrome users, it pairs a Flask backend (with user auth, usage logging, and API key management) with a Manifest V3 extension that streams OpenAI completions into a lightweight in-page UI.",
+      "subtitle": "A Chrome extension that overlays any webpage with cheerful, AI-generated affirmations tailored to the page’s URL. Built for desktop Chrome users, it pairs a Flask backend (with user auth, usage logging, and API key management) with a Manifest V3 extension that streams OpenAI completions into a lightweight in-page UI.",
       "tags": [
         "css",
         "html",

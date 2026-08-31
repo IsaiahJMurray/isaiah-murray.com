@@ -111,7 +111,7 @@ In `SegmentManager.svelte`, I maintain a simple form bound to local component st
   - `moveSegmentUp` and `moveSegmentDown` swap items in the `segments` array by index, with bounds checks.
   - Removal uses `filter` to exclude the specified index.
 
-Derived metrics leverage Svelte’s `$:` reactive declarations:
+Derived metrics use Svelte’s `$:` reactive declarations:
 
 ```js
 $: totalTime = get(segments).reduce((acc, segment) => acc + Number(segment.time), 0);

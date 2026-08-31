@@ -376,37 +376,6 @@ I validated the system's educational effectiveness through extensive testing:
 
 ![Additional Quest 3 environment mapping with Spanish vocabulary](/images/projects/bragi_master/low_quality_mapping_demo2.png)
 
-## Results
-
-The immersive Spanish learning platform achieved significant educational and technical milestones:
-
-**Educational Outcomes**:
-- **Vocabulary Retention**: 40% improvement in long-term vocabulary retention compared to traditional flashcard methods
-- **Pronunciation Accuracy**: Users achieved 85%+ pronunciation accuracy within 3 practice sessions per word
-- **Contextual Association**: 95% success rate in correctly identifying Spanish vocabulary when encountering real-world objects
-- **Learning Engagement**: Average session length increased by 60% compared to traditional language learning apps
-- **Knowledge Transfer**: Users successfully applied learned vocabulary in real-world Spanish conversations
-
-**Technical Performance**:
-- **Object Detection Accuracy**: 92% correct identification of target vocabulary objects
-- **Spatial Positioning**: ±2cm accuracy for flashcard placement on detected objects
-- **Speech Processing Latency**: &lt;500ms round-trip time for pronunciation assessment
-- **System Responsiveness**: Maintained 60+ FPS in Unity while running real-time object detection
-- **Cross-Platform Integration**: Seamless data flow between Quest 3, backend services, and web analytics
-
-**User Experience Metrics**:
-- **Learning Satisfaction**: 4.8/5 average user rating for immersive learning experience
-- **Pronunciation Confidence**: 75% of users reported increased confidence in Spanish pronunciation
-- **Real-World Application**: Users successfully used learned vocabulary in authentic Spanish conversations
-- **System Usability**: 90% of users completed onboarding without assistance
-- **Retention Rate**: 80% of users continued using the platform after initial 2-week trial period
-
-**System Validation**:
-- Tested with 25+ Spanish vocabulary words across multiple object categories
-- Validated pronunciation assessment accuracy with native Spanish speakers
-- Confirmed learning effectiveness through pre/post vocabulary assessments
-- Demonstrated system stability across various lighting and environmental conditions
-
 ## Lessons Learned
 
 **Contextual Learning Effectiveness**: Anchoring vocabulary to real-world objects dramatically improves retention and recall. Users consistently performed better on vocabulary tests when words were learned through spatial association rather than traditional methods.

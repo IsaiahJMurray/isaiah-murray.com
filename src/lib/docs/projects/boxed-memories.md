@@ -161,16 +161,6 @@ The Arduino component receives serial commands when similarity thresholds are me
 
 ---
 
-## Results
-
-The installation was successfully demonstrated to Red Fox Escape Rooms, where it achieved remarkable engagement metrics. Approximately 80% of attendees actively participated in the demonstration, with many staying beyond the scheduled time to experiment with the terrain manipulation.
-
-The system performed reliably during the presentation, accurately detecting terrain matches and providing consistent feedback. Red Fox Escape Rooms expressed strong interest in the concept and requested detailed schematics and implementation plans, though the ultimate deployment status remains unknown.
-
-The technical performance met all design goals: real-time processing maintained smooth interaction, similarity detection proved accurate enough for gameplay, and the hardware integration operated without technical issues during the demonstration.
-
----
-
 ## Lessons Learned
 
 Computer vision in uncontrolled lighting environments requires robust preprocessing—the color quantization approach proved essential for consistent similarity detection across different lighting conditions. The calibration system was crucial for deployment flexibility, allowing quick setup in various room configurations.

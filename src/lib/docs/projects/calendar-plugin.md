@@ -3,7 +3,7 @@ title: Calendar Plugin
 subtitle: A Chrome extension that pulls upcoming events from Google Calendar and enriches
   them with attendee context from Gmail and LinkedIn. Built for busy professionals
   who want quick meeting summaries and profiles without leaving their browser, it
-  showcases OAuth flows across multiple providers, secure token handling with chrome.identity
+  uses OAuth flows across multiple providers, secure token handling with chrome.identity
   and storage APIs, and a lightweight HTML/JavaScript popup UI.
 slug: calendar-plugin
 date: '2024-07-15'
