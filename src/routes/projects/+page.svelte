@@ -201,12 +201,15 @@
   .plate.all > .part.wide .lbl strong { font-size: var(--t-md); }
   .plate.all > .part.big .lbl { flex-wrap: nowrap; flex-direction: column; align-items: stretch; gap: var(--s1); }
   .plate.all > .part.big .lbl .mono { order: -1; }
+  .plate.all > .part.big .lbl > * { flex-shrink: 0; }
+  .plate.all > .part.big .lbl strong { overflow: visible; }
   .plate.all > .part.big .lbl p {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
+    max-height: calc(2 * 1.45em);
   }
 
   .proj-index .sort {

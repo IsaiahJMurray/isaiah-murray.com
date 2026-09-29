@@ -9,12 +9,6 @@
   import Footer from '$lib/chamber/Footer.svelte';
   import BuildColumn from '$lib/chamber/BuildColumn.svelte';
   import { inject } from '@vercel/analytics';
-  import { page } from '$app/stores';
-
-  // TEMPORARY: routes not yet ported to Build Chamber keep their old dark look so their cream
-  // text stays readable. Remove a route from this list when it is rewritten (then delete the list).
-  const LEGACY_ROUTES = [];
-  $: legacy = LEGACY_ROUTES.includes($page.route?.id ?? '');
 
   inject(); // Start Vercel Analytics
 
@@ -49,7 +43,7 @@
 
 <div class="shell">
   <Header />
-  <div class="page" class:legacy>
+  <div class="page">
     <slot />
   </div>
   <Footer />
@@ -60,7 +54,6 @@
 <style>
   .shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
   .page { flex: 1; min-width: 0; }
-  .legacy { background: #050608; color: #fdf6d6; padding-bottom: var(--s6); }
   .skip {
     position: absolute;
     left: var(--gutter);
