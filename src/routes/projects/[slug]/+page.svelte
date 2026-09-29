@@ -1,115 +1,175 @@
+<!--
+  Project page (Build Chamber). Any markdown doc from src/lib/docs/projects, laid out like the
+  mockup's #swarm view:
+    left  sticky "build height" ruler (≥ 900px): the global BuildColumn docked inside it, one mark
+          per h2 of the doc, and a Z readout;
+    right header (breadcrumb, H1, subtitle, meta, hero) and the doc body.
+  The doc is enhanced on mount (see `enhance`): h2s get ids and data-build labels (they are the
+  slice boundaries for the column), tables get a scroll wrapper, runs of image-only paragraphs
+  become galleries, and every image opens the shared Lightbox with the doc's full image list.
+-->
 <script>
-  import { onMount } from 'svelte';
-  import SimilarProjects from '$lib/components/SimilarProjects.svelte';
-  import ProjectVectorStar from '$lib/components/ProjectVectorStar.svelte';
+  import { tick } from 'svelte';
+  import { buildInfo, dockBuildColumn, refreshBuildColumn } from '$lib/chamber/build.js';
+  import Lightbox from '$lib/chamber/Lightbox.svelte';
 
   export let data;
-  const { metadata, component: Doc, slug, heroImage } = data;
 
+  const STATUS = { wip: 'In progress', prototype: 'Prototype', polished: 'Polished', production: 'Production', archived: 'Archived' };
   const siteBase = 'https://isaiah-murray.com';
-  const pageUrl = `${siteBase}/projects/${slug}`;
-  const ogImage = heroImage?.startsWith('http') ? heroImage : `${siteBase}${heroImage}`;
-  const ogTitle = `${metadata.title} · Isaiah Murray`;
-  const ogDescription = metadata.subtitle || metadata.description || `A project by Isaiah Murray.`;
 
-  const maturityLabels = {
-    production: 'Production',
-    polished: 'Polished',
-    prototype: 'Prototype',
-    wip: 'In Progress',
-    archived: 'Archived'
-  };
+  $: ({ metadata, component: Doc, slug, heroImage, neighbors: nb } = data);
+  $: pageUrl = `${siteBase}/projects/${slug}`;
+  $: ogImage = heroImage?.startsWith('http') ? heroImage : `${siteBase}${heroImage}`;
+  $: ogTitle = `${metadata.title} · Isaiah Murray`;
+  $: ogDescription = metadata.subtitle || metadata.description || `A project by Isaiah Murray.`;
+  $: subtitle = String(metadata.subtitle || '').replace(/\s+/g, ' ').trim();
+  $: status = STATUS[data.maturity] || null;
+  $: tags = data.tags || [];
 
-  const displayDate = metadata.updated || metadata.date || null;
-  const accent = metadata.accent || '#7bdcff';
+  /* ---------- ruler: marks from the column's slice map ---------- */
+  const MM_PER_PX = 0.02; // page height → build height, so a longer write-up is a taller part
+  const GAP = 22;
+  let lb;
+  let docMM = 0;
+  let lastSlices = null;
+  $: info = $buildInfo;
+  $: if (info.slices !== lastSlices) {
+    lastSlices = info.slices;
+    if (typeof document !== 'undefined') docMM = document.documentElement.scrollHeight * MM_PER_PX;
+  }
+  $: marks = info.docked ? info.slices.slice(1).filter((s) => s.el) : [];
+  $: ys = place(marks, info);
+  $: active = marks.reduce((on, s, i) => (info.progress + 0.002 >= s.a ? i : on), -1);
+  $: z = `Z ${(info.built * docMM).toFixed(2).padStart(6, '0')} mm`;
 
-  // Lightbox state
-  let lightboxOpen = false;
-  let lightboxSrc = '';
-  let lightboxAlt = '';
-
-  function openLightbox(src, alt) {
-    lightboxSrc = src;
-    lightboxAlt = alt || '';
-    lightboxOpen = true;
+  function place(list, inf) {
+    // marks sit at the base of each part; bottom-up keep ≥ GAP apart, and inside the ruler
+    const out = list.map((s) => inf.yForP(s.a));
+    for (let i = 1; i < out.length; i++) out[i] = Math.min(out[i], out[i - 1] - GAP);
+    for (let i = out.length - 1; i >= 0; i--) out[i] = Math.max(out[i], 8 + (out.length - 1 - i) * GAP);
+    return out;
   }
 
-  function closeLightbox() {
-    lightboxOpen = false;
+  function jump(s) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    s.el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    s.el.focus({ preventScroll: true });
   }
 
-  onMount(() => {
-    const docBody = document.querySelector('.doc-body');
-    if (!docBody) return;
+  /* ---------- doc enhancement ---------- */
+  const slugify = (t) =>
+    t.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const NUMERIC = /^[~≈<>≤≥±+\-–−]?\s*[\d][\d.,\s]*(?:[a-zA-Zµ°%Ω/]{0,6})?(?:\s*[×x]\s*\d+)?$/;
 
-    // Group consecutive image paragraphs into galleries
-    const children = Array.from(docBody.children);
-    let i = 0;
+  function isImagePara(el) {
+    if (el.tagName !== 'P' || !el.querySelector('img')) return false;
+    return [...el.childNodes].every(
+      (n) => (n.nodeType === 3 && !n.textContent.trim()) || n.nodeName === 'IMG' || n.nodeName === 'BR'
+    );
+  }
 
-    while (i < children.length) {
-      const node = children[i];
+  function zoomButton(img) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'zoom';
+    b.setAttribute('aria-label', img.alt ? `Enlarge image: ${img.alt}` : 'Enlarge image');
+    img.decoding = 'async';
+    img.replaceWith(b);
+    b.appendChild(img);
+    return b;
+  }
 
-      // Check if this is a paragraph containing only an image
-      if (isImageParagraph(node)) {
-        // Collect consecutive image paragraphs
-        const group = [node];
-        let j = i + 1;
+  function enhance(node) {
+    let items = [];
+    const onClick = (e) => {
+      const b = e.target.closest?.('button.zoom');
+      if (!b || !node.contains(b)) return;
+      lb?.open(items, Number(b.dataset.lb) || 0, b);
+    };
+    node.addEventListener('click', onClick);
 
-        while (j < children.length && isImageParagraph(children[j])) {
-          group.push(children[j]);
-          j++;
+    tick().then(() => {
+      // h2: ids + slice labels
+      const used = new Set();
+      node.querySelectorAll('h2').forEach((h, i) => {
+        const text = h.textContent.replace(/\s+/g, ' ').trim();
+        if (!h.id) {
+          const base = slugify(text) || `section-${i + 1}`;
+          let id = base;
+          for (let n = 2; used.has(id) || document.getElementById(id); n++) id = `${base}-${n}`;
+          h.id = id;
         }
+        used.add(h.id);
+        h.tabIndex = -1;
+        h.dataset.build = text || `Section ${i + 1}`;
+      });
 
-        // Create gallery wrapper
-        const gallery = document.createElement('figure');
-        gallery.className = `image-gallery gallery-${Math.min(group.length, 4)}`;
+      // tables: horizontal scroll wrapper + mono figures
+      node.querySelectorAll('table').forEach((t) => {
+        if (!t.parentElement.classList.contains('tbl-wrap')) {
+          const w = document.createElement('div');
+          w.className = 'tbl-wrap doc-tbl';
+          t.replaceWith(w);
+          w.appendChild(t);
+        }
+        t.querySelectorAll('tbody td').forEach((td) => {
+          if (NUMERIC.test(td.textContent.trim())) td.classList.add('num');
+        });
+      });
 
-        // Insert gallery before first image
-        node.parentNode.insertBefore(gallery, node);
-
-        // Move images into gallery
-        group.forEach((p, idx) => {
-          const img = p.querySelector('img');
-          if (img) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'gallery-item';
-            
-            // Clone the image and add click handler
-            const clonedImg = img.cloneNode(true);
-            clonedImg.style.cursor = 'zoom-in';
-            wrapper.appendChild(clonedImg);
-            gallery.appendChild(wrapper);
+      // runs of image-only paragraphs → galleries
+      const kids = [...node.children];
+      for (let i = 0; i < kids.length; ) {
+        if (!isImagePara(kids[i])) { i++; continue; }
+        let j = i;
+        const imgs = [];
+        while (j < kids.length && isImagePara(kids[j])) imgs.push(...kids[j++].querySelectorAll('img'));
+        const g = document.createElement('div');
+        g.className = `gallery g-${Math.min(imgs.length, 5)}`;
+        kids[i].before(g);
+        for (const img of imgs) {
+          const fig = document.createElement('figure');
+          g.appendChild(fig);
+          fig.appendChild(img);
+          zoomButton(img);
+          if (img.alt) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = img.alt;
+            cap.setAttribute('aria-hidden', 'true');
+            fig.appendChild(cap);
           }
-          p.remove();
-        });
-
-        // Add click handlers for lightbox
-        gallery.querySelectorAll('img').forEach(img => {
-          img.addEventListener('click', () => openLightbox(img.src, img.alt));
-        });
-
+        }
+        for (let k = i; k < j; k++) kids[k].remove();
         i = j;
-      } else {
-        i++;
       }
-    }
 
-    // Also add lightbox to any remaining standalone images
-    docBody.querySelectorAll('img').forEach(img => {
-      if (!img.closest('.image-gallery')) {
-        img.style.cursor = 'zoom-in';
-        img.addEventListener('click', () => openLightbox(img.src, img.alt));
-      }
+      // remaining images (inline in text), unless they are already links
+      node.querySelectorAll('img').forEach((img) => {
+        if (!img.closest('button.zoom, a')) zoomButton(img).classList.add('zoom-inline');
+      });
+
+      // lightbox list: every zoomable image in document order
+      const btns = [...node.querySelectorAll('button.zoom')];
+      items = btns.map((b, i) => {
+        b.dataset.lb = String(i);
+        const img = b.querySelector('img');
+        return { src: img.currentSrc || img.src, alt: img.alt || '', caption: img.alt || '' };
+      });
+
+      // video: native controls, sized by CSS
+      node.querySelectorAll('video').forEach((v) => {
+        v.removeAttribute('width');
+        v.removeAttribute('height');
+        v.controls = true;
+        v.playsInline = true;
+        if (!v.getAttribute('preload')) v.preload = 'metadata';
+      });
+
+      refreshBuildColumn();
     });
-  });
 
-  function isImageParagraph(node) {
-    if (node.tagName !== 'P') return false;
-    const img = node.querySelector('img');
-    if (!img) return false;
-    // Check if paragraph contains only the image (and maybe whitespace)
-    const textContent = node.textContent.trim();
-    return textContent === '' || textContent === img.alt;
+    return { destroy: () => node.removeEventListener('click', onClick) };
   }
 </script>
 
@@ -143,544 +203,257 @@
   <meta name="twitter:image" content={ogImage} />
 </svelte:head>
 
-<div class = "nav spacer"></div>
-<article class="project-page" style={`--accent:${accent}`}>
-  <a href="/projects" class="back-link">← Back to projects</a>
-
-  <header class="project-hero">
-    <div class="hero-media">
-      <img src={heroImage} alt={metadata.title} class="hero-image" />
+<main id="main" class="proj">
+  <aside class="ruler" aria-label="Build height: reading progress">
+    <div class="ruler-col" use:dockBuildColumn></div>
+    <div class="ruler-ticks" aria-hidden="true"></div>
+    <div class="ruler-marks">
+      {#each marks as s, i (s.el)}
+        <button type="button" class:on={i === active} style={`top:${ys[i]}px`} on:click={() => jump(s)}>
+          <span class="mono" aria-hidden="true">{(s.a * docMM).toFixed(1).padStart(5, '0')}</span>
+          <span class="t">{s.label}</span>
+        </button>
+      {/each}
     </div>
+    <div class="ruler-z mono" aria-hidden="true">{z}</div>
+  </aside>
 
-    <div class="hero-text">
-      <h1 class="project-title">{metadata.title}</h1>
+  {#key slug}
+    <article class="proj-main">
+      <header class="proj-head" data-build="Intro">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="/projects">Projects</a></li>
+            <li aria-current="page">{metadata.title}</li>
+          </ol>
+        </nav>
+        <h1>{metadata.title}</h1>
+        {#if subtitle}<p class="lede" class:long={subtitle.length > 150}>{subtitle}</p>{/if}
+        <div class="head-grid">
+          <dl class="meta">
+            {#if status}<dt>Status</dt><dd>{status}</dd>{/if}
+            {#if data.year}<dt>Year</dt><dd class="mono">{data.year}</dd>{/if}
+            {#if tags.length}<dt>Tags</dt><dd class="mono tags">{tags.join(', ')}</dd>{/if}
+          </dl>
+          <figure class="hero">
+            <img src={heroImage} alt={metadata.title} loading="eager" fetchpriority="high" decoding="async" />
+          </figure>
+        </div>
+      </header>
 
-      {#if metadata.subtitle}
-        <p class="project-subtitle">{metadata.subtitle}</p>
-      {/if}
-
-      <div class="hero-meta-row">
-        {#if metadata.maturity}
-          <span class={`maturity-pill maturity-${metadata.maturity}`}>
-            {maturityLabels[metadata.maturity] ?? metadata.maturity}
-          </span>
-        {/if}
-
-        {#if displayDate}
-          <span class="meta-pill">
-            Updated {new Date(displayDate).toLocaleDateString()}
-          </span>
-        {/if}
+      <div class="doc" use:enhance>
+        <svelte:component this={Doc} />
       </div>
 
-      {#if metadata.tags && metadata.tags.length}
-        <div class="hero-tags">
-          {#each metadata.tags as tag}
-            <span class="tag">{tag}</span>
-          {/each}
-        </div>
-      {/if}
-    </div>
+      <nav class="next" aria-label="More projects">
+        {#if nb?.prev}
+          <a class="go prev" href={`/projects/${nb.prev.slug}`}><small>Previous project</small>{nb.prev.title}</a>
+        {/if}
+        {#if nb?.next}
+          <a class="go nxt" href={`/projects/${nb.next.slug}`}><small>Next project</small>{nb.next.title}</a>
+        {/if}
+        <a class="all" href="/projects">All projects</a>
+      </nav>
+    </article>
+  {/key}
+</main>
 
-    <div class="hero-radar-col">
-      <ProjectVectorStar slug={slug} size={170} compact={false} showLabels={true} label="" />
-    </div>
-  </header>
-
-  <section class="project-body">
-    <div class="doc-body">
-      <Doc />
-      <SimilarProjects currentSlug={slug} />
-    </div>
-  </section>
-</article>
-
-<!-- Lightbox Modal -->
-{#if lightboxOpen}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-  <div class="lightbox-overlay" on:click={closeLightbox}>
-    <button class="lightbox-close" on:click={closeLightbox} aria-label="Close">×</button>
-    <img src={lightboxSrc} alt={lightboxAlt} class="lightbox-image" on:click|stopPropagation />
-  </div>
-{/if}
+<Lightbox bind:this={lb} />
 
 <style>
-  .nav.spacer {
-    height: 3.25em;
-  }
-  .project-page {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 0 2em;
-    width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  :global(.project-body) {
-    display: flex;
-    justify-content: space-evenly;
-  }
-
-  .back-link {
-    font-size: 0.84rem;
-    text-decoration: none;
-    color: rgba(244, 239, 214, 0.75);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    width: fit-content;
-    padding: 0.2rem 0;
-    border-bottom: 1px solid transparent;
-  }
-
-  .back-link:hover {
-    color: var(--accent);
-    border-bottom-color: color-mix(in srgb, var(--accent) 60%, transparent);
-  }
-
-  .project-hero {
+  /* ---------- page grid + ruler ---------- */
+  .proj {
     display: grid;
-    grid-template-columns: minmax(0, 320px) minmax(0, 1fr) auto;
-    gap: 1.6rem;
-    align-items: center;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 0 var(--s6);
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
   }
-
-  .hero-radar-col {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0.4rem 0;
+  .ruler {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 24px);
+    align-self: start;
+    height: calc(100vh - 48px);
+    margin-top: var(--s5);
   }
-
-  .hero-media {
-    border-radius: 1.2rem;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: radial-gradient(circle at 50% 0%, #171924, #050609);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-  }
-
-  .hero-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    aspect-ratio: 4 / 3;
-    transform: scale(1.02);
-  }
-
-  .hero-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .project-title {
-    margin: 0;
-    font-size: clamp(1.8rem, 2.7vw, 2.2rem);
-    letter-spacing: 0.04em;
-  }
-
-  .project-subtitle {
-    margin: 0;
-    font-size: 0.98rem;
-    color: rgba(244, 239, 214, 0.78);
-  }
-
-  .hero-meta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .maturity-pill {
-    font-size: 0.7rem;
-    padding: 0.22rem 0.7rem;
-    border-radius: 999px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    border: 1px solid rgba(244, 239, 214, 0.24);
-    white-space: nowrap;
-  }
-
-  .maturity-production {
-    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
-    background: linear-gradient(
-      120deg,
-      color-mix(in srgb, var(--accent) 65%, transparent),
-      rgba(255, 211, 176, 0.6),
-      rgba(158, 255, 212, 0.55)
-    );
-    color: #050608;
-  }
-
-  .maturity-polished {
-    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
-    background: linear-gradient(
-      120deg,
-      color-mix(in srgb, var(--accent) 55%, transparent),
-      rgba(255, 216, 188, 0.5)
-    );
-    color: #050608;
-  }
-
-  .maturity-prototype,
-  .maturity-wip {
-    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-    background: rgba(12, 16, 24, 0.95);
-    color: rgba(244, 239, 214, 0.95);
-  }
-
-  .maturity-archived {
-    border-color: rgba(180, 180, 180, 0.4);
-    background: rgba(10, 12, 16, 0.98);
-    color: rgba(199, 199, 199, 0.8);
-  }
-
-  .meta-pill {
-    font-size: 0.78rem;
-    padding: 0.18rem 0.6rem;
-    border-radius: 999px;
-    border: 1px solid rgba(244, 239, 214, 0.22);
-    color: rgba(244, 239, 214, 0.8);
-  }
-
-  .hero-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0;
-  }
-
-  .tag {
-    font-size: 0.78rem;
-    padding: 0.22rem 0.55rem;
-    border-radius: 999px;
-    background: rgba(18, 21, 29, 0.96);
-    border: 1px solid rgba(244, 239, 214, 0.18);
-    color: rgba(244, 239, 214, 0.86);
-  }
-
-  .project-body {
-    margin-top: 0.5rem;
-  }
-
-  .doc-body {
-    max-width: 780px;
-    width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
-     DYNAMIC IMAGE GALLERY SYSTEM
-     Automatically styled based on consecutive image count
-     ═══════════════════════════════════════════════════════════════════════════ */
-
-  /* Base image styling */
-  .doc-body :global(img) {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0.5rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    object-fit: cover;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
-  }
-
-  .doc-body :global(video) {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 0.5rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: #050609;
-  }
-
-  .doc-body :global(img:hover) {
-    transform: scale(1.015);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
-  }
-
-  /* Gallery container base */
-  .doc-body :global(.image-gallery) {
-    display: grid;
-    gap: 0.5rem;
-    margin: 1.25rem 0;
-    border-radius: 0.6rem;
-    overflow: hidden;
-  }
-
-  .doc-body :global(.gallery-item) {
-    position: relative;
-    overflow: hidden;
-    border-radius: 0.5rem;
-    background: radial-gradient(circle at 50% 0%, #171924, #050609);
-  }
-
-  .doc-body :global(.gallery-item img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
-  }
-
-  .doc-body :global(.gallery-item img:hover) {
-    transform: scale(1.03);
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     GALLERY-1: Single hero image — full width, prominent
-     ───────────────────────────────────────────────────────────────────────── */
-  .doc-body :global(.gallery-1) {
-    grid-template-columns: 1fr;
-  }
-
-  .doc-body :global(.gallery-1 .gallery-item) {
-    aspect-ratio: 16 / 9;
-    max-height: 420px;
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     GALLERY-2: Duo layout — balanced side by side
-     ───────────────────────────────────────────────────────────────────────── */
-  .doc-body :global(.gallery-2) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .doc-body :global(.gallery-2 .gallery-item) {
-    aspect-ratio: 4 / 3;
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     GALLERY-3: Trio layout — feature left, stack right
-     ───────────────────────────────────────────────────────────────────────── */
-  .doc-body :global(.gallery-3) {
-    grid-template-columns: 1.6fr 1fr;
-    grid-template-rows: repeat(2, 1fr);
-  }
-
-  .doc-body :global(.gallery-3 .gallery-item:first-child) {
-    grid-row: 1 / 3;
-    aspect-ratio: auto;
-  }
-
-  .doc-body :global(.gallery-3 .gallery-item:nth-child(2)),
-  .doc-body :global(.gallery-3 .gallery-item:nth-child(3)) {
-    aspect-ratio: 16 / 10;
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     GALLERY-4+: Grid/Masonry layout — flexible grid
-     ───────────────────────────────────────────────────────────────────────── */
-  .doc-body :global(.gallery-4) {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto auto;
-  }
-
-  .doc-body :global(.gallery-4 .gallery-item) {
-    aspect-ratio: 4 / 3;
-  }
-
-  /* For 5+ images, use a more flexible approach */
-  .doc-body :global(.gallery-5),
-  .doc-body :global(.gallery-6) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .doc-body :global(.gallery-5 .gallery-item),
-  .doc-body :global(.gallery-6 .gallery-item) {
-    aspect-ratio: 4 / 3;
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     Responsive adjustments
-     ───────────────────────────────────────────────────────────────────────── */
-  @media (max-width: 640px) {
-    .doc-body :global(.gallery-2),
-    .doc-body :global(.gallery-3),
-    .doc-body :global(.gallery-4) {
-      grid-template-columns: 1fr;
-    }
-
-    .doc-body :global(.gallery-3 .gallery-item:first-child) {
-      grid-row: auto;
-    }
-
-    .doc-body :global(.gallery-item) {
-      aspect-ratio: 16 / 10;
-    }
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
-     LIGHTBOX
-     ═══════════════════════════════════════════════════════════════════════════ */
-  :global(.lightbox-overlay) {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    animation: lightbox-fade-in 0.2s ease;
-  }
-
-  @keyframes lightbox-fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  :global(.lightbox-image) {
-    max-width: 90vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 0.5rem;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
-    animation: lightbox-zoom-in 0.25s ease;
-  }
-
-  @keyframes lightbox-zoom-in {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  :global(.lightbox-close) {
+  .ruler-col { position: absolute; left: 0; top: 0; width: 32px; height: calc(100% - 36px); }
+  .ruler-ticks {
     position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 2rem;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    cursor: pointer;
+    left: 38px;
+    top: 0;
+    bottom: 36px;
+    width: 6px;
+    background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 12px);
+  }
+  .ruler-marks { position: absolute; left: 36px; top: 0; bottom: 36px; right: 0; }
+  .ruler-marks button {
+    position: absolute;
+    left: 0;
+    max-width: 100%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: background 0.15s ease, transform 0.15s ease;
+    gap: var(--s2);
+    background: none;
+    border: 0;
+    padding: 2px 0;
+    font-size: var(--t-xs);
+    color: var(--ink-2);
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .ruler-marks button::before { content: ''; width: 12px; height: 1px; background: var(--part); flex: none; }
+  .ruler-marks .mono { font-size: 11px; color: var(--ink-2); min-width: 4ch; flex: none; }
+  .ruler-marks .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .ruler-marks button:hover, .ruler-marks button.on { color: var(--ink); }
+  .ruler-marks button.on::before { background: var(--laser); height: 2px; }
+  .ruler-z { position: absolute; left: 0; bottom: 0; font-size: var(--t-xs); color: var(--ink); }
+  @media (max-width: 900px) {
+    .proj { grid-template-columns: minmax(0, 1fr); }
+    .ruler { display: none; }
   }
 
-  :global(.lightbox-close:hover) {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
+  /* ---------- header ---------- */
+  .proj-main { min-width: 0; padding-bottom: var(--s8); }
+  .proj-head { padding: var(--s5) 0 var(--s7); }
+  .crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s2); font-size: var(--t-sm); color: var(--ink-2); }
+  .crumbs li { min-width: 0; }
+  .crumbs li + li::before { content: '/'; margin-right: var(--s2); color: var(--rule); }
+  .crumbs a { color: var(--ink-2); }
+  .crumbs a:hover { color: var(--ink); }
+  h1 {
+    font-weight: 900;
+    font-size: clamp(40px, 6.4vw, 84px);
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    margin-top: var(--s6);
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .lede { font-size: var(--t-xl); line-height: 1.35; max-width: 34ch; margin-top: var(--s5); letter-spacing: -0.005em; }
+  .lede.long { font-size: var(--t-lg); line-height: 1.45; max-width: 52ch; }
+  .head-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--s5) var(--s6);
+    margin-top: var(--s6);
+    align-items: start;
+  }
+  .meta { grid-column: 1 / span 4; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s2) var(--s4); margin: 0; font-size: var(--t-sm); }
+  .meta dt { color: var(--ink-2); }
+  .meta dd { margin: 0; min-width: 0; }
+  .meta .tags { font-size: var(--t-xs); line-height: 1.6; overflow-wrap: anywhere; color: var(--ink-2); }
+  .hero { grid-column: 5 / -1; margin: 0; padding: 7px; background: var(--powder-shade); }
+  .hero img { width: 100%; aspect-ratio: 5 / 4; object-fit: contain; background: var(--powder-shade); }
+  @media (max-width: 760px) {
+    .meta, .hero { grid-column: 1 / -1; }
+    .lede { font-size: var(--t-lg); }
+    .lede.long { font-size: var(--t-md); }
+    .proj-head { padding-bottom: var(--s6); }
   }
 
-  /* basic markdown styling */
-  .doc-body :global(h2) {
-    margin-top: 1.8rem;
-    margin-bottom: 0.6rem;
-    font-size: 1.2rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: rgba(244, 239, 214, 0.9);
+  /* ---------- doc body ---------- */
+  .doc { overflow-wrap: break-word; }
+  .doc > :global(:first-child) { margin-top: 0; }
+  .doc :global(h2) {
+    font-size: var(--t-2xl);
+    letter-spacing: -0.01em;
+    margin: var(--s7) 0 var(--s4);
+    scroll-margin-top: 24px;
   }
-
-  .doc-body :global(h3) {
-    margin-top: 1.2rem;
-    margin-bottom: 0.4rem;
-    font-size: 1.02rem;
+  .doc :global(hr + h2) { margin-top: 0; }
+  .doc :global(h3) { font-size: var(--t-lg); margin: var(--s6) 0 var(--s2); }
+  .doc :global(h4) { font-size: var(--t-md); margin: var(--s5) 0 var(--s1); }
+  .doc :global(h2 + h3) { margin-top: var(--s4); }
+  .doc :global(p) { max-width: 68ch; margin: var(--s3) 0 0; }
+  .doc :global(:is(h2, h3, h4) + p) { margin-top: 0; }
+  .doc :global(strong) { font-weight: 700; }
+  .doc :global(ul), .doc :global(ol) { max-width: 68ch; padding-left: 1.2em; margin: var(--s3) 0 0; }
+  .doc :global(li) { margin-top: var(--s2); }
+  .doc :global(li > ul), .doc :global(li > ol) { margin-top: var(--s1); }
+  .doc :global(li::marker) { color: var(--part); }
+  .doc :global(ol > li::marker) { font-family: var(--f-mono); font-size: var(--t-sm); }
+  .doc :global(hr) { border: 0; border-top: 1px solid var(--rule); margin: var(--s7) 0 var(--s6); }
+  .doc :global(blockquote) {
+    max-width: 68ch;
+    margin: var(--s5) 0 0;
+    padding: 0 0 0 var(--s4);
+    border-left: 2px solid var(--part);
+    color: var(--ink-2);
   }
+  .doc :global(blockquote p:first-child) { margin-top: 0; }
 
-  .doc-body :global(p) {
-    margin: 0.5rem 0;
-    line-height: 1.6;
-    font-size: 0.96rem;
-    color: rgba(244, 239, 214, 0.88);
-  }
+  /* code */
+  .doc :global(:not(pre) > code) { background: var(--powder-shade); padding: 1px 4px; overflow-wrap: anywhere; }
+  .doc :global(pre) { margin: var(--s5) 0 0; }
+  .doc :global(pre code) { background: none; padding: 0; }
 
-  .doc-body :global(ul),
-  .doc-body :global(ol) {
-    margin: 0.4rem 0 0.8rem 1.2rem;
-  }
+  /* tables (wrapped on mount; the fallback keeps SSR output from overflowing) */
+  .doc :global(table) { display: block; overflow-x: auto; }
+  .doc :global(.doc-tbl) { margin-top: var(--s5); }
+  .doc :global(.doc-tbl table) { display: table; }
+  .doc :global(td.num) { font-family: var(--f-mono); font-size: var(--t-xs); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .doc :global(td), .doc :global(th) { min-width: 9ch; }
+  .doc :global(td code) { white-space: nowrap; }
 
-  .doc-body :global(li) {
-    margin: 0.2rem 0;
-  }
-
-  .doc-body :global(code) {
-    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular,
-      Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    font-size: 0.85rem;
-    background: rgba(15, 18, 24, 0.95);
-    padding: 0.08rem 0.25rem;
-    border-radius: 0.25rem;
-  }
-
-  .doc-body :global(pre) {
-    margin: 0.9rem 0;
-    padding: 0.9rem 1rem;
-    border-radius: 0.7rem;
-    background: rgba(8, 10, 16, 0.98);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    overflow-x: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .doc-body :global(table) {
-    display: block;
+  /* media */
+  .doc :global(img) { max-width: 100%; height: auto; }
+  .doc :global(video) {
     width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-    border-collapse: collapse;
+    height: auto;
+    max-height: 80vh;
+    margin-top: var(--s5);
+    background: var(--part);
+  }
+  .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--part); cursor: zoom-in; }
+  .doc :global(button.zoom img) { width: 100%; height: 100%; object-fit: cover; }
+  .doc :global(button.zoom-inline) { display: inline-block; width: auto; max-width: 100%; vertical-align: middle; background: none; }
+
+  /* galleries: parts on a powder tray, flush, 7px apart */
+  .doc :global(.gallery) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    padding: 7px;
+    margin: var(--s5) 0 0;
+    background: var(--powder-shade);
+  }
+  .doc :global(.gallery figure) { margin: 0; min-width: 0; display: flex; flex-direction: column; }
+  .doc :global(.gallery .zoom) { aspect-ratio: 4 / 3; position: relative; overflow: hidden; }
+  .doc :global(.gallery .zoom img) { position: absolute; inset: 0; }
+  .doc :global(.gallery figcaption) { font-size: var(--t-xs); line-height: 1.4; color: var(--ink-2); padding: var(--s2) 2px var(--s1); }
+  .doc :global(.gallery.g-1) { grid-template-columns: minmax(0, 1fr); }
+  .doc :global(.gallery.g-1 .zoom) { aspect-ratio: auto; background: var(--powder-shade); }
+  .doc :global(.gallery.g-1 .zoom img) { position: static; height: auto; max-height: 72vh; object-fit: contain; margin: 0 auto; width: auto; max-width: 100%; }
+  .doc :global(.gallery.g-3) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .doc :global(.gallery.g-5) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 560px) {
+    .doc :global(.gallery.g-3), .doc :global(.gallery.g-5) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .doc :global(.gallery:not(.g-1) figure:last-child:nth-child(odd)) { grid-column: 1 / -1; }
+    .doc :global(.gallery:not(.g-1) figure:last-child:nth-child(odd) .zoom) { aspect-ratio: 16 / 9; }
+    .doc :global(h2) { font-size: var(--t-xl); }
   }
 
-  .doc-body :global(pre code) {
-    background: transparent;
-    padding: 0;
+  /* ---------- prev / next ---------- */
+  .next {
+    margin-top: var(--s8);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s5) var(--s6);
+    align-items: baseline;
   }
-
-  .doc-body :global(a) {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
-  }
-
-  .doc-body :global(a:hover) {
-    border-bottom-color: var(--accent);
-  }
-
-  @media (max-width: 960px) {
-    .project-hero {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hero-radar-col {
-      order: 3;
-      justify-self: center;
-    }
-
-    .hero-media {
-      max-width: 420px;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .project-page {
-      padding: 0 1rem;
-    }
-
-    :global(.project-body) {
-      justify-content: center;
-    }
-
-    .doc-body {
-      max-width: 100%;
-    }
+  .next .go { font-size: var(--t-xl); font-weight: 700; text-decoration: none; line-height: 1.2; min-width: 0; overflow-wrap: break-word; }
+  .next .go:hover { text-decoration: underline; }
+  .next .nxt { grid-column: 2; text-align: right; }
+  .next small { display: block; font-size: var(--t-xs); color: var(--ink-2); font-weight: 400; margin-bottom: var(--s1); }
+  .next .all { grid-column: 1 / -1; font-size: var(--t-sm); color: var(--ink-2); }
+  @media (max-width: 560px) {
+    .next { grid-template-columns: minmax(0, 1fr); }
+    .next .nxt { grid-column: 1; text-align: left; }
+    .next .go { font-size: var(--t-lg); }
   }
 </style>

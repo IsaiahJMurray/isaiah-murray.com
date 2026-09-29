@@ -1,0 +1,157 @@
+/* BUILD CHAMBER — global tokens, base elements and shared components.
+   Imported once, in src/routes/+layout.svelte. Page-specific styles live in the page.
+
+   Direction: a selective-laser-sintering powder bed seen from above. Powder is the ground,
+   sintered parts are darker grey solids, the laser is the only hot color.
+   One 12-column grid, 1200px max, spacing scale 4/8/12/16/24/32/48/64/96.
+   Color: --powder (ground) · --powder-shade (unsintered/trays) · --part (sintered nylon)
+          --ink (text) · --ink-2 (secondary) · --laser (live laser point, active filter, scroll fill ONLY)
+   Type:  Chivo 900 display · 700 headings · 400 body 17px/1.55
+          Chivo Mono 400/500 — machine readouts only (layer, Z, dates, part numbers, table figures, code).
+   Scale: 1.25 — 13 · 14 · 17 · 21 · 26 · 33 · 41 · display clamp
+   No rounded pills, gradients, glows or shadows (the lightbox is the one exception). */
+
+:root{
+  --powder:#E2E2DF; --powder-shade:#D3D3CF; --part:#5E605E; --ink:#1B1C1B; --ink-2:#545654;
+  --laser:#F2551D; --on-laser:#1B1C1B; --rule:#B9BAB6; --grain-opacity:.05;
+  --f-body:"Chivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --f-mono:"Chivo Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --t-xs:13px; --t-sm:14px; --t-md:17px; --t-lg:21px; --t-xl:26px; --t-2xl:33px; --t-3xl:41px;
+  --wrap:1200px; --gutter:clamp(16px,4vw,40px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --powder:#1A1A19; --powder-shade:#242423; --part:#9A9C98; --ink:#E7E7E3; --ink-2:#A3A5A1;
+    --laser:#FF6B35; --on-laser:#1A1A19; --rule:#3A3B39; --grain-opacity:.06; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --powder:#1A1A19; --powder-shade:#242423; --part:#9A9C98; --ink:#E7E7E3; --ink-2:#A3A5A1;
+  --laser:#FF6B35; --on-laser:#1A1A19; --rule:#3A3B39; --grain-opacity:.06; color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--powder);color:var(--ink);font-family:var(--f-body);font-size:var(--t-md);line-height:1.55;margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+/* powder grain: barely there. z-index:-1 keeps it under all content without making a stacking context,
+   so fixed overlays (lightbox z 50, build column z 5) layer against each other normally. */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:var(--grain-opacity);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+img,video,canvas{display:block;max-width:100%}
+img{height:auto}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--part)}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:700;line-height:1.15}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+code,kbd,samp,pre{font-family:var(--f-mono)}
+::selection{background:var(--ink);color:var(--powder)}
+
+/* ---------- utilities ---------- */
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 var(--gutter)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- sections ---------- */
+.section{padding-top:var(--s8);padding-bottom:var(--s8);border-top:1px solid var(--rule)}
+.section-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--s3) var(--s5);margin-bottom:var(--s5)}
+.section-head h2{font-size:var(--t-2xl);letter-spacing:-0.01em}
+@media (max-width:600px){ .section{padding-top:var(--s7);padding-bottom:var(--s7)} .section-head h2{font-size:var(--t-xl)} }
+
+/* ================================================================
+   SHARED COMPONENTS (used by home, /projects, /resume, project pages)
+   ================================================================ */
+
+/* ---------- discipline filters: the active one is the only orange control ---------- */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.filters button{background:transparent;border:1px solid var(--rule);padding:6px var(--s3);font-size:var(--t-sm);line-height:1.2;min-height:36px;transition:background-color .2s,border-color .2s,color .2s}
+.filters button:hover{border-color:var(--part)}
+.filters button[aria-pressed="true"]{background:var(--laser);border-color:var(--laser);color:var(--on-laser);font-weight:700}
+.plate-count{font-size:var(--t-xs);color:var(--ink-2);margin-left:var(--s2)}
+
+/* ---------- build plate: sintered parts on a powder tray ----------
+   Cells are placed by the page (grid-column / grid-row, or the --gc / --gr custom properties).
+   .part.is-powder = filtered out: the part sinks back into the powder. */
+.plate{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:118px;gap:7px;padding:7px;background:var(--powder-shade)}
+.plate > .part{grid-column:var(--gc, span 3);grid-row:var(--gr, span 2)}
+.part{position:relative;display:flex;flex-direction:column;min-width:0;background:var(--part);color:var(--powder);text-decoration:none;overflow:hidden;transition:background-color .2s}
+.part .img{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--part)}
+.part img{width:100%;height:100%;object-fit:cover;transition:filter .2s,opacity .2s}
+.part .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);padding:var(--s2) var(--s3);min-width:0;background:var(--part);color:var(--powder);transition:background-color .2s,color .2s}
+.part .lbl strong{font-weight:700;font-size:var(--t-sm);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.part .lbl .mono{font-size:var(--t-xs);flex:none}
+.part.big .lbl{flex-wrap:wrap;padding:var(--s3) var(--s4)}
+.part.big .lbl strong{font-size:var(--t-lg);white-space:normal}
+.part.big .lbl p{flex-basis:100%;font-size:var(--t-sm);line-height:1.45;max-width:52ch}
+a.part:hover .lbl strong{text-decoration:underline;text-underline-offset:3px}
+a.part:focus-visible{outline-offset:2px}
+.part.is-powder{background:var(--powder)}
+.part.is-powder img{filter:grayscale(1) contrast(.5);opacity:.18}
+.part.is-powder .img{background:var(--powder)}
+.part.is-powder .lbl{background:var(--powder);color:var(--ink-2)}
+@media (max-width:760px){
+  .plate{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;gap:6px;padding:6px}
+  .plate > .part{grid-column:auto;grid-row:auto}
+  .plate .part .img{flex:none;aspect-ratio:1/1}
+  .plate > .part.wide-m{grid-column:1 / -1}
+  .plate > .part.wide-m .img{aspect-ratio:16/9}
+  .plate > .part.big .img{aspect-ratio:4/3}
+  .part .lbl{flex-direction:column;gap:0}
+  .part .lbl strong{white-space:normal}
+  .part.big .lbl{flex-direction:row}
+}
+
+/* ---------- tables (index tables, spec tables) ---------- */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:var(--t-sm)}
+th,td{text-align:left;vertical-align:baseline;padding:var(--s3) var(--s4) var(--s3) 0;border-bottom:1px solid var(--rule)}
+thead th{font-weight:400;font-size:var(--t-xs);color:var(--ink-2);padding-top:0}
+tbody th{font-weight:700}
+.index td.yr{width:6ch;color:var(--ink-2)}
+.index tbody th{width:28%}
+.index td:last-child{color:var(--ink-2)}
+/* phones: each index row becomes a two-line entry (figure column + text column), no sideways scroll */
+@media (max-width:600px){
+  .index thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .index tr{display:grid;grid-template-columns:6ch minmax(0,1fr);column-gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid var(--rule)}
+  .index th,.index td{border:0;padding:0;width:auto}
+  .index tbody th{width:auto}
+  .index tr > :not(.yr){grid-column:2}
+  .index tr > td:not(.yr){margin-top:var(--s1)}
+}
+
+/* ---------- run logs (experience) + spec list (skills) ---------- */
+.log{list-style:none;margin:0;padding:0}
+.log > li{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s2) var(--s6);padding:var(--s5) 0;border-bottom:1px solid var(--rule)}
+.log > li:first-child{padding-top:0}
+.log .when{grid-column:1 / span 3;font-size:var(--t-sm);color:var(--ink-2)}
+.log .when span{display:block}
+.log .what{grid-column:4 / span 8;min-width:0;max-width:68ch}
+.log h3{font-size:var(--t-lg);margin-bottom:var(--s1)}
+.log .title{color:var(--ink-2);font-size:var(--t-md)}
+.log ul{margin:var(--s3) 0 0;padding-left:1.1em}
+.log ul li{margin-top:var(--s2)}
+.log ul li::marker{color:var(--part)}
+.log .brief{margin-top:var(--s2);color:var(--ink)}
+.skills{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s3) var(--s6);margin:var(--s6) 0 0;font-size:var(--t-sm)}
+.skills dt{grid-column:1 / span 3;color:var(--ink-2)}
+.skills dd{grid-column:4 / span 9;margin:0}
+@media (max-width:760px){
+  .log > li,.skills{grid-template-columns:minmax(0,1fr)}
+  .log .when,.log .what,.skills dt,.skills dd{grid-column:1 / -1}
+  .skills dd{margin-bottom:var(--s3)}
+}
+
+/* ---------- code ---------- */
+pre{margin:var(--s5) 0 0;padding:var(--s4) var(--s5);background:var(--powder-shade);overflow-x:auto;font-size:var(--t-xs);line-height:1.6;max-width:100%}
+pre code{font-family:inherit;font-size:inherit}
+code{font-size:.88em}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}

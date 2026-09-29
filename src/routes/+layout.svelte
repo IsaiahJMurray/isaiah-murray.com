@@ -1,17 +1,36 @@
+<!--
+  Site shell (Build Chamber).
+  Pages render their own <main id="main"> and mark their sections with data-build="Label"
+  so the BuildColumn can map them (see src/lib/chamber/BuildColumn.svelte).
+-->
 <script>
-  import Header from '$lib/components/Header.svelte';
-  import Footer from '$lib/components/Footer.svelte';
+  import '$lib/styles/chamber.css';
+  import Header from '$lib/chamber/Header.svelte';
+  import Footer from '$lib/chamber/Footer.svelte';
+  import BuildColumn from '$lib/chamber/BuildColumn.svelte';
   import { inject } from '@vercel/analytics';
+  import { page } from '$app/stores';
+
+  // TEMPORARY: routes not yet ported to Build Chamber keep their old dark look so their cream
+  // text stays readable. Remove a route from this list when it is rewritten (then delete the list).
+  const LEGACY_ROUTES = [];
+  $: legacy = LEGACY_ROUTES.includes($page.route?.id ?? '');
 
   inject(); // Start Vercel Analytics
 
-  console.log('Layout is being processed');
+  // Skip link: jump to the page's <main>, whatever its id.
+  function skip(e) {
+    const main = document.querySelector('main');
+    if (!main) return;
+    e.preventDefault();
+    if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+    main.focus();
+    main.scrollIntoView();
+  }
 </script>
 
 <svelte:head>
   <title>Isaiah Murray</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Default Open Graph (overridden by individual pages) -->
   <meta property="og:type" content="website" />
@@ -26,55 +45,32 @@
   <meta name="twitter:description" content="Electrical and Computer Engineering student at Olin College of Engineering." />
 </svelte:head>
 
-<div class="layout-container">
-  <div class="header-container">
-  <Header /></div>
-  
-  <main class="content">
-    <slot></slot>
-  </main>
-  
-  <Footer buildDate="December 16th, 2025" />
+<a class="skip" href="#main" on:click={skip}>Skip to content</a>
+
+<div class="shell">
+  <Header />
+  <div class="page" class:legacy>
+    <slot />
+  </div>
+  <Footer />
 </div>
 
+<BuildColumn />
+
 <style>
-  :global(*, *::before, *::after) {
-    box-sizing: border-box;
-  }
-
-  :global(html, body) {
-    margin: 0;
-    padding: 0;
-    /* overflow-x: hidden here would force overflow-y to auto per the CSS
-       overflow spec, splitting html/body into two independent scroll
-       containers and breaking SvelteKit's scroll-to-top-on-navigate (which
-       only resets window/documentElement scroll, not body's). clip avoids
-       creating that second scroll container. */
-    overflow-x: clip;
-    height: 100%;
-    color: #fdf6d6;
-    background-color: black;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter",
-      sans-serif;
-  }
-
-  .header-container {
+  .shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+  .page { flex: 1; min-width: 0; }
+  .legacy { background: #050608; color: #fdf6d6; padding-bottom: var(--s6); }
+  .skip {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    padding: 0px;
+    left: var(--gutter);
+    top: -100px;
+    z-index: 60;
+    background: var(--ink);
+    color: var(--powder);
+    padding: var(--s2) var(--s4);
+    font-size: var(--t-sm);
+    text-decoration: none;
   }
-
-  .layout-container {
-    display: flex;
-    flex-direction: column;
-
-    min-height: 100vh;
-  }
-
-  .content {
-    flex: 1; /* Allows content to grow and push the footer to the bottom */
-  }
+  .skip:focus { top: var(--s2); }
 </style>
