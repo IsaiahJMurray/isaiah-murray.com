@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Rowing Piece Planner · demo</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="./_app/immutable/assets/2.B65KEwOk.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.C5mHXcZn.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/entry.BBgP3qA4.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.aZHIKDCl.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.Haq8omwQ.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.77kEAwME.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.WGqFr6hp.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.DeQjVQYB.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.DAdUj357.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <main class="svelte-110q396"><h1 class="svelte-110q396" data-svelte-h="svelte-1p4xzb6">Rowing Piece Planner</h1> <div class="segment-manager svelte-1wgi0hy"><input type="number" placeholder="Distance (m)" class="svelte-1wgi0hy" value=""> <input type="number" placeholder="Split (sec/500m)" class="svelte-1wgi0hy" value=""> <input type="number" placeholder="Stroke Rate" class="svelte-1wgi0hy" value=""> <button class="svelte-1wgi0hy">Add Segment</button>  <ul class="svelte-1wgi0hy"></ul> <div class="summary svelte-1wgi0hy"><p class="svelte-1wgi0hy">Total Time: 0.00 seconds</p> <p class="svelte-1wgi0hy">Average Split: 0.00 seconds/500m</p> <p class="svelte-1wgi0hy">Average Stroke Rate: 0.00 spm</p></div> </div> <div class="progress-bar svelte-zgrh4b"> </div> <p class="demo-note svelte-110q396" data-svelte-h="svelte-99s34b">Static demo. The original&#39;s “Generate Playlist” step called Spotify&#39;s
+      Recommendations endpoint from a server route; Spotify closed that endpoint to new and
+      development-mode apps in Nov 2024, so it isn&#39;t included here.</p> </main> 
+			
+			<script>
+				{
+					__sveltekit_mekger = {
+						base: new URL(".", location).pathname.slice(0, -1),
+						assets: "/demos/rowing-planner"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("./_app/immutable/entry/start.C5mHXcZn.js"),
+						import("./_app/immutable/entry/app.77kEAwME.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

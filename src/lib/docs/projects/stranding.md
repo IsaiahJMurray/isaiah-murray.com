@@ -203,4 +203,3 @@ Even though the current UI is intentionally minimal, the groundwork is in place 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Stranding)
-- [Live Demo (placeholder)](https://example.com/stranding-demo)

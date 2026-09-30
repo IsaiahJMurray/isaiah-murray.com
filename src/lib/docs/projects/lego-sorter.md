@@ -281,6 +281,12 @@ Using the custom effectiveness metric, I could see that the "best" model was not
 
 The framework successfully generated and evaluated dozens of distinct CNN architectures, and the saved histories and metrics gave me a clear picture of how design choices influenced performance.
 
+Reloading the saved 20-epoch model and re-running it on the same validation split (1,275 images) reproduces its logged 89.6% accuracy. The confusion matrix shows where the misses come from: 1×2 plates (3023) are mistaken for 1×2 plates with one knob (3794) about half the time, which makes sense because the two parts only differ by the studs.
+
+![Held-out validation renders with the model's top guess and confidence. Green is correct and orange is a miss, with the true part number.](/images/projects/lego_sorter/validation-predictions.webp)
+
+![Left: train and validation accuracy by epoch from the run's training_history.csv. Right: confusion matrix over the 16 part classes.](/images/projects/lego_sorter/training-and-confusion.webp)
+
 ---
 
 ## Lessons Learned
@@ -296,4 +302,3 @@ The framework successfully generated and evaluated dozens of distinct CNN archit
 ## Links
 
 - GitHub Repository: [https://github.com/IsaiahJMurray/Lego-Sorter](https://github.com/IsaiahJMurray/Lego-Sorter)
-- Live Demo (placeholder): _TBD – link to hosted demo or notebook if/when available_

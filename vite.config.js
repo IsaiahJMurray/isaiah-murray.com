@@ -12,7 +12,8 @@ export default defineConfig({
     SvelteKitPWA({
       registerType: 'autoUpdate',
       workbox: {
-        navigateFallbackDenylist: [/\.pdf$/i],
+        // PDFs and the static project demos under /demos/ are real files, not app routes
+        navigateFallbackDenylist: [/\.pdf$/i, /^\/demos\//],
       },
     }),
   ],

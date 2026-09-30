@@ -269,4 +269,3 @@ This allows running the assistant in a passive mode where it wakes up when someo
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/VIRTUE)
-- [Live Demo (coming soon)](#)

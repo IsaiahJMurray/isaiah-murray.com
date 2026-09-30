@@ -295,4 +295,3 @@ If I iterate on this project, I’d like to:
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Vibes-Button)
-- Demo: _TBD (link to demo or video walkthrough)_

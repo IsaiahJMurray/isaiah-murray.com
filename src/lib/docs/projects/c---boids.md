@@ -150,4 +150,3 @@ This logic combines straightforward kinematics with simple but effective collisi
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/C---Boids)
-- [Live Demo](#) (placeholder)

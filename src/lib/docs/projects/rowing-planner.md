@@ -244,9 +244,13 @@ For now, I display a simple list of track names. This structure makes it easy to
 - Built a working rowing session planner that:
   - Lets me define and restructure workouts quickly.
   - Gives immediate feedback on total distance, time, and averages.
-  - Suggests playlists using the Spotify Recommendations API.
+  - Suggests playlists using the Spotify Recommendations API. (Spotify closed that endpoint to new and development-mode apps in November 2024, so the hosted demo leaves this step out.)
 - Validated a practical pattern for using Svelte stores in a small but non-trivial app.
 - Implemented a clean, minimal API integration with third-party services, keeping secrets server-side.
+
+![The planner with a three-segment 2k piece: 500 m at 1:52, 1000 m at 1:48, 500 m at 1:44](/images/projects/rowing_planner/planner-2k-piece.webp)
+
+<a href="/demos/rowing-planner/index.html" data-sveltekit-reload>Try the planner</a> (static build, runs in the browser). The demo includes one small fix: the summary now reads the segments store reactively, so total time and averages update as you add segments.
 
 ## Lessons Learned
 
@@ -259,4 +263,4 @@ For now, I display a simple list of track names. This structure makes it easy to
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/rowing-planner)
-- Demo: _TBD_
+- <a href="/demos/rowing-planner/index.html" data-sveltekit-reload>Live demo</a>

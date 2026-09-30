@@ -205,6 +205,14 @@ Decoding focuses on robust timing and frequency extraction:
 - Developed reusable audio utilities and visualization tools that I can apply to other DSP or protocol experiments.
 - Identified clear bottlenecks (e.g., decoding robustness in high noise, real‑time performance) and paved the way for ML‑assisted demodulation and adaptive filters.
 
+![Spectrograms: the clean encoder output for the repo's test request (top) and the hello-world transmission after a simulated speaker-to-mic channel (bottom). The 250/450 Hz Manchester clock runs along the bottom, data tones sit between 700 and 2150 Hz, and the section mode tones sit above them.](/images/projects/binaric/spectrogram-encoder-vs-mic.webp)
+
+What it sounds like: the first 20 seconds of each transmission above.
+
+<audio controls preload="none" src="/images/projects/binaric/binaric-encoder-output.mp3"></audio>
+
+<audio controls preload="none" src="/images/projects/binaric/binaric-speaker-to-mic.mp3"></audio>
+
 ## Lessons Learned
 
 - **Clock design is crucial.** A reliable timing signal (Manchester‑encoded clock) dramatically simplifies decoding; without it, symbol recovery quickly degrades.
@@ -216,4 +224,3 @@ Decoding focuses on robust timing and frequency extraction:
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Binaric)
-- Demo / audio samples: _TBD_

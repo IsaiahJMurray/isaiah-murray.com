@@ -407,6 +407,7 @@
     margin-top: var(--s5);
     background: var(--part);
   }
+  .doc :global(audio) { display: block; width: 100%; max-width: 68ch; margin-top: var(--s3); }
   .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--part); cursor: zoom-in; }
   .doc :global(button.zoom img) { width: 100%; height: 100%; object-fit: cover; }
   .doc :global(button.zoom-inline) { display: inline-block; width: auto; max-width: 100%; vertical-align: middle; background: none; }

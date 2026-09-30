@@ -115,6 +115,8 @@ The `.gitignore` excludes virtual environments and CSVs to keep the repository f
 - The treemap immediately highlights a small number of high-cost items that dominate total spend, which is much less obvious from a raw table.
 - The simplicity of the script makes it easy to adapt—for example, to group items by category or manufacturer in future iterations.
 
+![Output of main.py, run on a sample 12-line cart. Tile area is unit price × quantity, so two dev boards take up most of the chart.](/images/projects/digikeydisplay/treemap-sample-cart.webp)
+
 ## Lessons Learned
 
 - Even a very small amount of code can dramatically improve usability over a raw CSV, especially when paired with the right visualization.
@@ -125,4 +127,3 @@ The `.gitignore` excludes virtual environments and CSVs to keep the repository f
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/DigikeyDisplay)
-- [Live Demo](#)

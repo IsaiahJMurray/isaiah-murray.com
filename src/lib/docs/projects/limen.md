@@ -268,4 +268,3 @@ Starting with simple networking via `URLSession` and JSON payloads is enough to 
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Limen)
-- Demo: _TBD_

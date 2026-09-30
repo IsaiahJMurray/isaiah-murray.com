@@ -223,4 +223,3 @@ The incremental update workflow maintains index and CSV synchronization as new m
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Gmail-Categorization)
-- Demo: _TBD_

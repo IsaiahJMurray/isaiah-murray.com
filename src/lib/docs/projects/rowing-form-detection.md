@@ -137,6 +137,8 @@ This structure gives me a detailed time series of body landmarks that I can late
 - Verified that the Video Intelligence API can reliably detect a rower and output a rich set of pose points suitable for further kinematic analysis.
 - Established a clear path for the next phase: transforming raw landmark sequences into domain-specific rowing metrics and automated coaching feedback.
 
+![Pose landmarks from the Video Intelligence API drawn over a frame of an erg session](/images/projects/rowing_form/pose-landmarks.jpg)
+
 ## Lessons Learned
 
 - Cloud video APIs provide a fast path to high-quality pose data without training custom models, which is ideal for early prototypes.
@@ -147,4 +149,3 @@ This structure gives me a detailed time series of body landmarks that I can late
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Rowing-Form-Detection)
-- Demo (coming soon)

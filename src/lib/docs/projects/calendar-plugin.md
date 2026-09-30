@@ -282,4 +282,3 @@ While the repository is still early-stage (no stars or forks yet), it already se
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/calendar-plugin)
-- [Live Demo (placeholder)](https://example.com/demo-calendar-plugin)

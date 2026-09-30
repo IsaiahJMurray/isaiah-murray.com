@@ -296,6 +296,8 @@ I delivered a working SvelteKit dashboard that:
 - Aggregates and visualizes daily coding activity
 - Presents a readable, motivational overview of a developer's GitHub work
 
+![The dashboard header with the three activity rings (commits, lines changed, file-size changes). Rendered locally with stubbed API responses, since the live app needs a registered GitHub OAuth app.](/images/projects/github_grader/dashboard-activity-rings.webp)
+
 I also created a reusable SVG-based ring component suitable for future "fitness-like" dashboards and established a clean separation between auth, data APIs, and presentation components, making future iterations (e.g., badges, streaks, goals) straightforward.
 
 ---
@@ -313,4 +315,3 @@ I also created a reusable SVG-based ring component suitable for future "fitness-
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/github-grader)
-- [Live Demo](https://example.com) <!-- Replace with actual demo URL if/when deployed -->

@@ -255,4 +255,3 @@ The frontend is intentionally minimal at this stage while I iterate on the backe
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Curator)
-- Demo (TBD)

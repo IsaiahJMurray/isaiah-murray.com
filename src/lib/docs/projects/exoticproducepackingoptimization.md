@@ -172,6 +172,10 @@ The project delivered two reusable components:
 
 I can now combine these components to analyze how different radius and sigma values affect neighborhood structures, and study how specific packing patterns interact with spatial coupling for future objective function development.
 
+In the report, every layout was run through an ethylene-diffusion and ripening model on the 3×3 crate network for 100 timesteps:
+
+![Top: final mean ripeness for all 1,680 layouts. Bottom: final ripeness and ethylene maps for the layouts with the lowest mean ripeness, the highest mean ripeness and the largest spread between crates. Figures from the project report (main.pdf).](/images/projects/exotic_produce/ripeness-by-layout.webp)
+
 ---
 
 ## Lessons Learned

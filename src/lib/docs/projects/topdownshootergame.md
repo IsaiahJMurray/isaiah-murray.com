@@ -87,4 +87,3 @@ The game achieved its main goal: it was playable, easy to pick up, and entertain
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/TopDownShooterGame)
-- Demo: _TBD_

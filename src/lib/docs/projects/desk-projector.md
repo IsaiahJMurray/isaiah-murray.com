@@ -212,6 +212,10 @@ I exported these from Fusion 360 using the Shaper Origin plugin. While not execu
 - Demonstrated interactive control: moving the cursor in the transformed camera window results in a projected highlight moving over the same physical location on the desk.
 - Built tools to quickly test regions of interest and save desk-aligned patches as images.
 
+![The projected calibration grid landing on the desk, and on a hand](/images/projects/desk_projector/3D1BDF01-08AA-4F0F-8D1F-29A5C2F5E56B_1_105_c.jpeg)
+
+![Left: raw frame from the overhead camera, which sees the desk upside down and at an angle. Right: the same frame after warpPerspective with the saved calibration matrix, now in projector coordinates, so the grid cells square up and the numbers read the right way round.](/images/projects/desk_projector/camera-to-projector-homography.webp)
+
 The project is intentionally exploratory, but it now provides a solid base for more advanced applications such as gesture-driven interactions or depth-aware projection.
 
 ## Lessons Learned
@@ -225,4 +229,3 @@ The project is intentionally exploratory, but it now provides a solid base for m
 ## Links
 
 - [GitHub Repository](https://github.com/IsaiahJMurray/Desk-Projector)
-- [Live Demo / Video (placeholder)](https://example.com/desk-projector-demo)
