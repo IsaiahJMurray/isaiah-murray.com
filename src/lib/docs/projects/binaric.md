@@ -16,7 +16,7 @@ tags:
 maturity: polished
 featured: false
 visibility: public
-heroImage: /generated/logos/binaric.png
+heroImage: /images/projects/binaric/hero-spectrogram.webp
 ---
 ## Overview
 

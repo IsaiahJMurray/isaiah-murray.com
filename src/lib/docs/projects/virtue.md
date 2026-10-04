@@ -13,7 +13,7 @@ tags:
 maturity: prototype
 featured: false
 visibility: public
-heroImage: /generated/logos/virtue.png
+heroImage: /images/projects/virtue/title.png
 ---
 ## Overview
 

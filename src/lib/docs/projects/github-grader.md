@@ -17,7 +17,7 @@ tags:
 maturity: production
 featured: false
 visibility: public
-heroImage: /generated/logos/github-grader.png
+heroImage: /images/projects/github_grader/hero-activity-rings.webp
 order: 904
 ---
 

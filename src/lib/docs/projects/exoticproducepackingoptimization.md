@@ -14,7 +14,7 @@ tags:
 maturity: prototype
 featured: false
 visibility: public
-heroImage: /generated/logos/exoticproducepackingoptimization.png
+heroImage: /images/projects/exotic_produce/hero-layout-maps.webp
 ---
 
 ## Overview

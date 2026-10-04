@@ -13,7 +13,7 @@ tags:
 maturity: production
 featured: false
 visibility: public
-heroImage: /generated/logos/digikeydisplay.png
+heroImage: /images/projects/digikeydisplay/hero-treemap.webp
 ---
 ## Overview
 

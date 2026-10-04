@@ -16,7 +16,7 @@ tags:
 maturity: production
 featured: false
 visibility: public
-heroImage: /generated/logos/lego-sorter.png
+heroImage: /images/projects/lego_sorter/hero-validation-renders.webp
 order: 902
 ---
 

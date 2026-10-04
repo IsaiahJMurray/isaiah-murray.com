@@ -12,7 +12,7 @@ tags:
 maturity: prototype
 featured: false
 visibility: public
-heroImage: /generated/logos/desk-projector.png
+heroImage: /images/projects/desk_projector/hero-hand-grid.jpg
 ---
 ## Overview
 

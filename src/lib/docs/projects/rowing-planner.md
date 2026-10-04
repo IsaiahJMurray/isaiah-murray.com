@@ -15,7 +15,7 @@ tags:
 maturity: production
 featured: false
 visibility: public
-heroImage: /generated/logos/rowing-planner.png
+heroImage: /images/projects/rowing_planner/hero-planner.webp
 ---
 ## Overview
 
