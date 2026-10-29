@@ -8,6 +8,7 @@
   import Header from '$lib/chamber/Header.svelte';
   import Footer from '$lib/chamber/Footer.svelte';
   import BuildColumn from '$lib/chamber/BuildColumn.svelte';
+  import CircuitBackground from '$lib/circuit/CircuitBackground.svelte';
   import { inject } from '@vercel/analytics';
 
   inject(); // Start Vercel Analytics
@@ -40,6 +41,8 @@
 </svelte:head>
 
 <a class="skip" href="#main" on:click={skip}>Skip to content</a>
+
+<CircuitBackground />
 
 <div class="shell">
   <Header />

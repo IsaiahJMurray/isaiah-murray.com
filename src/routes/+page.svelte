@@ -1,5 +1,4 @@
 <script>
-  import SinterHero from '$lib/chamber/SinterHero.svelte';
   import CopyEmail from '$lib/chamber/CopyEmail.svelte';
   import { DISCIPLINES, firstSentence } from '$lib/projects.js';
 
@@ -49,7 +48,9 @@
 
 <main id="main">
   <section class="wrap hero" data-build="Intro" aria-labelledby="h1-home">
-    <SinterHero lines={['Isaiah', 'Murray']} id="h1-home" />
+    <!-- The circuit board spells the name in this empty stage (see CircuitBackground). -->
+    <h1 id="h1-home" class="visually-hidden">Isaiah Murray</h1>
+    <div class="stage" data-circuit-name aria-hidden="true"></div>
     <div class="hero-bottom">
       <p class="role">
         Electrical &amp; computer engineering student at Olin College. I build embedded systems, flight hardware and the tools around them.
@@ -212,8 +213,9 @@
 </main>
 
 <style>
-  .hero { padding-top: var(--s7); padding-bottom: var(--s8); }
-  .hero-bottom { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s5) var(--s6); margin-top: var(--s7); align-items: start; }
+  .hero { padding-bottom: var(--s8); }
+  .stage { height: 72vh; height: 72svh; min-height: 420px; }
+  .hero-bottom { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s5) var(--s6); align-items: start; }
   .role { grid-column: 1 / span 6; font-size: var(--t-lg); line-height: 1.45; max-width: 34ch; }
   .role small { display: block; font-size: var(--t-sm); color: var(--ink-2); margin-top: var(--s2); }
   .now { grid-column: 8 / span 5; font-size: var(--t-md); max-width: 44ch; }
@@ -221,8 +223,7 @@
   .links { list-style: none; padding: 0; margin: var(--s4) 0 0; display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-sm); }
   @media (max-width: 860px) {
     .role, .now { grid-column: 1 / -1; }
-    .hero { padding-top: var(--s5); padding-bottom: var(--s7); }
-    .hero-bottom { margin-top: var(--s5); }
+    .hero { padding-bottom: var(--s7); }
   }
 
   .all-link { margin-top: var(--s4); font-size: var(--t-sm); }
