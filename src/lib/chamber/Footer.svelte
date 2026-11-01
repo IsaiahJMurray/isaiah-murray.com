@@ -1,5 +1,5 @@
 <!--
-  Site footer: plain text links, email as selectable text, a mono build-date line.
+  Site footer: plain text links, email as selectable text, a mono last-updated line.
   __BUILD_DATE__ is injected by vite.config.js (define) at build time.
 -->
 <script>
@@ -24,7 +24,7 @@
   </div>
   <div class="row meta">
     <span>Isaiah Murray, Needham / Boston, MA</span>
-    <span class="mono">{built ? `Build ${built.replaceAll('-', '.')} · ` : ''}110 µm layers</span>
+    <span class="mono">{built ? `Updated ${built.replaceAll('-', '.')}` : ''}</span>
   </div>
 </footer>
 

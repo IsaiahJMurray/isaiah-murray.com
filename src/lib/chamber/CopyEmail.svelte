@@ -60,12 +60,12 @@
   .sm .email { font-size: var(--t-lg); }
   .copy-btn {
     background: var(--ink);
-    color: var(--powder);
+    color: var(--bg);
     border: 0;
     padding: var(--s2) var(--s4);
     font-size: var(--t-sm);
     min-height: 40px;
     min-width: 96px;
   }
-  .copy-btn:hover { background: var(--part); }
+  .copy-btn:hover { background: var(--surface); }
 </style>

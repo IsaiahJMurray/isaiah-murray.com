@@ -77,6 +77,10 @@
     nameFallback: true,    // if the latch text doesn't fit (phones), spell it in
                            // large segment displays instead, one word per line
     textAt: [0.5, 0.5],    // centre of the text as a fraction of width / height
+    textBox: null,         // [left, top, right, bottom] as fractions like textAt: fit the
+                           // text (and subtitle) inside this box instead of centring
+                           // on textAt, shrinking to segment digits if it must
+    subtitle: '',          // with textBox: a line of segment displays under the name
     latchHold: 2.5,        // s a lit letter stays fully on
     latchFade: 1.8,        // s it takes to fade back out
     latchSpread: 0.045,    // s for the glow to step to a neighbouring latch
@@ -181,7 +185,7 @@
   };
 
   // Options that change the generated network and need a rebuild.
-  const STRUCTURAL = ['cell', 'mobileCell', 'mobileWidth', 'nameFallback','density', 'mix', 'reach', 'reachV', 'maxFanout', 'seed', 'text', 'textAt', 'chips', 'displays', 'scroll', 'keepout', 'keepoutPad'];
+  const STRUCTURAL = ['cell', 'mobileCell', 'mobileWidth', 'nameFallback', 'density', 'mix', 'reach', 'reachV', 'maxFanout', 'seed', 'text', 'textAt', 'textBox', 'subtitle', 'chips', 'displays', 'scroll', 'keepout', 'keepoutPad'];
   const CHIP_KINDS = [
     { kind: 'counter', label: 'CD4017', cells: 10 },
     { kind: 'timer', label: 'NE555', cells: 0 },
@@ -302,32 +306,27 @@
 
     // ---------------------------------------------------------------- network
 
-    // Lays `o.text` out on the cell grid, one glyph pixel per cell. Returns a
-    // per-cell letter index (-1 = not part of the text). Falls back to one
-    // word per line, and to nothing if it still doesn't fit. `colAt` /
-    // `rowAt` turn a fraction of the viewport into a grid position.
-    function layoutText(cols, rows, colAt, rowAt) {
-      const mask = new Int16Array(cols * rows).fill(-1);
-      const words = String(o.text || '').toUpperCase().split(/\s+/)
+    // Latch-font text: one glyph pixel per cell, letters 1 cell apart, words
+    // WORD_GAP apart, lines LINE_GAP rows apart.
+    const GLYPH_H = 7, WORD_GAP = 3, LINE_GAP = 2;
+    const wordW = (w) => w.reduce((s, ch) => s + FONT[ch][0].length + 1, -1);
+    const lineW = (l) => l.reduce((s, w) => s + wordW(w) + WORD_GAP, -WORD_GAP);
+    const linesH = (n) => n * (GLYPH_H + LINE_GAP) - LINE_GAP;
+
+    // `o.text` as latch-font words, characters without a glyph dropped.
+    function latchWords() {
+      return String(o.text || '').toUpperCase().split(/\s+/)
         .map((w) => [...w].filter((ch) => FONT[ch]))
         .filter((w) => w.length);
-      if (!words.length) return mask;
+    }
 
-      const GAP = 3, LEAD = 2, GLYPH_H = 7, MARGIN = 2;
-      const wordW = (w) => w.reduce((s, ch) => s + FONT[ch][0].length + 1, -1);
-      const lineW = (l) => l.reduce((s, w) => s + wordW(w) + GAP, -GAP);
-      let lines = [words];
-      if (lineW(words) > cols - 2 * MARGIN) lines = words.map((w) => [w]);
-      const width = Math.max(...lines.map(lineW));
-      const height = lines.length * GLYPH_H + (lines.length - 1) * LEAD;
-      if (width > cols - 2 * MARGIN || height > rows - 2 * MARGIN) return mask;
-
-      const top = clamp(Math.round(rowAt(o.textAt[1]) - height / 2), MARGIN, rows - MARGIN - height);
+    // Writes latch lines into `mask` (cell -> letter index), each line centred
+    // on column `cx`, the first starting at row `top`.
+    function writeLatches(mask, cols, lines, cx, top) {
       let id = 0;
       lines.forEach((line, li) => {
-        const lw = lineW(line);
-        let col = clamp(Math.round(colAt(o.textAt[0]) - lw / 2), MARGIN, cols - MARGIN - lw);
-        const row0 = top + li * (GLYPH_H + LEAD);
+        let col = Math.round(cx - lineW(line) / 2);
+        const row0 = top + li * (GLYPH_H + LINE_GAP);
         for (const word of line) {
           for (const ch of word) {
             const glyph = FONT[ch];
@@ -337,10 +336,74 @@
             col += glyph[0].length + 1;
             id++;
           }
-          col += GAP - 1;
+          col += WORD_GAP - 1;
         }
       });
-      return mask;
+    }
+
+    // Without `textBox`: the text centred on `textAt`, on one line or a word
+    // per line, and dropped if it still doesn't fit. `colAt` / `rowAt` turn a
+    // fraction of the viewport into a grid position.
+    function layoutText(mask, cols, rows, colAt, rowAt) {
+      const words = latchWords();
+      if (!words.length) return;
+      const MARGIN = 2;
+      let lines = [words];
+      if (lineW(words) > cols - 2 * MARGIN) lines = words.map((w) => [w]);
+      const width = Math.max(...lines.map(lineW)), height = linesH(lines.length);
+      if (width > cols - 2 * MARGIN || height > rows - 2 * MARGIN) return;
+      const top = clamp(Math.round(rowAt(o.textAt[1]) - height / 2), MARGIN, rows - MARGIN - height);
+      const cx = clamp(colAt(o.textAt[0]), MARGIN + width / 2, cols - MARGIN - width / 2);
+      writeLatches(mask, cols, lines, cx, top);
+    }
+
+    // With `textBox`: the name, and `subtitle` under it, fitted inside the box.
+    // Rows and columns of the box that touch a keep-out are trimmed off first,
+    // so nothing ends up clipped. The largest layout that fits wins: latch font
+    // on one line, then a word per line, then segment digits at size 3, 2, 1;
+    // first with the subtitle, then without it if it can't fit. Returns the
+    // segment display specs to place (latch text goes straight into `mask`).
+    function layoutTitle(mask, cols, rows, blocked, colAt, rowAt) {
+      const b = o.textBox;
+      let c0 = Math.max(1, Math.ceil(colAt(b[0]))), c1 = Math.min(cols - 2, Math.floor(colAt(b[2])) - 1);
+      let r0 = Math.max(1, Math.ceil(rowAt(b[1]))), r1 = Math.min(rows - 2, Math.floor(rowAt(b[3])) - 1);
+      const hit = (ra, rb, ca, cb) => {
+        for (let r = ra; r <= rb; r++) for (let c = ca; c <= cb; c++) if (blocked[r * cols + c]) return true;
+        return false;
+      };
+      while (r0 <= r1 && hit(r0, r0, c0, c1)) r0++;
+      while (r1 >= r0 && hit(r1, r1, c0, c1)) r1--;
+      while (c0 <= c1 && hit(r0, r1, c0, c0)) c0++;
+      while (c1 >= c0 && hit(r0, r1, c1, c1)) c1--;
+      const bw = c1 - c0 + 1, bh = r1 - r0 + 1;
+      if (bw <= 0 || bh <= 0) return [];
+
+      const words = latchWords();
+      const names = String(o.text || '').toUpperCase().split(/\s+/).filter(Boolean);
+      if (!names.length) return [];
+      const options = words.length ? [{ latch: [words] }, { latch: words.map((w) => [w]) }] : [];
+      for (const size of [3, 2, 1]) options.push({ size });
+      const measure = (opt) => opt.latch
+        ? [Math.max(...opt.latch.map(lineW)), linesH(opt.latch.length)]
+        : [Math.max(...names.map((n) => n.length)) * opt.size, names.length * 3 * opt.size - opt.size];
+
+      const SUB_GAP = 1;
+      const sub = o.subtitle ? wrap(String(o.subtitle).toUpperCase(), bw) : [];
+      const subH = sub.length && sub.every((l) => l.length <= bw) ? sub.length * 3 - 1 : 0;
+      for (const withSub of subH ? [true, false] : [false]) {
+        const extra = withSub ? SUB_GAP + subH : 0;
+        for (const opt of options) {
+          const [w, h] = measure(opt);
+          if (w > bw || h + extra > bh) continue;
+          const top = r0 + Math.floor((bh - h - extra) / 2), cx = c0 + bw / 2;
+          const specs = [];
+          if (opt.latch) writeLatches(mask, cols, opt.latch, cx, top);
+          else specs.push({ text: names.join('\n'), size: opt.size, place: [cx, top] });
+          if (withSub) specs.push({ text: o.subtitle, place: [cx, top + h + SUB_GAP], maxCols: bw });
+          return specs;
+        }
+      }
+      return [];
     }
 
     function build() {
@@ -396,7 +459,8 @@
       const rowY = (i) => oy + i * c;
       const colAt = (f) => (f * W - ox) / c;
       const rowAt = (f) => (f * viewH - oy) / c;
-      const mask = layoutText(cols, rows, colAt, rowAt);
+      // Cell -> latch letter index (-1 = not text); filled once keep-outs are known.
+      const mask = new Int16Array(cols * rows).fill(-1);
 
       // Keep-out zones: every cell within `keepoutPad` of a matching element
       // is blocked. Pins sit every other row down the left and right edges.
@@ -432,6 +496,8 @@
         }
         zones.push(z);
       }
+      const titleSpecs = o.textBox ? layoutTitle(mask, cols, rows, blocked, colAt, rowAt) : [];
+      if (!o.textBox) layoutText(mask, cols, rows, colAt, rowAt);
       for (let i = 0; i < mask.length; i++) if (blocked[i]) mask[i] = -1;
 
       // True if any leg of wire `w` passes through a zone. The stub at a
@@ -450,17 +516,21 @@
       // Segment displays go down first since their position is chosen. Each
       // character is a package `size` columns wide and twice that tall, with
       // two input pins down each side. Lines are 3 * size rows apart, and
-      // wrap at spaces to fit the visible width.
+      // wrap at spaces to fit the visible width (or `maxCols`). Placed by
+      // `at` (centre, as a fraction of the viewport) or, for the title, by
+      // `place` ([centre column, top row]).
       const visCols = Math.floor(W / c) - 1;
       function placeDisplay(spec) {
         const s = Math.max(1, Math.round(spec.size || 1));
-        const lines = wrap(String(spec.text || '').toUpperCase(), Math.floor(visCols / s));
+        const lines = wrap(String(spec.text || '').toUpperCase(), Math.floor((spec.maxCols || visCols) / s));
         const n = Math.max(0, ...lines.map((l) => l.length));
         const width = n * s, height = lines.length * 3 * s - s;
         if (!n || width > cols - 2 || height > rows - 2) return;
         const at = spec.at || [0.5, 0.5];
-        const left = clamp(Math.round(colAt(at[0]) - width / 2), 1, cols - 1 - width);
-        const top = clamp(Math.round(rowAt(at[1]) - height / 2), 1, rows - 1 - height);
+        const cx = spec.place ? spec.place[0] : colAt(at[0]);
+        const cy = spec.place ? spec.place[1] + height / 2 : rowAt(at[1]);
+        const left = clamp(Math.round(cx - width / 2), 1, cols - 1 - width);
+        const top = clamp(Math.round(cy - height / 2), 1, rows - 1 - height);
         let prev = null;
         lines.forEach((line, li) => {
           const r0 = top + li * 3 * s, c0 = left + Math.floor((n - line.length) / 2) * s;
@@ -509,11 +579,12 @@
         });
       }
 
-      // A name too wide for the latch font (on a phone) is spelled in the
-      // largest segment displays that fit instead, a word per line.
-      const specs = (o.displays || []).slice();
+      // Without a textBox, a name too wide for the latch font (on a phone) is
+      // spelled in the largest segment displays that fit instead, a word per
+      // line. (With one, layoutTitle has already chosen.)
+      const specs = titleSpecs.concat(o.displays || []);
       const words = String(o.text || '').toUpperCase().split(/\s+/).filter(Boolean);
-      if (o.nameFallback && words.length && !mask.some((v) => v >= 0)) {
+      if (!o.textBox && o.nameFallback && words.length && !mask.some((v) => v >= 0)) {
         const longest = Math.max(...words.map((w) => w.length));
         const visRows = Math.floor(viewH / c) - 2;
         let size = 1;
@@ -791,12 +862,16 @@
       for (const z of zones) ro.observe(z.el);
       lastSize = sizeKey();
 
-      // The intro runs once, but a rebuild clears the queue, and pages often
-      // re-measure just after load (web fonts, images). A rebuild within the
-      // first 1.5 s of the intro starts it again.
-      if (o.intro && (latches.length || displays.length) && !reduced() && (introAt < 0 || t - introAt < 1.5)) {
-        api.reveal(0.6, introAt < 0 ? 0.6 : 0.1);
-        if (introAt < 0) introAt = t;
+      // The intro runs once, but a rebuild clears the queue and every lit
+      // letter, and pages often re-measure for a few seconds after load (web
+      // fonts, images). A rebuild while the intro would still be showing
+      // (wall clock, since the simulation clock stops when the tab is hidden)
+      // lights the text again.
+      const now = performance.now();
+      const showing = introAt >= 0 && now - introAt < (0.6 + o.latchHold + o.latchFade) * 1000;
+      if (o.intro && (latches.length || displays.length) && !reduced() && (introAt < 0 || showing)) {
+        api.reveal(0.6, introAt < 0 ? 0.6 : 0);
+        if (introAt < 0) introAt = now;
       }
     }
 

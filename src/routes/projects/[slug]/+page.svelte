@@ -1,16 +1,14 @@
 <!--
-  Project page (Build Chamber). Any markdown doc from src/lib/docs/projects, laid out like the
-  mockup's #swarm view:
-    left  sticky "build height" ruler (≥ 900px): the global BuildColumn docked inside it, one mark
-          per h2 of the doc, and a Z readout;
+  Project page. Any markdown doc from src/lib/docs/projects:
+    left  sticky contents rail (≥ 900px): a reading-progress line and one entry per h2 of the
+          doc, the current one highlighted;
     right header (breadcrumb, H1, subtitle, meta, hero) and the doc body.
-  The doc is enhanced on mount (see `enhance`): h2s get ids and data-build labels (they are the
-  slice boundaries for the column), tables get a scroll wrapper, runs of image-only paragraphs
-  become galleries, and every image opens the shared Lightbox with the doc's full image list.
+  The doc is enhanced on mount (see `enhance`): h2s get ids (they make the contents), tables get
+  a scroll wrapper, runs of image-only paragraphs become galleries, and every image opens the
+  shared Lightbox with the doc's full image list.
 -->
 <script>
-  import { tick } from 'svelte';
-  import { buildInfo, dockBuildColumn, refreshBuildColumn } from '$lib/chamber/build.js';
+  import { onMount, tick } from 'svelte';
   import Lightbox from '$lib/chamber/Lightbox.svelte';
 
   export let data;
@@ -27,29 +25,27 @@
   $: status = STATUS[data.maturity] || null;
   $: tags = data.tags || [];
 
-  /* ---------- ruler: marks from the column's slice map ---------- */
-  const MM_PER_PX = 0.02; // page height → build height, so a longer write-up is a taller part
-  const GAP = 22;
+  /* ---------- contents rail ---------- */
   let lb;
-  let docMM = 0;
-  let lastSlices = null;
-  $: info = $buildInfo;
-  $: if (info.slices !== lastSlices) {
-    lastSlices = info.slices;
-    if (typeof document !== 'undefined') docMM = document.documentElement.scrollHeight * MM_PER_PX;
-  }
-  $: marks = info.docked ? info.slices.slice(1).filter((s) => s.el) : [];
-  $: ys = place(marks, info);
-  $: active = marks.reduce((on, s, i) => (info.progress + 0.002 >= s.a ? i : on), -1);
-  $: z = `Z ${(info.built * docMM).toFixed(2).padStart(6, '0')} mm`;
+  let toc = []; // [{ label, el }], one per h2, filled by `enhance`
+  let active = -1;
+  let progress = 0;
 
-  function place(list, inf) {
-    // marks sit at the base of each part; bottom-up keep ≥ GAP apart, and inside the ruler
-    const out = list.map((s) => inf.yForP(s.a));
-    for (let i = 1; i < out.length; i++) out[i] = Math.min(out[i], out[i - 1] - GAP);
-    for (let i = out.length - 1; i >= 0; i--) out[i] = Math.max(out[i], 8 + (out.length - 1 - i) * GAP);
-    return out;
+  // Reading progress, and the last h2 that has reached the top of the window.
+  function track() {
+    const de = document.documentElement;
+    progress = Math.min(1, Math.max(0, scrollY / Math.max(1, de.scrollHeight - innerHeight)));
+    active = toc.reduce((on, s, i) => (s.el.getBoundingClientRect().top <= 140 ? i : on), -1);
   }
+
+  onMount(() => {
+    addEventListener('scroll', track, { passive: true });
+    addEventListener('resize', track);
+    return () => {
+      removeEventListener('scroll', track);
+      removeEventListener('resize', track);
+    };
+  });
 
   function jump(s) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -90,7 +86,7 @@
     node.addEventListener('click', onClick);
 
     tick().then(() => {
-      // h2: ids + slice labels
+      // h2: ids + contents entries
       const used = new Set();
       node.querySelectorAll('h2').forEach((h, i) => {
         const text = h.textContent.replace(/\s+/g, ' ').trim();
@@ -102,8 +98,12 @@
         }
         used.add(h.id);
         h.tabIndex = -1;
-        h.dataset.build = text || `Section ${i + 1}`;
       });
+      toc = [...node.querySelectorAll('h2')].map((h, i) => ({
+        label: h.textContent.replace(/\s+/g, ' ').trim() || `Section ${i + 1}`,
+        el: h
+      }));
+      track();
 
       // tables: horizontal scroll wrapper + mono figures
       node.querySelectorAll('table').forEach((t) => {
@@ -166,7 +166,6 @@
         if (!v.getAttribute('preload')) v.preload = 'metadata';
       });
 
-      refreshBuildColumn();
     });
 
     return { destroy: () => node.removeEventListener('click', onClick) };
@@ -203,24 +202,21 @@
   <meta name="twitter:image" content={ogImage} />
 </svelte:head>
 
-<main id="main" class="proj">
-  <aside class="ruler" aria-label="Build height: reading progress">
-    <div class="ruler-col" use:dockBuildColumn></div>
-    <div class="ruler-ticks" aria-hidden="true"></div>
-    <div class="ruler-marks">
-      {#each marks as s, i (s.el)}
-        <button type="button" class:on={i === active} style={`top:${ys[i]}px`} on:click={() => jump(s)}>
-          <span class="mono" aria-hidden="true">{(s.a * docMM).toFixed(1).padStart(5, '0')}</span>
-          <span class="t">{s.label}</span>
-        </button>
-      {/each}
-    </div>
-    <div class="ruler-z mono" aria-hidden="true">{z}</div>
+<main id="main" class="proj" data-circuit-keepout>
+  <aside class="ruler" aria-label="Contents">
+    <div class="rail" aria-hidden="true"><span style={`transform:scaleY(${progress})`}></span></div>
+    {#if toc.length}
+      <ol class="toc">
+        {#each toc as s, i (s.el)}
+          <li><button type="button" class:on={i === active} on:click={() => jump(s)}>{s.label}</button></li>
+        {/each}
+      </ol>
+    {/if}
   </aside>
 
   {#key slug}
     <article class="proj-main">
-      <header class="proj-head" data-build="Intro">
+      <header class="proj-head">
         <nav class="crumbs" aria-label="Breadcrumb">
           <ol>
             <li><a href="/projects">Projects</a></li>
@@ -261,7 +257,7 @@
 <Lightbox bind:this={lb} />
 
 <style>
-  /* ---------- page grid + ruler ---------- */
+  /* ---------- page grid + contents rail ---------- */
   .proj {
     display: grid;
     grid-template-columns: 200px minmax(0, 1fr);
@@ -277,39 +273,20 @@
     height: calc(100vh - 48px);
     margin-top: var(--s5);
   }
-  .ruler-col { position: absolute; left: 0; top: 0; width: 32px; height: calc(100% - 36px); }
-  .ruler-ticks {
-    position: absolute;
-    left: 38px;
-    top: 0;
-    bottom: 36px;
-    width: 6px;
-    background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 12px);
-  }
-  .ruler-marks { position: absolute; left: 36px; top: 0; bottom: 36px; right: 0; }
-  .ruler-marks button {
-    position: absolute;
-    left: 0;
-    max-width: 100%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    gap: var(--s2);
+  .rail { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--rule); }
+  .rail span { display: block; height: 100%; background: var(--accent); transform-origin: top; }
+  .toc { list-style: none; margin: 0; padding: 0 0 0 var(--s4); display: grid; gap: var(--s1); }
+  .toc button {
     background: none;
     border: 0;
     padding: 2px 0;
     font-size: var(--t-xs);
+    line-height: 1.3;
     color: var(--ink-2);
     text-align: left;
-    white-space: nowrap;
-    line-height: 1.2;
   }
-  .ruler-marks button::before { content: ''; width: 12px; height: 1px; background: var(--part); flex: none; }
-  .ruler-marks .mono { font-size: 11px; color: var(--ink-2); min-width: 4ch; flex: none; }
-  .ruler-marks .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .ruler-marks button:hover, .ruler-marks button.on { color: var(--ink); }
-  .ruler-marks button.on::before { background: var(--laser); height: 2px; }
-  .ruler-z { position: absolute; left: 0; bottom: 0; font-size: var(--t-xs); color: var(--ink); }
+  .toc button:hover, .toc button.on { color: var(--ink); }
+  .toc button.on { font-weight: 700; }
   @media (max-width: 900px) {
     .proj { grid-template-columns: minmax(0, 1fr); }
     .ruler { display: none; }
@@ -345,8 +322,8 @@
   .meta dt { color: var(--ink-2); }
   .meta dd { margin: 0; min-width: 0; }
   .meta .tags { font-size: var(--t-xs); line-height: 1.6; overflow-wrap: anywhere; color: var(--ink-2); }
-  .hero { grid-column: 5 / -1; margin: 0; padding: 7px; background: var(--powder-shade); }
-  .hero img { width: 100%; aspect-ratio: 5 / 4; object-fit: contain; background: var(--powder-shade); }
+  .hero { grid-column: 5 / -1; margin: 0; padding: 7px; background: var(--bg-2); }
+  .hero img { width: 100%; aspect-ratio: 5 / 4; object-fit: contain; background: var(--bg-2); }
   @media (max-width: 760px) {
     .meta, .hero { grid-column: 1 / -1; }
     .lede { font-size: var(--t-lg); }
@@ -373,20 +350,20 @@
   .doc :global(ul), .doc :global(ol) { max-width: 68ch; padding-left: 1.2em; margin: var(--s3) 0 0; }
   .doc :global(li) { margin-top: var(--s2); }
   .doc :global(li > ul), .doc :global(li > ol) { margin-top: var(--s1); }
-  .doc :global(li::marker) { color: var(--part); }
+  .doc :global(li::marker) { color: var(--surface); }
   .doc :global(ol > li::marker) { font-family: var(--f-mono); font-size: var(--t-sm); }
   .doc :global(hr) { border: 0; border-top: 1px solid var(--rule); margin: var(--s7) 0 var(--s6); }
   .doc :global(blockquote) {
     max-width: 68ch;
     margin: var(--s5) 0 0;
     padding: 0 0 0 var(--s4);
-    border-left: 2px solid var(--part);
+    border-left: 2px solid var(--surface);
     color: var(--ink-2);
   }
   .doc :global(blockquote p:first-child) { margin-top: 0; }
 
   /* code */
-  .doc :global(:not(pre) > code) { background: var(--powder-shade); padding: 1px 4px; overflow-wrap: anywhere; }
+  .doc :global(:not(pre) > code) { background: var(--bg-2); padding: 1px 4px; overflow-wrap: anywhere; }
   .doc :global(pre) { margin: var(--s5) 0 0; }
   .doc :global(pre code) { background: none; padding: 0; }
 
@@ -405,28 +382,28 @@
     height: auto;
     max-height: 80vh;
     margin-top: var(--s5);
-    background: var(--part);
+    background: var(--surface);
   }
   .doc :global(audio) { display: block; width: 100%; max-width: 68ch; margin-top: var(--s3); }
-  .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--part); cursor: zoom-in; }
+  .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--surface); cursor: zoom-in; }
   .doc :global(button.zoom img) { width: 100%; height: 100%; object-fit: cover; }
   .doc :global(button.zoom-inline) { display: inline-block; width: auto; max-width: 100%; vertical-align: middle; background: none; }
 
-  /* galleries: parts on a powder tray, flush, 7px apart */
+  /* galleries: images on a tray, flush, 7px apart */
   .doc :global(.gallery) {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 7px;
     padding: 7px;
     margin: var(--s5) 0 0;
-    background: var(--powder-shade);
+    background: var(--bg-2);
   }
   .doc :global(.gallery figure) { margin: 0; min-width: 0; display: flex; flex-direction: column; }
   .doc :global(.gallery .zoom) { aspect-ratio: 4 / 3; position: relative; overflow: hidden; }
   .doc :global(.gallery .zoom img) { position: absolute; inset: 0; }
   .doc :global(.gallery figcaption) { font-size: var(--t-xs); line-height: 1.4; color: var(--ink-2); padding: var(--s2) 2px var(--s1); }
   .doc :global(.gallery.g-1) { grid-template-columns: minmax(0, 1fr); }
-  .doc :global(.gallery.g-1 .zoom) { aspect-ratio: auto; background: var(--powder-shade); }
+  .doc :global(.gallery.g-1 .zoom) { aspect-ratio: auto; background: var(--bg-2); }
   .doc :global(.gallery.g-1 .zoom img) { position: static; height: auto; max-height: 72vh; object-fit: contain; margin: 0 auto; width: auto; max-width: 100%; }
   .doc :global(.gallery.g-3) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .doc :global(.gallery.g-5) { grid-template-columns: repeat(3, minmax(0, 1fr)); }

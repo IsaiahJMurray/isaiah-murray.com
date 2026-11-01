@@ -3,7 +3,6 @@
 
   $: status = $page.status;
   $: notFound = status === 404;
-  $: layer = String(status).padStart(4, '0');
   $: message = $page.error?.message || 'Something went wrong.';
 </script>
 
@@ -13,10 +12,10 @@
 </svelte:head>
 
 <main id="main">
-  <section class="wrap err" data-build={notFound ? 'Not found' : 'Error'} aria-labelledby="h1-err">
+  <section class="wrap err" aria-labelledby="h1-err">
     {#if notFound}
-      <h1 id="h1-err">Build failed at layer <span class="mono">{layer}</span></h1>
-      <p class="lede">That page isn't on the build plate.</p>
+      <h1 id="h1-err">No route to this page <span class="mono">{status}</span></h1>
+      <p class="lede">That page doesn't exist, or has moved.</p>
     {:else}
       <h1 id="h1-err">Error <span class="mono">{status}</span></h1>
       <p class="lede">{message}</p>

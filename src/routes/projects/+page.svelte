@@ -5,7 +5,7 @@
 
   $: projects = data.projects;
 
-  /* ---------- build plate packing (deterministic) ----------
+  /* ---------- project grid packing (deterministic) ----------
      12-column grid, 88px rows. Parts: featured 6×4 ("big"), small 3×2, wide 6×2.
      The plate is stacked as bands 4 rows tall:
        mixed band = one featured part + a 6×4 block of 1–4 other parts (sides alternate)
@@ -110,10 +110,10 @@
 </svelte:head>
 
 <main id="main">
-  <section class="wrap head" data-build="Projects" aria-labelledby="h1-projects">
+  <section class="wrap head" aria-labelledby="h1-projects">
     <h1 id="h1-projects">Projects</h1>
     <p class="intro">
-      All {projects.length} public projects. Featured work gets the larger parts on the plate; the index below lists everything by year or name.
+      All {projects.length} public projects. Featured work gets the larger cards; the index below lists everything by year or name.
     </p>
     {#if filters.length > 1}
       <div class="filters" role="group" aria-label="Filter projects by discipline">
@@ -121,12 +121,12 @@
         {#each filters as f}
           <button type="button" aria-pressed={filter === f.id} on:click={() => (filter = f.id)}>{f.label}</button>
         {/each}
-        <span class="plate-count mono" aria-live="polite">{hits.length} / {projects.length} parts</span>
+        <span class="plate-count mono" aria-live="polite">{hits.length} / {projects.length} projects</span>
       </div>
     {/if}
   </section>
 
-  <section class="wrap plate-sec" data-build="Build plate" aria-label="Build plate">
+  <section class="wrap plate-sec" aria-label="Projects">
     <div class="plate all">
       {#each cells as { p, kind, style }, i (p.slug)}
         {@const hit = matches(p, filter)}
@@ -152,7 +152,7 @@
     </div>
   </section>
 
-  <section class="wrap section" data-build="Index" aria-labelledby="h-index">
+  <section class="wrap section" aria-labelledby="h-index">
     <div class="section-head">
       <h2 id="h-index">Index</h2>
       <span class="plate-count mono">{rows.length} rows</span>

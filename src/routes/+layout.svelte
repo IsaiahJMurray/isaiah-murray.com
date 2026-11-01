@@ -1,14 +1,14 @@
 <!--
-  Site shell (Build Chamber).
-  Pages render their own <main id="main"> and mark their sections with data-build="Label"
-  so the BuildColumn can map them (see src/lib/chamber/BuildColumn.svelte).
+  Site shell: the circuit board background, then header, page and footer.
+  Pages render their own <main id="main">; the board keeps clear of its content
+  (see src/lib/circuit/CircuitBackground.svelte).
 -->
 <script>
   import '$lib/styles/chamber.css';
   import Header from '$lib/chamber/Header.svelte';
   import Footer from '$lib/chamber/Footer.svelte';
-  import BuildColumn from '$lib/chamber/BuildColumn.svelte';
   import CircuitBackground from '$lib/circuit/CircuitBackground.svelte';
+  import { page } from '$app/stores';
   import { inject } from '@vercel/analytics';
 
   inject(); // Start Vercel Analytics
@@ -26,6 +26,8 @@
 
 <svelte:head>
   <title>Isaiah Murray</title>
+  <!-- One URL per page for crawlers: no query strings, always the production host. -->
+  <link rel="canonical" href={`https://isaiah-murray.com${$page.url.pathname}`} />
 
   <!-- Default Open Graph (overridden by individual pages) -->
   <meta property="og:type" content="website" />
@@ -52,8 +54,6 @@
   <Footer />
 </div>
 
-<BuildColumn />
-
 <style>
   .shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
   .page { flex: 1; min-width: 0; }
@@ -63,7 +63,7 @@
     top: -100px;
     z-index: 60;
     background: var(--ink);
-    color: var(--powder);
+    color: var(--bg);
     padding: var(--s2) var(--s4);
     font-size: var(--t-sm);
     text-decoration: none;

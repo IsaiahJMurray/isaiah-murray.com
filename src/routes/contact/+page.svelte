@@ -33,7 +33,7 @@
 </script>
 
 <main id="main">
-  <section class="wrap head" data-build="Contact" aria-labelledby="h1-contact">
+  <section class="wrap head" aria-labelledby="h1-contact">
     <h1 id="h1-contact">Contact</h1>
     <p class="lede">
       Best for recruiting and collaboration: email or LinkedIn.
@@ -42,7 +42,7 @@
     <div class="email"><CopyEmail /></div>
   </section>
 
-  <section class="wrap section" data-build="Links" aria-labelledby="h-links">
+  <section class="wrap section" aria-labelledby="h-links">
     <h2 id="h-links" class="visually-hidden">Links</h2>
     <ul class="links">
       {#each links as l}

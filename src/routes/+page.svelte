@@ -4,7 +4,27 @@
 
   export let data;
 
-  // Cell placement on the 12-column plate, by number of parts (desktop). The first part is the big one.
+  // schema.org Person, so search engines and other crawlers can read who this is directly.
+  const person = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Isaiah Murray',
+    url: 'https://isaiah-murray.com',
+    image: 'https://isaiah-murray.com/faceshot.jpg',
+    jobTitle: 'Electrical and computer engineering student',
+    description: 'Electrical and computer engineering student at Olin College. Embedded systems, flight hardware and the tools around them.',
+    affiliation: { '@type': 'CollegeOrUniversity', name: 'Olin College of Engineering', url: 'https://www.olin.edu' },
+    address: { '@type': 'PostalAddress', addressLocality: 'Needham', addressRegion: 'MA', addressCountry: 'US' },
+    sameAs: [
+      'https://github.com/IsaiahJMurray',
+      'https://www.linkedin.com/in/isa-murray/',
+      'https://www.instagram.com/isaiah.murray1/',
+      'https://cambridge.nuvustudio.com/users/isa-murray'
+    ]
+  };
+  const ldJson = `<script type="application/ld+json">${JSON.stringify(person).replace(/</g, '\\u003c')}</` + `script>`;
+
+  // Cell placement on the 12-column grid, by number of projects (desktop). The first one is the big one.
   const LAYOUTS = {
     1: [['1 / 13', '1 / span 4']],
     2: [['1 / 8', '1 / span 4'], ['8 / 13', '1 / span 4']],
@@ -17,14 +37,14 @@
   $: featured = data.featured;
   $: others = data.others;
   $: cells = LAYOUTS[featured.length] || [];
-  // only offer filters for disciplines that are actually on the plate
+  // only offer filters for disciplines that are actually featured
   $: filters = DISCIPLINES.filter((d) => featured.some((p) => p.disciplines.includes(d.id)));
 
   let filter = 'all';
   $: hits = featured.filter((p) => filter === 'all' || p.disciplines.includes(filter)).length;
 
   const meta = (p) => [p.year, p.maturity === 'wip' ? 'in progress' : null].filter(Boolean).join(' · ');
-  // on phones the plate is two columns: the big part spans both, and so does the last one if it would sit alone
+  // on phones the grid is two columns: the big card spans both, and so does the last one if it would sit alone
   const wideOnPhone = (i, n) => i === 0 || (i === n - 1 && (n - 1) % 2 === 1);
 </script>
 
@@ -44,10 +64,11 @@
   <meta name="twitter:title" content="Isaiah Murray" />
   <meta name="twitter:description" content="Electrical and computer engineering student at Olin College. Embedded systems, flight hardware and the tools around them." />
   <meta name="twitter:image" content="https://isaiah-murray.com/faceshot.jpg" />
+  {@html ldJson}
 </svelte:head>
 
 <main id="main">
-  <section class="wrap hero" data-build="Intro" aria-labelledby="h1-home">
+  <section class="wrap hero" aria-labelledby="h1-home">
     <!-- The circuit board spells the name in this empty stage (see CircuitBackground). -->
     <h1 id="h1-home" class="visually-hidden">Isaiah Murray</h1>
     <div class="stage" data-circuit-name aria-hidden="true"></div>
@@ -70,7 +91,7 @@
     </div>
   </section>
 
-  <section class="wrap section" id="work" data-build="Selected work" aria-labelledby="h-work">
+  <section class="wrap section" id="work" aria-labelledby="h-work">
     <div class="section-head">
       <h2 id="h-work">Selected work</h2>
       {#if filters.length > 1}
@@ -79,7 +100,7 @@
           {#each filters as f}
             <button type="button" aria-pressed={filter === f.id} on:click={() => (filter = f.id)}>{f.label}</button>
           {/each}
-          <span class="plate-count mono" aria-live="polite">{hits} / {featured.length} parts</span>
+          <span class="plate-count mono" aria-live="polite">{hits} / {featured.length} projects</span>
         </div>
       {/if}
     </div>
@@ -111,7 +132,7 @@
   </section>
 
   {#if others.length}
-    <section class="wrap section" data-build="Other work" aria-labelledby="h-index">
+    <section class="wrap section" aria-labelledby="h-index">
       <div class="section-head"><h2 id="h-index">Other work</h2></div>
       <div class="tbl-wrap index">
         <table>
@@ -133,7 +154,7 @@
     </section>
   {/if}
 
-  <section class="wrap section" id="experience" data-build="Experience" aria-labelledby="h-exp">
+  <section class="wrap section" id="experience" aria-labelledby="h-exp">
     <div class="section-head"><h2 id="h-exp">Experience</h2></div>
     <ol class="log">
       <li>
@@ -199,7 +220,7 @@
     <p class="all-link"><a href="/resume">Full resume</a></p>
   </section>
 
-  <section class="wrap section" id="contact" data-build="Contact" aria-labelledby="h-contact">
+  <section class="wrap section" id="contact" aria-labelledby="h-contact">
     <div class="section-head"><h2 id="h-contact">Contact</h2></div>
     <div class="contact-grid">
       <div class="email-col"><CopyEmail /></div>
@@ -214,7 +235,8 @@
 
 <style>
   .hero { padding-bottom: var(--s8); }
-  .stage { height: 72vh; height: 72svh; min-height: 420px; }
+  /* The rest of the first screen under the header; the board fits the name and subtitle inside. */
+  .stage { height: calc(100vh - 88px); height: calc(100svh - 88px); min-height: 420px; }
   .hero-bottom { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s5) var(--s6); align-items: start; }
   .role { grid-column: 1 / span 6; font-size: var(--t-lg); line-height: 1.45; max-width: 34ch; }
   .role small { display: block; font-size: var(--t-sm); color: var(--ink-2); margin-top: var(--s2); }

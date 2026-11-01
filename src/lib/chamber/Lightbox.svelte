@@ -132,7 +132,7 @@
     position: fixed;
     inset: 0;
     z-index: 50;
-    background: var(--powder);
+    background: var(--bg);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 16px);
@@ -143,7 +143,7 @@
   .lb-bar { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); padding-bottom: var(--s3); }
   .lb-bar .mono { font-size: var(--t-xs); color: var(--ink-2); }
   .lb-btn { background: transparent; border: 1px solid var(--rule); min-height: 40px; padding: var(--s2) var(--s4); font-size: var(--t-sm); }
-  .lb-btn:hover { border-color: var(--part); }
+  .lb-btn:hover { border-color: var(--surface); }
   figure { margin: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; }
   img { max-width: 100%; max-height: 100%; height: auto; object-fit: contain; min-height: 0; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25); }
   figcaption { font-size: var(--t-sm); color: var(--ink); padding-top: var(--s3); max-width: 66ch; text-align: center; }

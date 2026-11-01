@@ -76,7 +76,7 @@
 </script>
 
 <main id="main" class="resume">
-  <header class="wrap head" data-build="Resume">
+  <header class="wrap head">
     <h1>Resume</h1>
     <p class="who">Isaiah Murray · Sophomore, Class of 2029 · U.S. Citizen · Embedded systems, instrumentation, and perception for physical hardware</p>
     <div class="actions">
@@ -92,7 +92,7 @@
     </ul>
   </header>
 
-  <section class="wrap section" data-build="Experience" aria-labelledby="h-exp">
+  <section class="wrap section" aria-labelledby="h-exp">
     <div class="section-head"><h2 id="h-exp">Experience</h2></div>
     <ol class="log">
       <li>
@@ -167,7 +167,7 @@
     </ol>
   </section>
 
-  <section class="wrap section" data-build="Projects" aria-labelledby="h-proj">
+  <section class="wrap section" aria-labelledby="h-proj">
     <div class="section-head"><h2 id="h-proj">Projects</h2></div>
     <div class="tbl-wrap">
       <table class="ptbl">
@@ -187,7 +187,7 @@
     </div>
   </section>
 
-  <section class="wrap section" data-build="Education" aria-labelledby="h-edu">
+  <section class="wrap section" aria-labelledby="h-edu">
     <div class="section-head"><h2 id="h-edu">Education</h2></div>
     <ol class="log">
       <li>
@@ -209,7 +209,7 @@
     </ol>
   </section>
 
-  <section class="wrap section" data-build="Skills" aria-labelledby="h-skills">
+  <section class="wrap section" aria-labelledby="h-skills">
     <div class="section-head"><h2 id="h-skills">Skills</h2></div>
     <dl class="skills spec">
       <dt>Languages</dt>
@@ -223,7 +223,7 @@
     </dl>
   </section>
 
-  <section class="wrap section" data-build="Interests" aria-labelledby="h-int">
+  <section class="wrap section" aria-labelledby="h-int">
     <div class="section-head"><h2 id="h-int">Interests</h2></div>
     <ul class="interests">
       <li>Rugby and MMA (Babson)</li>
@@ -243,10 +243,10 @@
     display: inline-flex; align-items: center; min-height: 40px; padding: var(--s2) var(--s4);
     font-size: var(--t-sm); text-decoration: none; border: 1px solid var(--ink);
   }
-  .pdf { background: var(--ink); color: var(--powder); font-weight: 700; }
-  .pdf:hover { background: var(--part); border-color: var(--part); }
+  .pdf { background: var(--ink); color: var(--bg); font-weight: 700; }
+  .pdf:hover { background: var(--surface); border-color: var(--surface); }
   .print { background: transparent; }
-  .print:hover { border-color: var(--part); color: var(--ink-2); }
+  .print:hover { border-color: var(--surface); color: var(--ink-2); }
   .contact {
     list-style: none; margin: var(--s5) 0 0; padding: 0;
     display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-sm); color: var(--ink-2);

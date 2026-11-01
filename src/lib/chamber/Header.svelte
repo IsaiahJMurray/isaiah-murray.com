@@ -1,10 +1,9 @@
 <!--
-  Site header: name (home link), nav Work · Resume · Contact, theme toggle.
-  The toggle's label is the theme you'd switch TO. Current section gets aria-current="page".
+  Site header: name (home link), nav Work · Resume · Contact. Current section gets
+  aria-current="page". The theme follows the browser (see theme.js), so there's no toggle.
 -->
 <script>
   import { page } from '$app/stores';
-  import { theme, toggleTheme } from './theme.js';
 
   const nav = [
     { href: '/projects', label: 'Work' },
@@ -28,9 +27,6 @@
         {/each}
       </ul>
     </nav>
-    <button class="theme-btn" type="button" on:click={toggleTheme} aria-label={`Switch to ${$theme === 'dark' ? 'light' : 'dark'} theme`}>
-      {$theme === 'dark' ? 'Light' : 'Dark'}
-    </button>
   </div>
 </header>
 
@@ -55,16 +51,6 @@
     text-decoration-color: var(--ink);
     text-underline-offset: 5px;
   }
-  .theme-btn {
-    background: none;
-    border: 1px solid var(--rule);
-    padding: var(--s1) var(--s3);
-    font-size: var(--t-xs);
-    color: var(--ink-2);
-    min-height: 32px;
-    min-width: 56px;
-  }
-  .theme-btn:hover { color: var(--ink); border-color: var(--part); }
   @media (max-width: 480px) {
     .bar { padding-top: var(--s4); padding-bottom: var(--s4); }
     .bar-right, ul { gap: var(--s4); }

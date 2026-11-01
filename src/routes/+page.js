@@ -5,7 +5,7 @@ const OTHERS_MAX = 8;
 
 export function load() {
   const projects = loadProjects();
-  // Build plate: featured public projects, in loader order, up to six.
+  // Featured public projects, in loader order, up to six.
   const featured = projects.filter((p) => p.featured).slice(0, PLATE_MAX);
   const onPlate = new Set(featured.map((p) => p.slug));
   // Other work: the other public projects, newest year first (undated last), loader order within a year.
