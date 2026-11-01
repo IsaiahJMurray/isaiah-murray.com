@@ -5,7 +5,7 @@
 
   What it draws
     A board of gates, chips and traces that scrolls with the page. A gate firing lights its whole
-    output net at once (`mode: 'nets'`). Signals are --accent, traces are --surface, lit letters
+    output net at once (`mode: 'nets'`). Signals are --signal, traces are --surface, lit letters
     and displays are --ink. Clicking (or tapping) empty space fires a burst of signals.
 
   Keeping content clear
@@ -27,7 +27,9 @@
   import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { theme } from '$lib/chamber/theme.js';
+  import { ambient } from './settings.js';
 
+  const AMBIENT = 0.8; // spontaneous firings per second per megapixel of window, while on
   const NAME = 'Isaiah Murray';
   const SUBTITLE = 'ELECTRICAL & COMPUTER ENGINEERING';
   const KEEPOUT = [
@@ -53,7 +55,7 @@
 
   function colours(t) {
     const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-    return { theme: t, colors: { trace: css('--surface'), pulse: css('--accent'), memory: css('--ink') } };
+    return { theme: t, colors: { trace: css('--surface'), pulse: css('--signal'), memory: css('--ink') } };
   }
 
   // After a page change (or a resize that moves the hero): place or drop the name, and light
@@ -68,7 +70,7 @@
   afterNavigate(({ from }) => relayout(!!from));
 
   onMount(() => {
-    let alive = true, timer = 0, unTheme = () => {};
+    let alive = true, timer = 0, unTheme = () => {}, unAmbient = () => {};
     const onResize = () => { clearTimeout(timer); timer = setTimeout(() => relayout(false), 200); };
 
     // The library is a browser-only script that registers window.CircuitField.
@@ -79,9 +81,15 @@
         current = t;
         if (field) field.setOptions(colours(t));
       });
+      let on = true;
+      unAmbient = ambient.subscribe((v) => {
+        on = v;
+        if (field) field.setOptions({ ambient: v ? AMBIENT : 0 });
+      });
       field = window.CircuitField(canvas, {
         scroll: true,
         mode: 'nets',
+        ambient: on ? AMBIENT : 0,
         keepout: KEEPOUT,
         ignore: 'a, button, input, textarea, select, label, summary, [contenteditable], [role="slider"], [data-circuit-ignore]',
         ...colours(current),
@@ -96,6 +104,7 @@
       clearTimeout(timer);
       removeEventListener('resize', onResize);
       unTheme();
+      unAmbient();
       field?.destroy();
       field = null;
     };

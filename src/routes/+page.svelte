@@ -1,5 +1,6 @@
 <script>
   import CopyEmail from '$lib/chamber/CopyEmail.svelte';
+  import { ambient } from '$lib/circuit/settings.js';
   import { DISCIPLINES, firstSentence } from '$lib/projects.js';
 
   export let data;
@@ -72,6 +73,15 @@
     <!-- The circuit board spells the name in this empty stage (see CircuitBackground). -->
     <h1 id="h1-home" class="visually-hidden">Isaiah Murray</h1>
     <div class="stage" data-circuit-name aria-hidden="true"></div>
+    <div class="stage-bar">
+      <button
+        type="button"
+        class="ambient"
+        role="switch"
+        aria-checked={$ambient}
+        on:click={() => ambient.set(!$ambient)}
+      ><span class="track" aria-hidden="true"></span>Background signals</button>
+    </div>
     <div class="hero-bottom">
       <p class="role">
         Electrical &amp; computer engineering student at Olin College. I build embedded systems, flight hardware and the tools around them.
@@ -236,7 +246,42 @@
 <style>
   .hero { padding-bottom: var(--s8); }
   /* The rest of the first screen under the header; the board fits the name and subtitle inside. */
-  .stage { height: calc(100vh - 88px); height: calc(100svh - 88px); min-height: 420px; }
+  .stage { height: calc(100vh - 136px); height: calc(100svh - 136px); min-height: 380px; }
+  /* Under the stage, still on the first screen: the switch for the board's ambient activity. */
+  .stage-bar { display: flex; justify-content: flex-end; align-items: center; height: 48px; }
+  .ambient {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    padding: 0 var(--s1);
+    background: none;
+    border: 0;
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    color: var(--ink-2);
+  }
+  .ambient:hover { color: var(--ink); }
+  .track {
+    position: relative;
+    width: 26px;
+    height: 14px;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    transition: background-color .15s, border-color .15s;
+  }
+  .track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    background: var(--ink-2);
+    transition: transform .15s, background-color .15s;
+  }
+  .ambient[aria-checked='true'] .track { background: var(--accent); border-color: var(--accent); }
+  .ambient[aria-checked='true'] .track::after { transform: translateX(12px); background: var(--on-accent); }
   .hero-bottom { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s5) var(--s6); align-items: start; }
   .role { grid-column: 1 / span 6; font-size: var(--t-lg); line-height: 1.45; max-width: 34ch; }
   .role small { display: block; font-size: var(--t-sm); color: var(--ink-2); margin-top: var(--s2); }

@@ -3,18 +3,19 @@
 
    Behind every page runs the circuit board (src/lib/circuit); content sits in clear areas on it.
    One 12-column grid, 1200px max, spacing scale 4/8/12/16/24/32/48/64/96.
-   Palette (coolors.co/a4b494-bec5ad-3b5249-519872-34252f):
-          sage #A4B494 · ash #BEC5AD · feldgrau #3B5249 · sea green #519872 · plum #34252F
+   Palette: Teal lagoon (coolors.co/00b9ae-037171-03312e-02c3bd-009f93) with scarlet signals.
+          It has no light colour, so the light ground and dark-mode text are derived pale teals.
    Color: --bg (ground) · --bg-2 (trays, code) · --surface (cards, traces)
-          --ink (text) · --ink-2 (secondary) · --accent (signals, active filter, current section)
+          --ink (text) · --ink-2 (secondary) · --signal (circuit signals)
+          --accent (active filter, current section; deeper than --signal so white text reads on it)
    Type:  Chivo 900 display · 700 headings · 400 body 17px/1.55
           Chivo Mono 400/500 for figures only (dates, table figures, code).
    Scale: 1.25 — 13 · 14 · 17 · 21 · 26 · 33 · 41 · display clamp
    No rounded pills, gradients, glows or shadows (the lightbox is the one exception). */
 
 :root{
-  --bg:#BEC5AD; --bg-2:#A4B494; --surface:#3B5249; --ink:#34252F; --ink-2:#3B5249;
-  --accent:#519872; --on-accent:#34252F; --rule:#A4B494;
+  --bg:#E3F5F3; --bg-2:#C4E3E1; --surface:#037171; --ink:#03312E; --ink-2:#037171;
+  --signal:#FF2400; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#B6CECC;
   --f-body:"Chivo", "Helvetica Neue", Arial, system-ui, sans-serif;
   --f-mono:"Chivo Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
@@ -25,8 +26,8 @@
 /* Dark follows the browser / OS setting; there is no manual override. */
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#34252F; --bg-2:#40303A; --surface:#A4B494; --ink:#BEC5AD; --ink-2:#A4B494;
-    --accent:#519872; --on-accent:#34252F; --rule:#3B5249; color-scheme: dark;
+    --bg:#03312E; --bg-2:#034440; --surface:#00B9AE; --ink:#D9F4F1; --ink-2:#02C3BD;
+    --signal:#FF4127; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#2E5855; color-scheme: dark;
   }
 }
 
