@@ -2,9 +2,9 @@
 title: Canopy
 subtitle: >
   A telemetry, power distribution and diagnostics system for the Olin Baja
-  Racing car, built around an STM32H743 network supervisor and a CAN bus.
-  Co-developed with Aryan Banerjee and Zach Wheeler; my part is the ride-height
-  suspension sensor and the CAN data-acquisition side.
+  Racing car, built around an STM32H743 network supervisor and a CAN bus,
+  with a ride-height suspension sensor for damper tuning. I designed the
+  system and its boards.
 slug: canopy
 updated: '2026-11-14'
 tags:
@@ -26,26 +26,23 @@ heroImage: /images/projects/canopy/carrier-both-cards-inserted.png
 
 Canopy is Olin Baja Racing's telemetry, power distribution and control system.
 Its goal is to centralize data collection across the car and support electronic
-diagnostics during testing and races. It is maintained by Isaiah Murray,
-[Aryan Banerjee](https://aryan-banerjee.com) and Zach Wheeler.
+diagnostics during testing and races. I designed the system: its boards, its
+CAN network and its sensors.
 
 The system has three parts: a **network supervisor board (NSB)**, a **power
 distribution board (PDB)**, and a **CAN network** connecting them to sensors
 around the car.
 
-| | |
-|---|---|
-| **My work** | Ride-height suspension sensor for damper tuning; CAN-based data acquisition |
-| **Aryan Banerjee** | Leads the power distribution board |
-| **Team** | NSB architecture, CAN network design, board iterations |
-| **Status** | NSB on physical boards across five design iterations; PDB in progress; message rates below are design targets |
+**Status:** the NSB is on physical boards after five design iterations; the
+PDB and ride-height sensor are in progress; the CAN message rates below are
+design targets, not measurements.
 
 ---
 
 ## Ride-Height Sensor
 
-The ride-height sensor is my subsystem. Its job is to give the team suspension
-travel data for **damper tuning**.
+The ride-height sensor's job is to give the team suspension travel data for
+**damper tuning**.
 
 The signal chain is simple on purpose: the sensing element sits in a
 **Wheatstone bridge**, and an **ADC** reads the bridge output. The bridge turns a
@@ -121,7 +118,7 @@ STM32's single-ended TX/RX to differential CANH/CANL (ISO 11898-2, up to
 
 ## Power Distribution Board
 
-The PDB, led by Aryan Banerjee, regulates and distributes power to every
+The PDB regulates and distributes power to every
 component on the car. It draws from the battery, provides auxiliary rails at
 12 V, 5 V and 3.3 V, feeds the NSB's sensitive power rails, and joins the CAN
 network as a sensor node reporting circuit load and battery status. It is still
@@ -152,7 +149,7 @@ supply board standing in for the PDB. In order:
 **Built:** the NSB is on physical hardware, powered from a separate supply
 board.
 
-**In progress:** the PDB (Aryan) and the ride-height sensor.
+**In progress:** the PDB and the ride-height sensor.
 
 **Open items from the last schematic review:** discrete regulator stages for the
 3.3 V rails, a termination resistor across CANH/CANL, the LoRa module's interface

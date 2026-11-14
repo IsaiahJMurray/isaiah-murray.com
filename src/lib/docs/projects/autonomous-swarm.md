@@ -109,16 +109,19 @@ Autonomous maneuvers are commanded through PX4's MAVSDK `Offboard` API rather
 than manual sticks, with `MPC_TILTMAX_AIR` raised past its conservative default
 to allow steeper commanded pitch.
 
-### Sensing (selected for the design)
+### Sensing
 
-- **Global-shutter camera** (innomaker OV9281, 720p/120 fps, USB/UVC) for
-  visual SLAM on the ground PC. Global shutter avoids the rolling-shutter
+The distance sensors are set up on the drone; the camera and SLAM pipeline are
+next.
+
+- **Optical flow + rangefinder (set up):** MicoAir MTF-02P for lateral position
+  and altitude, rated to 70 klux, MAVLink over serial to the flight controller.
+- **Multi-zone ToF (set up):** VL53L5CX (8×8) as a reflex-level obstacle layer
+  kept independent of the camera/SLAM stack, so a slow or dropped perception
+  pipeline can't take basic collision avoidance down with it.
+- **Global-shutter camera (planned):** innomaker OV9281 (720p/120 fps, USB/UVC)
+  for visual SLAM on the ground PC. Global shutter avoids the rolling-shutter
   distortion that corrupts SLAM tracking during fast motion.
-- **Optical flow + rangefinder** (MicoAir MTF-02P) for lateral position and
-  altitude, rated to 70 klux, MAVLink over serial to the flight controller.
-- **Multi-zone ToF** (VL53L5CX, 8×8) as a reflex-level obstacle layer kept
-  independent of the camera/SLAM stack, so a slow or dropped perception pipeline
-  can't take basic collision avoidance down with it.
 
 The camera and ToF sensor are tilted forward and down to match the drone's
 expected cruise pitch, so their fields of view agree on "forward" in aggressive
@@ -161,6 +164,8 @@ allocation: dividing the room between vehicles and merging what they see.
 - One physical quadrotor built and flying.
 - Four-vehicle concurrent autonomous flight in simulation.
 - Rigid 10K electronics guard holding up through build and crash cycles.
+- Distance sensing (MTF-02P optical flow/rangefinder and VL53L5CX ToF) set up on
+  the drone.
 
 **In progress:**
 - Autonomous flight on the physical drone has been rough so far. I'm retuning
@@ -170,7 +175,8 @@ allocation: dividing the room between vehicles and merging what they see.
 - Redesigning the full-ring prop guard in SLS Nylon 12 or Tough 2000.
 
 **Next:**
-- Bring up and flight-test the perception sensors and the link-loss fallback.
+- Integrate the camera and SLAM pipeline; flight-test the distance sensors and
+  the link-loss fallback.
 - Cooperative task allocation and shared mapping in simulation.
 
 ---

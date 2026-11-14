@@ -3,7 +3,7 @@ title: Tracking Gimbal
 subtitle: >
   A three-axis camera gimbal that stabilizes a professional camera and tracks
   its subject from the camera's own video feed, so framing follows what the lens
-  actually sees. Built by a team of five at Olin; I own the motors and ESCs.
+  actually sees. Built by a team of five at Olin; I own the motors and motor drivers.
   Single-axis stabilization works, and camera-to-tracker latency is down from
   290 ms to 112 ms.
 slug: tracking-gimbal
@@ -59,7 +59,7 @@ engineers.
 
 | Person | Role |
 |---|---|
-| [Isaiah Murray](https://www.linkedin.com/in/isa-murray/) | Motors and ESCs: selection, ordering, wiring and PWM outputs |
+| [Isaiah Murray](https://www.linkedin.com/in/isa-murray/) | Motors and FOC drivers: selection, ordering, wiring and PWM outputs |
 | [Reja Haddad](https://www.linkedin.com/in/reja-haddad/) | Project manager; controls (PID, filtering, camera latency) |
 | [Hugo Delasnerie](https://www.linkedin.com/in/hugo-delasnerie-7287b2266/) | Mechanical design and fabrication |
 | [Chengyue (Leo) Liao](https://www.linkedin.com/in/chengyue-liao-61930a384/) | Computer vision and tracking software |
@@ -67,11 +67,20 @@ engineers.
 
 ---
 
-## Motors and ESCs
+## Motors and Drivers
 
-My part of the build is the actuation: choosing the motors and ESCs, getting
+My part of the build is the actuation: choosing the motors and drivers, getting
 them ordered, and wiring the motors and coordinating the PWM outputs that drive
 them.
+
+- **MVP motor:** a [DFRobot FIT1036](https://www.dfrobot.com/product-3006.html),
+  a 4015 gimbal BLDC (40 mm stator diameter, 15 mm stator height) with a built-in
+  **AS5600** magnetic encoder, rated for 24 V field-oriented control (FOC).
+- **Driver:** a **SimpleFOC Mini** board (DFRobot sells an equivalent as
+  DRI0058), driven by three PWM phase outputs from the STM32. The encoder gives
+  the controller rotor angle for commutation and position feedback.
+- **Three-axis build:** the larger **iPower GM5208-12** with an **AS5048A**
+  encoder, a 5208 gimbal motor sized for DSLR-class cameras.
 
 At the MVP stage my role was integration: testing the Nano, getting camera
 input, and setting up the IMU, motors and power.
@@ -201,14 +210,14 @@ Two design ideas from the prototype carry forward to the hardware:
 
 ## Hardware
 
-The build moved away from the original plan (ESP32 with SimpleFOC drivers and a
-laptop for vision) to an onboard stack:
+The build moved away from the original plan (an ESP32 controller and a laptop
+for vision) to an onboard stack:
 
 | Component | Part | Notes |
 |---|---|---|
 | Vision compute | NVIDIA Jetson Nano | Runs detection and tracking on the captured feed |
 | Controller | STM32 board | Wiring documented and organized by Spencer; a smaller ESP32 build is being considered to cut the electronics footprint |
-| Actuation | Brushless motors with ESCs, PWM-driven | My subsystem; three-axis motors ordered with a 15% sponsor discount |
+| Actuation | MVP: DFRobot FIT1036 (4015, AS5600 encoder). Three-axis: iPower GM5208-12 (AS5048A encoder) | SimpleFOC Mini FOC drivers on STM32 PWM; my subsystem; motors ordered with a 15% sponsor discount |
 | Video in | HDMI capture card | Camera-to-tracker latency 290 ms → 112 ms |
 | Sensing | IMU | Stabilization feedback |
 
