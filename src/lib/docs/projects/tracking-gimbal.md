@@ -1,13 +1,14 @@
 ---
 title: Tracking Gimbal
 subtitle: >
-  A 2-axis camera gimbal for sports filming that tracks its subject from the
-  main camera's own video feed, so framing stays tight even on a long lens
-  from the sideline. Vision and predictive control are prototyped on Olin
-  Baja footage; the hardware build is underway with a team of five.
+  A three-axis camera gimbal that stabilizes a professional camera and tracks
+  its subject from the camera's own video feed, so framing follows what the lens
+  actually sees. Built by a team of five at Olin; I own the motors and ESCs.
+  Single-axis stabilization works, and camera-to-tracker latency is down from
+  290 ms to 112 ms.
 slug: tracking-gimbal
 date: '2026-10-19'
-updated: '2026-10-21'
+updated: '2026-11-14'
 tags:
 - computer-vision
 - object-detection
@@ -28,32 +29,96 @@ heroImage: /images/projects/tracking-gimbal/hero-tracking-comparison.jpg
 ## Overview
 
 Auto-tracking gimbals usually find their subject with a separate,
-side-mounted wide-angle camera. That works at short range, but on a
-telephoto lens from the sideline the tracker sees a wide scene while the
-lens sees a tight one, and the subject gets lost long before it leaves the
-shot.
+side-mounted wide-angle camera. That works at short range, but on a telephoto
+lens the tracker sees a wide scene while the lens sees a tight one, and the
+subject gets lost long before it leaves the shot.
 
-This gimbal tracks from **the recording camera's own feed** instead. What
-the tracker sees is exactly what's in frame, at whatever focal length the
-lens is set to. That makes it zoom-aware by construction.
+This gimbal tracks from **the recording camera's own feed** instead, captured
+over HDMI. What the tracker sees is exactly what's in frame, at whatever focal
+length the lens is set to.
 
-It's an 8-week build (October to early December 2026) by a team of five
-Olin engineers: [Isaiah Murray](https://www.linkedin.com/in/isa-murray/),
-[Hugo Delasnerie](https://www.linkedin.com/in/hugo-delasnerie-7287b2266/),
-[Reja Haddad](https://www.linkedin.com/in/reja-haddad/),
-[Spencer Ng](https://www.linkedin.com/in/spencer-t-ng/) and
-[Chengyue Liao](https://www.linkedin.com/in/chengyue-liao-61930a384/). The vision and
-control stack is already running on recorded footage. The pan/tilt
-hardware is next.
+The final goal is a three-axis gimbal that stabilizes a professional camera and
+tracks people and objects. The stretch goal is support for multiple cameras and
+lenses, with live focal-length adjustment.
+
+**Progress so far:**
+- **MVP done (Nov 6):** the gimbal stabilizes in one axis.
+- **Latency: 290 ms → 112 ms** from camera to tracker, a 61% cut
+  (Reja's work on the HDMI capture path).
+- **In simulation,** latency-compensated control halves the median framing
+  error compared with feedback alone (details below).
+
+<video controls playsinline preload="metadata" poster="/images/projects/tracking-gimbal/tracking-basketball-poster.jpg">
+  <source src="/images/projects/tracking-gimbal/tracking-basketball.mp4" type="video/mp4">
+</video>
+
+*Early hardware tracking test: the one-axis MVP (background) turning to follow a basketball.*
+
+It's an 8-week build (October to mid-December 2026) by a team of five Olin
+engineers.
+
+| Person | Role |
+|---|---|
+| [Isaiah Murray](https://www.linkedin.com/in/isa-murray/) | Motors and ESCs: selection, ordering, wiring and PWM outputs |
+| [Reja Haddad](https://www.linkedin.com/in/reja-haddad/) | Project manager; controls (PID, filtering, camera latency) |
+| [Hugo Delasnerie](https://www.linkedin.com/in/hugo-delasnerie-7287b2266/) | Mechanical design and fabrication |
+| [Chengyue (Leo) Liao](https://www.linkedin.com/in/chengyue-liao-61930a384/) | Computer vision and tracking software |
+| [Spencer Ng](https://www.linkedin.com/in/spencer-t-ng/) | Wiring, power distribution, flashing the Jetson Nano |
+
+---
+
+## Motors and ESCs
+
+My part of the build is the actuation: choosing the motors and ESCs, getting
+them ordered, and wiring the motors and coordinating the PWM outputs that drive
+them.
+
+At the MVP stage my role was integration: testing the Nano, getting camera
+input, and setting up the IMU, motors and power.
+
+![A camera on a red mount above a cylindrical gimbal motor, wired to an STM32 board on a wooden bench](/images/projects/tracking-gimbal/mvp-hardware.jpg)
+
+*The one-axis MVP with the camera mounted.*
+
+![Gimbal motor under the red camera mount, connected by colored leads to the driver and STM32 board](/images/projects/tracking-gimbal/motor-wiring.jpg)
+
+*Gimbal motor and driver wiring.*
+
+I negotiated a **15% sponsor discount** on the motors. The motor order for the
+three-axis build was finalized the week of November 6, with delivery expected
+November 18.
+
+---
+
+## Latency and the Pivot to Slower Subjects
+
+Tracking from the camera's own feed has a cost: the video has to leave the
+camera, pass through a capture card, and go through inference before the gimbal
+can react. With uncompensated delay, framing error is roughly the target's
+angular speed times the latency, and a longer lens makes the same error a bigger
+share of the frame.
+
+Before hardware, we estimated this for sports at 150 ms of latency:
+
+| Target (30 m away) | Angular speed | Error at 150 ms | Share of a 50 mm frame | Share of a 200 mm frame |
+|---|---|---|---|---|
+| Player sprinting (8 m/s) | ~15°/s | 2.3° | ~6% | ~22% |
+| Ball on a pass (20 m/s) | ~38°/s | 5.7° | ~14% | ~55% |
+
+On the real hardware, camera and processing latency came in higher than we
+expected. Reja brought the HDMI path from **290 ms down to 112 ms**. A constant
+delay can be compensated for, but the system still struggles with fast
+acceleration. Sports are full of sudden, unpredictable changes, so we **pivoted
+from sports to tracking slower-moving people and objects**.
 
 ---
 
 ## Vision Prototype
 
-Before any motors exist, the full tracking stack runs on recorded footage
-from an Olin Baja drive day, driving a **virtual gimbal**: a crop window
-that moves like a real motor loop (rate and acceleration limits, plus
-simulated capture and inference latency).
+Before any motors existed, the tracking stack ran on recorded footage from an
+Olin Baja drive day, driving a **virtual gimbal**: a crop window that moves like
+a real motor loop, with rate and acceleration limits plus simulated capture and
+inference latency.
 
 <video controls preload="metadata" poster="/images/projects/tracking-gimbal/tracking-demo-poster.jpg">
   <source src="/images/projects/tracking-gimbal/tracking-demo.mp4" type="video/mp4">
@@ -93,27 +158,12 @@ against its gallery, while the Subaru scores about 0.86. Over the
 
 ![Re-acquiring the buggy behind spectators while the Subaru, which the detector also reports as a vehicle, is ignored](/images/projects/tracking-gimbal/reacquire-behind-spectators.jpg)
 
----
+### Compensating for latency
 
-## Latency and Prediction
-
-Tracking from the camera's own feed has a cost: the video has to come out
-of the camera, through a capture card, and through inference before the
-gimbal can react. On HDMI out from a mirrorless body, that chain is
-realistically 100 to 250 ms. With uncompensated delay, framing error is
-roughly the target's angular speed times the latency, and a longer lens
-makes the same error a bigger fraction of the frame.
-
-| Target (30 m away) | Angular speed | Error at 150 ms | Share of a 50 mm frame | Share of a 200 mm frame |
-|---|---|---|---|---|
-| Player sprinting (8 m/s) | ~15°/s | 2.3° | ~6% | ~22% |
-| Ball on a pass (20 m/s) | ~38°/s | 5.7° | ~14% | ~55% |
-
-The gimbal controller compensates in two ways. It aims at where the
-Kalman filter says the target is *now* (the delayed estimate plus velocity
-times latency), and it feeds the target's velocity forward into the loop
-so a steady pan has no lag. On the Baja clip, with 150 ms of simulated
-latency at 1.8x zoom:
+The controller compensates for delay in two ways. It aims at where the Kalman
+filter says the target is *now* (the delayed estimate plus velocity times
+latency), and it feeds the target's velocity forward into the loop so a steady
+pan has no lag. On the Baja clip, with 150 ms of simulated latency at 1.8x zoom:
 
 | Gimbal mode | Median framing error | 95th percentile |
 |---|---|---|
@@ -135,70 +185,61 @@ The predictive gimbal's view on its own:
   <source src="/images/projects/tracking-gimbal/gimbal-view.mp4" type="video/mp4">
 </video>
 
-Two pieces of the control design carry over directly to the real
-hardware:
+Two design ideas from the prototype carry forward to the hardware:
 
-- **Pose history:** encoder angles are timestamped and buffered, so each
+- **Pose history:** timestamp and buffer the gimbal's angles, so each
   detection is interpreted against where the gimbal was pointing when
   that frame was captured, not where it points now. Without this, the
   gimbal's own motion during the delay looks like target motion and the
   loop oscillates.
 - **Online focal-length estimation (planned):** comparing how far the
-  gimbal rotated (from the encoders) with how far the image shifted (from
-  optical flow) gives pixels per degree, which is the current focal
-  length. The loop gains and prediction then scale with zoom
-  automatically, without any camera integration.
+  gimbal rotated with how far the image shifted (from optical flow) gives
+  pixels per degree, which is the current focal length. The loop gains and
+  prediction can then scale with zoom automatically.
 
 ---
 
 ## Hardware
 
-![System block diagram. The laptop closes the visual loop at 30 to 60 Hz, the ESP32 runs the motor loop at about 1 kHz, and timestamped encoder angles flow back so each detection is matched to where the gimbal pointed when the frame was captured.](/images/projects/tracking-gimbal/block-diagram.svg)
+The build moved away from the original plan (ESP32 with SimpleFOC drivers and a
+laptop for vision) to an onboard stack:
 
 | Component | Part | Notes |
 |---|---|---|
-| Motors | iPower GM5208-12 with AS5048A encoders ×2 | Direct drive, 0.18 to 0.25 N·m, sized for a DSLR with a small lens. Encoders give real FOC commutation and a drift-free absolute pan angle. |
-| Motor drivers | SimpleFOC Mini (DRV8313) ×2 | 2.5 A per phase against roughly 1 A of real draw, run in voltage mode |
-| Controller | ESP32-S3 running SimpleFOC | Both axes on one MCU and one clock: one SPI bus shared by both encoders, native USB to the laptop |
-| Video in | HDMI to USB capture | Clean HDMI out from the camera, 60p, audio off to cut camera-side latency |
-| Vision compute | Laptop | Detection, tracking and prediction; sends position and velocity setpoints at 30 to 60 Hz |
-| Power | 20 V USB-C PD with a trigger board | Inline fuse and bulk capacitor at the driver input |
-| IMU | 6-axis IMU on the camera plate | Fused with the encoders later for bump rejection |
-
-The fast loop (FOC, about 1 kHz) runs on the ESP32 and never depends on
-the laptop. The laptop only closes the slow visual loop, so an operating
-system hiccup costs a smoothly extrapolated setpoint, not a jerk on
-camera.
+| Vision compute | NVIDIA Jetson Nano | Runs detection and tracking on the captured feed |
+| Controller | STM32 board | Wiring documented and organized by Spencer; a smaller ESP32 build is being considered to cut the electronics footprint |
+| Actuation | Brushless motors with ESCs, PWM-driven | My subsystem; three-axis motors ordered with a 15% sponsor discount |
+| Video in | HDMI capture card | Camera-to-tracker latency 290 ms → 112 ms |
+| Sensing | IMU | Stabilization feedback |
 
 ---
 
 ## Timeline
 
-| Week | Dates | Milestone |
+| Milestone | Date | Status |
 |---|---|---|
-| 1 | Oct 19 to 25 | Vision prototype on recorded footage (done). Order parts. |
-| 2 to 3 | Oct 26 to Nov 8 | Frame CAD and print. Single-axis closed-loop FOC bring-up. |
-| 4 to 5 | Nov 9 to 22 | Both axes closed-loop. HDMI capture into the laptop. Close the visual loop. |
-| 6 | Nov 23 to 29 | Field tests filming the Olin Baja SAE team |
-| 7 | Nov 30 to Dec 6 | Tuning; online focal-length estimation |
-| 8 | Early December | Demo and write-up |
+| MVP: one-axis stabilization | Nov 6 | Done |
+| All parts ordered | Nov 13 | |
+| Stationary three-axis actuation | Nov 20 | Motors arrive Nov 18 |
+| Computer vision pipeline done | Dec 1 | |
+| Full integration test | Dec 8 | |
+| Demo and write-up | Dec 1 to 15 | |
 
 ---
 
 ## Status
 
 **Working:**
+- One-axis stabilization on hardware (MVP).
+- HDMI capture latency reduced from 290 ms to 112 ms.
 - Single-target tracking with occlusion handling and appearance
-  re-identification on recorded Baja footage.
-- Virtual gimbal with simulated latency; predictive control halves median
-  framing error against feedback only.
+  re-identification on recorded footage; predictive control halves median
+  framing error in simulation.
 
 **In progress:**
-- Ordering and bring-up of the motors, drivers and controller.
-- Pan/tilt frame design.
-
-**Next:**
-- Closing the visual loop on real hardware, then field testing with Olin
-  Baja.
-- Testing on multi-car competition footage, where several look-alike
-  vehicles share the frame.
+- Motor wiring and PWM output coordination for three axes (me).
+- Faster object tracking on the Nano (Leo).
+- PID and filtering tuning with added vibration, to keep tracking stable when
+  both camera and subject move (Reja).
+- Printing the three-axis prototype (Hugo).
+- Shrinking the electronics footprint (Spencer).

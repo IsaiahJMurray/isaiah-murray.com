@@ -1,14 +1,14 @@
 ---
 title: Radar Calibration Automation
 subtitle: >
-  An internal calibration automation project focused on phased-array radar systems.
-  The work replaced manual antenna gain and phase tuning with a programmatic workflow
-  driven by FPGA control, spectrum analysis, and algorithmic optimization—reducing
-  calibration time from hours to minutes while significantly improving array
-  efficiency.
+  An automated gain and phase calibration program for a phased-array radar at
+  Cherish. It sets every antenna element through the board's FPGA, measures the
+  result on a spectrum analyzer, and iterates, cutting calibration from multiple
+  hours by hand to about 30 minutes, raising received power 310% and cutting
+  sidelobe interference 20% (TX) and 30% (RX) against the legacy phase offset.
 slug: radar-calibration
 date: '2024-06-01'
-updated: '2024-06-01'
+updated: '2026-11-14'
 tags:
 - rf
 - radar
@@ -25,107 +25,65 @@ heroImage: /images/projects/radar-calibration/image.png
 
 ## Overview
 
-This project was completed at **Cherish** and focused on automating the calibration of
-a multi-antenna radar system. Prior to this work, newly fabricated boards required
-manual tuning of antenna gain and phase, a time-consuming process due to the number
-of antennas on each board.
+At **Cherish**, every newly fabricated radar board needed the gain and phase of
+each antenna element tuned by hand. With the number of elements on a board, that
+took multiple hours per board.
 
-The objective was to replace this manual workflow with an automated calibration
-program capable of rapidly tuning transmit and receive antenna arrays while
-improving overall radiation efficiency.
+I wrote the program that replaced it. From a PC, it sets each element's gain and
+phase through the onboard FPGA, measures the effect on a spectrum analyzer while
+the board sits in an RF isolation enclosure, and adjusts until the array is
+aligned.
 
----
+**Results:**
+- Calibration time went from **multiple hours** by hand to a **~30 minute**
+  automated run.
+- **Received power up 310%** on the calibrated receive array.
+- **Sidelobe interference down 20% (TX) and 30% (RX).**
+- Each receive subarray on its own improved by up to **142%** after local
+  calibration.
 
-## My Involvement
-
-When I joined the project, the hardware team was actively seeking ways to automate
-antenna calibration. I took ownership of the problem and designed a software-driven
-approach to calibrate both the transmit (TX) and receive (RX) arrays.
-
-The radar system consists of two antenna arrays:
-- A **transmit array**
-- A **receive array**
-
-These arrays are controlled by four beamformer chips:
-- One beamformer for the transmit array
-- Three beamformers for the receive array
-
-All beamformers are controlled by an onboard FPGA, which I interfaced with from a PC
-to configure phase and gain settings programmatically.
+The baseline for these comparisons is the legacy configuration: before this
+work, every board got the same fixed phase offset rather than a per-board
+calibration.
 
 ---
 
-## Calibration Strategy
+## Measurement Chain
 
-I approached the problem in two phases:
-1. **Transmit array calibration**
-2. **Receive array calibration**
+The radar has two antenna arrays driven by four beamformer chips:
+- **Transmit array:** one beamformer
+- **Receive array:** three beamformers, each controlling a subset of elements
 
-Each array required a distinct methodology due to differences in signal flow and
-measurement constraints.
+All four beamformers are controlled by an onboard FPGA. My program talked to the
+FPGA from a PC to write phase and gain settings for each element, then read the
+result from the instruments:
 
----
-
-## Transmit Calibration
-
-Each antenna element in the transmit array has configurable **gain** and **phase**.
-
-- **Gain** controls signal power output.
-- **Phase** offsets the transmitted sine wave to enable beamforming.
-
-### Gain Calibration
-
-To calibrate gain:
-- I used the FPGA to read the power draw of each antenna.
-- A reference antenna was selected.
-- Other antennas were adjusted to match the reference power level.
-
-Legal emission limits imposed a lower bound on attenuation to ensure regulatory
-compliance.
-
-### Phase Calibration
-
-Phase calibration was more complex due to manufacturing variability in trace length
-and PCB material.
-
-The procedure:
-- The board was placed inside an RF isolation enclosure.
-- A spectrum analyzer measured signal strength at a fixed receiver.
-- Each antenna was iteratively phase-shifted to **minimize** received power.
-
-Minimizing power avoids distortion from radiation-pattern lobes that scale with signal
-amplitude. Once the minimum was found, the antenna phase was flipped by 180°, aligning
-it with the reference signal without amplifying lobe artifacts.
-
-After calibration, I measured the transmit radiation pattern by rotating the board in
-fixed angular increments and recording signal intensity. This data was plotted as a
-radar chart to visualize beam distribution.
-
-An initial attempt at gain calibration used an aggressive simulated annealing
-approach, which overfit antenna gains to board geometry and degraded real-world
-performance. Switching to a gentler approximation strategy produced a significantly
-cleaner radiation pattern.
+- **RF isolation enclosure** around the board, so the measurement only sees the
+  board's own emissions.
+- **Spectrum analyzer** at a fixed receiver position, measuring signal strength
+  after each phase or gain change.
+- **Radiation-pattern check:** after calibration, I rotated the board in fixed
+  angular increments, recorded signal intensity at each step, and plotted the
+  result as a polar chart.
 
 ---
 
-## Receive Calibration
+## Receive Array: Diagnosing a Combined-Array Failure
 
-Receive calibration differed due to the architecture of the RX array.
+I calibrated each of the three receive subarrays locally, using the same
+phase-minimization method as the transmit array (below). Each subarray looked
+good in isolation, improving by up to 142%. Combined, though, the full receive
+array performed worse: the three subarrays were phase-misaligned relative to
+each other and were interfering destructively.
 
-- Antennas were split across **three beamformers**, each controlling a subset of
-  elements.
-- Each subset was first **locally phase-calibrated** using the same minimization
-  approach as the transmit array.
+Because every subarray passed on its own, the problem had to be in how they were
+combined rather than in the per-element calibration. I traced it to a
+configuration override that was silently bypassing the global phase offsets
+meant to align the subarrays to each other. Applying the global offsets directly
+at the antenna level, instead of through that configuration path, fixed it.
 
-After local calibration, the three receiver arrays were phase-misaligned relative to
-each other. While each array performed well in isolation (up to **142% improvement**),
-they interfered destructively when combined.
-
-The issue was traced to a configuration override that unintentionally bypassed global
-phase offsets. Once global offsets were applied directly at the antenna level,
-receiver performance improved dramatically.
-
-This final approach resulted in a **310% increase in received power**.
+The final receive array showed a **310% increase in received power** over the
+legacy phase offset.
 
 ![Final receive array azimuth distribution (censored)](/images/projects/radar-calibration/Screenshot_(3).png)
 
@@ -133,22 +91,48 @@ This final approach resulted in a **310% increase in received power**.
 
 ---
 
-## Results
+## Transmit Array
 
-- Reduced calibration time from **multiple hours** to a **~30 minute automated
-  program**.
-- Improved antenna efficiency by up to **310%**.
-- Delivered consistent, repeatable calibration results across boards.
-- Eliminated a major manual bottleneck in radar hardware bring-up.
+Each transmit element has a configurable **gain** (output power) and **phase**
+(the offset of its transmitted sine wave, which is what makes beamforming work).
+
+### Gain
+
+- The FPGA reported the power draw of each antenna.
+- I picked a reference antenna and adjusted every other element to match its
+  power level.
+- Legal emission limits set a floor on attenuation, so gains could only be
+  matched within that bound.
+
+My first gain calibration used an aggressive simulated-annealing search. It
+overfit the gains to the board's geometry and made the measured radiation
+pattern worse, even though the optimization itself looked good. Switching to a
+gentler approximation produced a much cleaner pattern.
+
+### Phase
+
+Trace length and PCB material vary from board to board, so each element's phase
+has to be measured rather than assumed.
+
+With the board in the enclosure, I swept each element's phase against the
+reference and looked for the setting that **minimized** received power at the
+fixed receiver: the point where the element's signal cancels the reference.
+Shifting that setting by 180° then puts the element in phase with the reference.
+
+Searching for the minimum instead of the maximum worked better for two reasons.
+Near the in-phase peak, received power changes slowly with phase, so the peak is
+broad and hard to locate precisely; near the null it changes quickly, so the
+null is sharp. And at the minimum, distortion from radiation-pattern lobes, which
+scales with signal amplitude, is smallest.
 
 ---
 
 ## Takeaways
 
-- Automated calibration is essential for scaling phased-array radar production.
-- Minimization-based phase alignment is more robust than direct maximization in the
-  presence of radiation-pattern irregularities.
-- Over-aggressive optimization can degrade real-world performance despite good
-  simulated results.
-- Tight integration between FPGA control, RF measurement equipment, and software
-  tooling enables substantial efficiency gains.
+- Calibrate in stages, but test the combined system. Every subarray passing on
+  its own hid a configuration bug that only showed up when they were combined.
+- Finding a null and shifting 180° is more precise than finding a peak.
+- An aggressive optimizer can overfit to its model and make the physical result
+  worse.
+- Tying FPGA control, RF instruments and software together into one loop is what
+  turned hours of manual work into a single automated run.
