@@ -20,6 +20,7 @@ tags:
 maturity: prototype
 featured: true
 visibility: public
+order: 1.5
 heroImage: /images/projects/radar-calibration/image.png
 ---
 
