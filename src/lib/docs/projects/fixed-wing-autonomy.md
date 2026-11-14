@@ -5,7 +5,8 @@ subtitle: >
   flight controller, GPS/compass, ELRS link, elevon mixing and onboard logging,
   brought up from bench to flight. Manual flight and autopilot heading hold are
   flight-tested; autonomous loiter is configured but not yet flown. A side
-  project at Formlabs with CEO Maxim Lobovsky.
+  project at Formlabs with CEO Maxim Lobovsky, who did the mechanical
+  engineering on the airframe; I did the avionics and integration.
 slug: fixed-wing-autonomy
 date: '2026'
 updated: '2026-11-14'
@@ -29,11 +30,16 @@ heroImage: /images/projects/fixed-wing-autonomy/hero.jpg
 ## Overview
 
 This started as a small side project at Formlabs with CEO Maxim Lobovsky. The
-goal was to take a basic flying-wing RC aircraft and turn it into a
+goal was to take a flying-wing RC aircraft and turn it into a
 GPS-enabled autonomous platform that can circle a fixed point on its own.
 
-The airframe itself was simple. Most of the work was integration: configuring
-the flight controller for an elevon layout, bringing up GPS and compass
+| | |
+|---|---|
+| **Maxim Lobovsky** | Mechanical engineering: the airframe design |
+| **Me** | Avionics and integration: electronics, flight controller configuration, radio link, sensors, logging and flight modes |
+
+My side of the work was integration: configuring the flight controller for an
+elevon layout, bringing up GPS and compass
 hardware, setting up the ELRS control link, validating everything on battery
 power rather than only over USB, and debugging several cases where the aircraft
 behaved correctly on the bench but not in its flight configuration.
