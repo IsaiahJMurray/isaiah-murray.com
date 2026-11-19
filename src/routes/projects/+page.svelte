@@ -1,4 +1,6 @@
 <script>
+  import ProjectCard from '$lib/chamber/ProjectCard.svelte';
+  import SignalChain from '$lib/chamber/SignalChain.svelte';
   import { DISCIPLINES, firstSentence } from '$lib/projects.js';
 
   export let data;
@@ -6,7 +8,7 @@
   $: projects = data.projects;
 
   /* ---------- project grid packing (deterministic) ----------
-     12-column grid, 88px rows. Parts: featured 6×4 ("big"), small 3×2, wide 6×2.
+     12-column grid, 104px rows. Parts: featured 6×4 ("big"), small 3×2, wide 6×2.
      The plate is stacked as bands 4 rows tall:
        mixed band = one featured part + a 6×4 block of 1–4 other parts (sides alternate)
        pair band  = two featured parts side by side
@@ -68,8 +70,8 @@
   $: cells = pack(projects);
 
   /* ---------- filters (apply to plate and table) ---------- */
-  $: filters = DISCIPLINES.filter((d) => projects.some((p) => p.disciplines.includes(d.id)));
   let filter = 'all';
+  let plate;
   const matches = (p, f) => f === 'all' || p.disciplines.includes(f);
   $: hits = projects.filter((p) => matches(p, filter));
 
@@ -89,7 +91,6 @@
   const ariaSort = (key, k, d) => (k === key ? (d === 1 ? 'ascending' : 'descending') : undefined);
 
   const label = Object.fromEntries(DISCIPLINES.map((d) => [d.id, d.label]));
-  const meta = (p) => [p.year, p.maturity === 'wip' ? 'in progress' : null].filter(Boolean).join(' · ');
 
   const desc = 'Every public project by Isaiah Murray: flight hardware, circuit boards, firmware, software and ML.';
 </script>
@@ -111,43 +112,21 @@
 
 <main id="main">
   <section class="wrap head" aria-labelledby="h1-projects">
-    <h1 id="h1-projects">Projects</h1>
+    <h1 id="h1-projects" class="page-title">Projects</h1>
     <p class="intro">
-      All {projects.length} public projects. Featured work gets the larger cards; the index below lists everything by year or name.
+      All {projects.length} public projects, from flight hardware and circuit boards to firmware, software and models.
+      Pick a stage of the signal chain to see the work that touches it.
     </p>
-    {#if filters.length > 1}
-      <div class="filters" role="group" aria-label="Filter projects by discipline">
-        <button type="button" aria-pressed={filter === 'all'} on:click={() => (filter = 'all')}>All</button>
-        {#each filters as f}
-          <button type="button" aria-pressed={filter === f.id} on:click={() => (filter = f.id)}>{f.label}</button>
-        {/each}
-        <span class="plate-count mono" aria-live="polite">{hits.length} / {projects.length} projects</span>
-      </div>
-    {/if}
+    <div class="filter-row">
+      <SignalChain {projects} bind:value={filter} target={plate} />
+      <span class="plate-count mono" aria-hidden="true">{hits.length} / {projects.length} projects</span>
+    </div>
   </section>
 
   <section class="wrap plate-sec" aria-label="Projects">
-    <div class="plate all">
+    <div class="plate all" bind:this={plate}>
       {#each cells as { p, kind, style }, i (p.slug)}
-        {@const hit = matches(p, filter)}
-        <a
-          class="part"
-          class:big={kind === 'f'}
-          class:wide={kind === 'w'}
-          class:is-powder={!hit}
-          href={`/projects/${p.slug}`}
-          {style}
-        >
-          <div class="img">
-            <img src={p.cardImage} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
-          </div>
-          <div class="lbl">
-            <strong>{p.title}</strong>
-            {#if meta(p)}<span class="mono">{meta(p)}</span>{/if}
-            {#if kind === 'f' && p.subtitle}<p>{firstSentence(p.subtitle)}</p>{/if}
-          </div>
-          {#if !hit}<span class="visually-hidden">(filtered out)</span>{/if}
-        </a>
+        <ProjectCard project={p} big={kind === 'f'} hit={matches(p, filter)} {filter} eager={i < 2} {style} />
       {/each}
     </div>
   </section>
@@ -192,24 +171,18 @@
 
 <style>
   .head { padding-top: var(--s7); padding-bottom: var(--s6); }
-  h1 { font-weight: 900; font-size: clamp(44px, 7vw, 88px); letter-spacing: -0.03em; line-height: 0.95; }
-  .intro { font-size: var(--t-lg); line-height: 1.4; max-width: 46ch; margin-top: var(--s4); }
-  .filters { margin-top: var(--s5); }
+  .intro { font-size: var(--t-lg); line-height: 1.4; max-width: 52ch; margin-top: var(--s4); }
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s5); margin-top: var(--s5); }
+  .plate-count { font-size: var(--t-xs); color: var(--ink-2); }
   .plate-sec { padding-bottom: var(--s8); }
 
-  .plate.all { grid-auto-rows: 88px; }
-  .plate.all > .part.wide .lbl strong { font-size: var(--t-md); }
-  .plate.all > .part.big .lbl { flex-wrap: nowrap; flex-direction: column; align-items: stretch; gap: var(--s1); }
-  .plate.all > .part.big .lbl .mono { order: -1; }
-  .plate.all > .part.big .lbl > * { flex-shrink: 0; }
-  .plate.all > .part.big .lbl strong { overflow: visible; }
-  .plate.all > .part.big .lbl p {
+  .plate.all { grid-auto-rows: 104px; }
+  .plate.all :global(.part.big .lbl p) {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    max-height: calc(2 * 1.45em);
   }
 
   .proj-index .sort {
@@ -232,11 +205,11 @@
   @media (max-width: 760px) {
     /* phones: one column. Featured parts stay full-bleed; the rest become thumbnail rows. */
     .plate.all { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
-    .plate.all > .part { grid-column: 1 / -1; }
-    .plate.all > .part.big .img { aspect-ratio: 4 / 3; }
-    .plate.all > .part:not(.big) { flex-direction: row; min-height: 88px; }
-    .plate.all > .part:not(.big) .img { flex: none; width: 88px; aspect-ratio: 1 / 1; }
-    .plate.all > .part:not(.big) .lbl { flex: 1; justify-content: center; }
+    .plate.all :global(.part) { grid-column: 1 / -1; }
+    .plate.all :global(.part.big .img) { aspect-ratio: 4 / 3; }
+    .plate.all :global(.part:not(.big)) { flex-direction: row; min-height: 88px; }
+    .plate.all :global(.part:not(.big) .img) { flex: none; width: 88px; aspect-ratio: 1 / 1; }
+    .plate.all :global(.part:not(.big) .lbl) { flex: 1; align-content: center; }
   }
   @media (max-width: 600px) {
     .head { padding-top: var(--s5); }

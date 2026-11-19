@@ -20,7 +20,7 @@ tags:
 maturity: polished
 featured: true
 visibility: public
-heroImage: /images/projects/clasp/IMG_4305-min.jpg
+heroImage: /images/projects/clasp/IMG_4305-hero.jpg
 order: 3
 ---
 

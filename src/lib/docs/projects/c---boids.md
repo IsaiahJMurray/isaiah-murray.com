@@ -1,5 +1,5 @@
 ---
-title: C Boids
+title: C++ Boids
 subtitle: High-performance Boids flocking simulation in C++ and SFML, rendering 1,000
   agents navigating a 2D space with wrap-around boundaries. Designed for graphics
   and game dev enthusiasts exploring emergent behavior, it adds obstacle-aware steering,

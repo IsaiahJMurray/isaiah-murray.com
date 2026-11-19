@@ -56,11 +56,11 @@
     mobileWidth: 640,
     density: 0.6,          // fraction of cells holding a gate
     mix: { AND: 0.3, OR: 0.32, XOR: 0.24, NOT: 0.14 },
-    reach: 5,              // max columns away a gate looks for a driver
-    reachV: 3,             // max rows away
+    reach: 10,              // max columns away a gate looks for a driver
+    reachV: 5,             // max rows away
     maxFanout: 4,
 
-    mode: 'particles',     // 'particles': pulses travel along wires
+    mode: 'nets',     // 'particles': pulses travel along wires
                            // 'nets': a firing gate lights its whole output net at once
     speed: 480,            // px / s along wires
     trail: 44,             // px of glowing tail behind each pulse
@@ -131,7 +131,7 @@
     dark: {
       trace: [150, 175, 205],
       alpha: { wire: 0.08, gate: 0.15, chip: 0.05, chipLine: 0.32 },
-      pulse: [110, 210, 255],
+      pulse: [225, 36, 0],
       head: [230, 250, 255],
       memory: [235, 240, 248],
       blend: 'lighter',

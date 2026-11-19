@@ -1,5 +1,5 @@
 ---
-title: Digikeydisplay
+title: DigiKey Display
 subtitle: A tiny Python tool that turns DigiKey cart CSVs into a treemap so you can
   instantly see where your budget is going. Ideal for hardware engineers and hobbyists
   optimizing BOM costs, it uses pandas, matplotlib, and squarify to visualize line-item

@@ -34,7 +34,7 @@
 
 <main id="main">
   <section class="wrap head" aria-labelledby="h1-contact">
-    <h1 id="h1-contact">Contact</h1>
+    <h1 id="h1-contact" class="page-title">Contact</h1>
     <p class="lede">
       Best for recruiting and collaboration: email or LinkedIn.
       If you’re reaching out about a project, include context and what you’d like to build.
@@ -57,7 +57,6 @@
 
 <style>
   .head { padding-top: var(--s7); padding-bottom: var(--s8); }
-  h1 { font-size: clamp(41px, 7vw, 72px); font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
   .lede { margin-top: var(--s4); font-size: var(--t-lg); line-height: 1.45; max-width: 46ch; }
   .email { margin-top: var(--s7); min-width: 0; }
 

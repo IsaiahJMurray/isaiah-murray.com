@@ -1,12 +1,13 @@
 ---
-title: Advanced Resin Cure Monitoring with FormLabs
-subtitle: 'Real-time dielectric sensing system for monitoring UV resin cure state
-  during SLA 3D printing, developed during a 3-day hackathon at FormLabs headquarters.
-
-  '
+title: Resin Cure Monitoring at Formlabs
+subtitle: >
+  A dielectric sensing experiment that tracked resin cure state during SLA
+  printing, built in a 3-day hackathon at Formlabs headquarters with an
+  oscilloscope and waveform generator standing in for an impedance analyzer that
+  a snowstorm kept from arriving.
 slug: advanced-resin-cure-monitoring-with-formlabs
 date: '2026-01-15'
-updated: '2026-02-06'
+updated: '2026-11-14'
 tags:
 - dielectric-sensing
 - sla-printing
@@ -25,155 +26,130 @@ order: 5
 
 ## Overview
 
-I led a four-person team in developing a real-time dielectric sensing system to monitor UV resin cure state during SLA 3D printing. Over three intensive days at FormLabs' Somerville headquarters, we proved the viability of using impedance measurements to detect nanoscale changes in resin properties as layers cure.
+SLA printers cure liquid photopolymer layer by layer with UV light, but nothing
+reports cure state while a print is running. An undercured layer or a failed
+print is usually found only when the part comes off the build plate.
 
-Our system successfully identified specific printing phases including layer start times, plunge cycles, cure progression, and print completion by analyzing phase offset and amplitude changes in a 245kHz test signal. The work demonstrated clear differentiation between cured and uncured resin states with voltage amplitude differences of up to 0.3V across the frequency spectrum.
+Over a three-day hackathon at Formlabs' Somerville headquarters, my team tested
+whether dielectric sensing could see that cure happening. We put interdigitated
+electrodes in contact with the resin, drove them with a test signal, and watched
+how the amplitude and phase of the response changed as resin cured.
 
-FormLabs leadership showed real interest in the results and is supporting continued development, with an eye toward integrating this into their SLA printers for real-time print quality control and failure detection.
-
----
-
-## Role & Context
-
-I served as team captain and handled all electrical engineering aspects of the project, working alongside Crawford Phillips, Mason Vogt, and Trevor McDonald. The team was invited to participate in FormLabs' hackathon after previous research caught their attention.
-
-My primary responsibilities included designing the impedance measurement system, developing the data collection pipeline, and running experiments with Mason. Crawford, Mason, and Trevor handled mechanical integration while Mason also created data visualizations in MATLAB. This was an R&D focused project with all work currently under wraps due to commercial sensitivity.
-
-The motivation was to solve a fundamental challenge in SLA printing: there's currently no way to monitor cure state in real-time during printing, leading to failed prints that aren't detected until completion.
-
----
-
-## Tech Stack
-
-- **Hardware**: Custom PCB with interdigitated electrode sensors, oscilloscope, waveform generator
-- **Signal Processing**: 245kHz impedance analysis, phase and amplitude measurement
-- **Data Analysis**: MATLAB for signal processing and visualization
-- **Integration**: FormLabs SLA printer modification, custom build plate mounting
-- **Sensors**: Multiple electrode geometries for different layer thicknesses
-- **Materials**: UV-sensitive photopolymer resins, various cure states
-
----
-
-## Problem
-
-SLA 3D printing relies on precise UV curing of liquid photopolymer resin, but there's no real-time feedback on cure quality during printing. Failed prints are only discovered after completion, wasting time, materials, and energy.
+**Results:**
+- Measured a difference between fully cured and uncured resin across a
+  100 to 400 kHz sweep, largest between 200 and 300 kHz.
+- Tracked a full print of about 800 seconds and picked out distinct signal
+  signatures for build-plate finishing, individual layer starts and print
+  completion.
+- In glass-slide tests, saw the signal shift within seconds of UV exposure.
 
 <video controls playsinline preload="metadata">
   <source src="/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5176.mp4" type="video/mp4" />
   Undercured sample removal showing liquid resin layer
 </video>
 
-Critical issues include:
-
-- **Incomplete curing** leading to weak or failed parts with liquid resin layers that aren't visible until removal
-- **Over-curing** causing dimensional inaccuracy or brittleness  
-- **Layer adhesion failures** that aren't detected until print completion
-- **Oxidation layer effects** that impact surface quality
-- **Process optimization** requiring manual trial-and-error approaches
-
-Existing quality control methods are post-process only, providing no opportunity for real-time correction or early failure detection. The industry needed a non-invasive method to monitor cure state during active printing.
+*An undercured sample: the liquid layer isn't visible until the part is removed.*
 
 ---
 
-## Approach / Architecture
+## Team & Role
 
-Our approach centered on dielectric sensing using interdigitated electrode sensors integrated directly into the printer build plate. The system measures impedance changes as resin transitions from liquid to solid state during UV exposure.
+I was team captain and handled the electrical side, working with Crawford
+Phillips, Mason Vogt and Trevor McDonald. The team was invited to the hackathon
+after earlier research caught Formlabs' attention.
 
-The architecture consists of three main components:
+- **Me:** designed the sensor PCB and the measurement setup, built the data
+  collection pipeline, and ran the experiments with Mason.
+- **Crawford, Mason and Trevor:** mechanical integration with the printer.
+- **Mason:** data visualization in MATLAB.
 
-**Sensor Array**: Custom PCB with multiple electrode geometries optimized for different layer thicknesses and cure detection sensitivity. Electrodes are positioned to make direct contact with resin during printing.
+---
 
-**Signal Generation & Measurement**: 245kHz test signal generated by waveform generator, with phase and amplitude response measured via oscilloscope. This frequency was selected for optimal sensitivity to resin dielectric property changes.
+## Sensor Design
 
-**Data Pipeline**: Real-time signal processing to extract cure state indicators from impedance measurements, with MATLAB-based analysis for pattern recognition and visualization.
+I designed a PCB with several **interdigitated electrode** patterns. The
+electrodes set up fringing electric fields that reach into the resin, so a
+change in the resin's dielectric properties as it cures shows up as a change in
+the electrodes' impedance.
+
+The board carried a range of comb spacings and electrode widths. Tighter spacing
+concentrates the field near the surface, which suits thin layers; wider patterns
+sample more volume and give a better signal-to-noise ratio for bulk
+measurements.
 
 ![Hardware setup showing PCB integration](/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5213_929d9e.png)
 
 ---
 
-## Key Features
+## Measurement Without an Impedance Analyzer
 
-- **Real-time cure monitoring** during active SLA printing
-- **Multi-geometry sensor array** for different layer thickness optimization
-- **Phase and amplitude analysis** at 245kHz for maximum sensitivity
-- **Layer-by-layer detection** of cure progression and timing
-- **Print phase identification** including plunge cycles and layer starts
-- **Quantitative differentiation** between cured and uncured states
-- **Non-invasive integration** with existing FormLabs hardware
-- **Sub-second response time** for rapid cure state changes
+The impedance analyzer we planned to use was delayed by a snowstorm. I rebuilt
+the measurement around a **waveform generator and oscilloscope**: drive the
+electrodes with a sine wave and compare the output against the input.
+
+From each measurement I extracted:
+- **Phase offset** between input and output
+- **Amplitude change** (ΔV<sub>pp</sub>), which tracks the impedance magnitude
+- **Frequency response** across 100 to 400 kHz, to find where cured and uncured
+  resin differ most
+
+Preliminary sweeps showed the strongest response to cure state in the low
+hundreds of kHz, so I ran the print-monitoring tests at a single **245 kHz** test
+signal.
+
+The signal changes being measured were small, so shielding and grounding
+mattered, particularly against noise from the printer's UV LED array and
+mechanics.
 
 ---
 
-## Technical Details
+## Experiments
 
-### Sensor Design
-
-I designed a custom PCB featuring multiple interdigitated electrode patterns with varying geometries. The electrodes create fringing electric fields that penetrate into the resin, allowing measurement of dielectric properties at different depths and sensitivities.
-
-The sensor array included different comb spacings and electrode widths to optimize detection for various resin layer thicknesses. Smaller electrode spacing provided higher sensitivity for thin layers, while larger patterns offered better signal-to-noise ratios for bulk measurements.
-
-### Signal Processing
-
-With the impedance analyzer delayed by a snowstorm, I adapted our measurement approach using an oscilloscope and waveform generator. The 245kHz test frequency was selected after preliminary testing showed optimal sensitivity to cure-state changes in this range.
-
-Key measurements included:
-- **Phase offset** between input and output signals
-- **Amplitude ratio** (ΔV_pp) indicating impedance magnitude changes  
-- **Frequency response** across 100-400kHz range for characterization
-
-### Data Collection Results
-
-Our experiments produced several breakthrough results using a systematic approach to sample preparation and measurement:
-
-**Sample Preparation**: Glass slides were carefully applied over resin drops on the PCB to create uniform thickness samples for cure testing, ensuring consistent contact between the resin and electrode sensors.
+**Glass-slide samples.** To get uniform sample thickness, we pressed a glass
+slide over a drop of resin on the PCB, which also kept contact between resin and
+electrodes consistent.
 
 <video controls playsinline preload="metadata">
   <source src="/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5169.mp4" type="video/mp4" />
   Glass slide application process
 </video>
 
-**Cured vs Uncured Differentiation**: Clear amplitude differences of ~0.0078V mean between fully cured and uncured resin samples across the frequency spectrum, with peak differentiation around 200-300kHz.
+**Cured vs. uncured.** Across the 100 to 400 kHz sweep, the mean amplitude
+difference between fully cured and uncured samples was about **7.8 mV**, with the
+largest differences between 200 and 300 kHz.
 
-**Real-time Print Monitoring**: Successfully tracked complete print cycles showing distinct voltage signatures for buildplate finishing, individual layer starts, and print completion over ~800-second print duration.
+![Frequency response of cured and uncured samples, 100 to 400 kHz](/images/projects/advanced_resin_cure_monitoring_with_formlabs/Freq_100-400cureduncured_0d8e65.png)
 
-**Cure Kinetics**: Glass slide tests revealed real-time cure progression with voltage transitions occurring within seconds of UV exposure, demonstrating the system's ability to detect cure state changes as they happen.
+**Cure in real time.** In the glass-slide tests, the signal shifted within
+seconds of UV exposure, so the measurement follows cure as it happens rather than
+only before and after.
+
+**Full print.** With the PCB mounted in a custom build plate, we tracked a
+complete print of about 800 seconds. Build-plate finishing, the start of each
+layer, and print completion each produced a distinct voltage signature.
 
 ![Sample analysis showing cure progression](/images/projects/advanced_resin_cure_monitoring_with_formlabs/IMG_5204_c3aec6.png)
 
-### Integration Challenges
-
-Mounting the sensor system required careful mechanical integration to avoid interfering with the SLA printing process. The PCB was integrated into a custom build plate that maintained proper resin contact while allowing normal printer operation.
-
-Signal integrity was critical given the small voltage changes being measured. Proper shielding and grounding techniques were essential to minimize noise from the printer's UV LED array and mechanical systems.
-
 ---
 
-## Results
+## What I'd Do Next
 
-The hackathon demonstrated clear proof-of-concept for real-time resin cure monitoring. Key quantitative results included:
-
-- **0.3V amplitude differences** between cure states in optimal frequency ranges
-- **Real-time detection** of print phases with sub-second response times
-- **Successful integration** with FormLabs hardware without process interference
-- **Multiple sensor validation** across different electrode geometries
-- **Reproducible measurements** across different resin samples and cure conditions
-
-The work proved that dielectric sensing can reliably differentiate cure states and track cure progression in real-time during SLA printing. FormLabs leadership expressed strong interest in the technology's commercial potential.
-
-![Data results showing frequency response analysis](/images/projects/advanced_resin_cure_monitoring_with_formlabs/Freq_100-400cureduncured_0d8e65.png)
+**Multi-frequency measurement.** The frequency sweeps showed that cured and
+uncured resin have distinct spectral signatures, differing most across a band
+rather than at one frequency. Measuring several frequencies at once would make
+detection more robust than relying on a single 245 kHz signal.
 
 ---
 
 ## Lessons Learned
 
-**Hardware Adaptability**: When our impedance analyzer didn't arrive due to weather, quickly adapting to oscilloscope-based measurements taught me the importance of flexible experimental design and backup measurement approaches.
+**Have a backup measurement plan.** When the impedance analyzer didn't arrive,
+reframing the measurement around a scope and a waveform generator kept the
+experiment running.
 
-**Frequency Selection**: The 245kHz frequency proved optimal, but systematic frequency sweeps revealed that different cure states have distinct spectral signatures. Future work should explore multi-frequency analysis for more robust detection.
+**Benchtop isn't the printer.** Mounting electrodes in a build plate without
+disturbing the print process brought mechanical and electrical constraints that
+never showed up on the bench.
 
-**Integration Complexity**: Real-world integration with commercial printers involves numerous mechanical and electrical constraints not apparent in benchtop testing. Early consideration of manufacturing and integration requirements is crucial.
-
-**Team Dynamics**: Leading a multidisciplinary team under tight hackathon constraints reinforced the importance of clear role definition and regular communication, especially when combining EE and ME expertise.
-
-**Commercial Viability**: The strong industry interest validated our technical approach but also highlighted the importance of IP considerations and commercial development pathways in R&D projects.
-
----
+**Split roles early.** With EE and ME work running in parallel on a three-day
+clock, clear ownership and frequent check-ins kept the two halves converging.

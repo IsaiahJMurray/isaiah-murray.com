@@ -77,11 +77,11 @@
 
 <main id="main" class="resume">
   <header class="wrap head">
-    <h1>Resume</h1>
+    <h1 class="page-title">Resume</h1>
     <p class="who">Isaiah Murray · Sophomore, Class of 2029 · U.S. Citizen · Embedded systems, instrumentation, and perception for physical hardware</p>
     <div class="actions">
-      <a class="pdf" href={PDF} target="_blank" rel="noreferrer" data-sveltekit-reload>Resume (PDF)</a>
-      <button class="print" type="button" on:click={() => printPdf(PDF)}>Print</button>
+      <a class="btn" href={PDF} target="_blank" rel="noreferrer" data-sveltekit-reload>Resume (PDF)</a>
+      <button class="btn ghost print" type="button" on:click={() => printPdf(PDF)}>Print</button>
     </div>
     <ul class="contact mono">
       <li><a href="tel:+17815583863">(781) 558-3863</a></li>
@@ -236,17 +236,8 @@
 
 <style>
   .head { padding-top: var(--s7); padding-bottom: var(--s7); }
-  h1 { font-size: clamp(41px, 7vw, 72px); font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
   .who { margin-top: var(--s4); font-size: var(--t-lg); line-height: 1.45; max-width: 52ch; }
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s5); }
-  .pdf, .print {
-    display: inline-flex; align-items: center; min-height: 40px; padding: var(--s2) var(--s4);
-    font-size: var(--t-sm); text-decoration: none; border: 1px solid var(--ink);
-  }
-  .pdf { background: var(--ink); color: var(--bg); font-weight: 700; }
-  .pdf:hover { background: var(--surface); border-color: var(--surface); }
-  .print { background: transparent; }
-  .print:hover { border-color: var(--surface); color: var(--ink-2); }
   .contact {
     list-style: none; margin: var(--s5) 0 0; padding: 0;
     display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-sm); color: var(--ink-2);

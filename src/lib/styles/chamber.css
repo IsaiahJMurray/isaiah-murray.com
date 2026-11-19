@@ -1,34 +1,34 @@
 /* Global tokens, base elements and shared components.
    Imported once, in src/routes/+layout.svelte. Page-specific styles live in the page.
 
-   Behind every page runs the circuit board (src/lib/circuit); content sits in clear areas on it.
+   The site is a powered circuit board (src/lib/circuit) with content sitting in clear areas on it.
+   Dark solder mask is the default; the light board is a visitor's choice (src/lib/chamber/theme.js).
+
    One 12-column grid, 1200px max, spacing scale 4/8/12/16/24/32/48/64/96.
    Palette: Teal lagoon (coolors.co/00b9ae-037171-03312e-02c3bd-009f93) with scarlet signals.
-          It has no light colour, so the light ground and dark-mode text are derived pale teals.
-   Color: --bg (ground) · --bg-2 (trays, code) · --surface (cards, traces)
-          --ink (text) · --ink-2 (secondary) · --signal (circuit signals)
-          --accent (active filter, current section; deeper than --signal so white text reads on it)
+   Color: --bg (solder mask) · --bg-2 (trays, code) · --card (project cards, recessed)
+          --surface (traces, bright teal) · --ink (silkscreen text) · --ink-2 (secondary text)
+          --link (underlines, lit indicators) · --signal (circuit signals, live state)
+          --accent (the one pressed control; deeper than --signal so white text reads on it)
    Type:  Chivo 900 display · 700 headings · 400 body 17px/1.55
-          Chivo Mono 400/500 for figures only (dates, table figures, code).
+          Chivo Mono 400/500 for figures only (dates, counts, measurements, code).
    Scale: 1.25 — 13 · 14 · 17 · 21 · 26 · 33 · 41 · display clamp
    No rounded pills, gradients, glows or shadows (the lightbox is the one exception). */
 
 :root{
-  --bg:#E3F5F3; --bg-2:#C4E3E1; --surface:#037171; --ink:#03312E; --ink-2:#037171;
-  --signal:#FF2400; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#B6CECC;
+  --bg:#03312E; --bg-2:#0A4A45; --card:#022522; --surface:#00B9AE; --ink:#E3F5F3; --ink-2:#8FC7C2;
+  --link:#02C3BD; --signal:#FF4127; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#1C544F;
   --f-body:"Chivo", "Helvetica Neue", Arial, system-ui, sans-serif;
   --f-mono:"Chivo Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
   --t-xs:13px; --t-sm:14px; --t-md:17px; --t-lg:21px; --t-xl:26px; --t-2xl:33px; --t-3xl:41px;
   --wrap:1200px; --gutter:clamp(16px,4vw,40px);
-  color-scheme: light;
+  color-scheme: dark;
 }
-/* Dark follows the browser / OS setting; there is no manual override. */
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#03312E; --bg-2:#034440; --surface:#00B9AE; --ink:#D9F4F1; --ink-2:#02C3BD;
-    --signal:#FF4127; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#2E5855; color-scheme: dark;
-  }
+:root[data-theme="light"]{
+  --bg:#E3F5F3; --bg-2:#C4E3E1; --card:#F6FCFB; --surface:#037171; --ink:#03312E; --ink-2:#2C6B67;
+  --link:#037171; --signal:#FF2400; --accent:#D81B00; --on-accent:#FFFFFF; --rule:#B6CECC;
+  color-scheme: light;
 }
 
 /* ---------- base ---------- */
@@ -37,8 +37,8 @@ html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--t-md);line-height:1.55;margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 img,video,canvas{display:block;max-width:100%}
 img{height:auto}
-a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--surface)}
-a:hover{text-decoration-color:var(--ink)}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--link)}
+a:hover{text-decoration-color:currentColor}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 [tabindex="-1"]:focus{outline:none}
 h1,h2,h3{text-wrap:balance;margin:0;font-weight:700;line-height:1.15}
@@ -54,51 +54,64 @@ code,kbd,samp,pre{font-family:var(--f-mono)}
 
 /* ---------- sections ---------- */
 .section{padding-top:var(--s8);padding-bottom:var(--s8);border-top:1px solid var(--rule)}
-.section-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--s3) var(--s5);margin-bottom:var(--s5)}
-.section-head h2{font-size:var(--t-2xl);letter-spacing:-0.01em}
-@media (max-width:600px){ .section{padding-top:var(--s7);padding-bottom:var(--s7)} .section-head h2{font-size:var(--t-xl)} }
+.section-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--s4) var(--s5);margin-bottom:var(--s5)}
+.section-head h2{font-size:var(--t-3xl);font-weight:900;letter-spacing:-0.02em;line-height:1}
+.section-note{font-size:var(--t-md);color:var(--ink-2);max-width:52ch;margin:calc(-1 * var(--s3)) 0 var(--s5)}
+@media (max-width:600px){ .section{padding-top:var(--s7);padding-bottom:var(--s7)} .section-head h2{font-size:var(--t-2xl)} }
+
+/* ---------- page titles (projects, resume, contact, errors) ---------- */
+.page-title{font-weight:900;font-size:clamp(44px,7vw,88px);letter-spacing:-0.03em;line-height:0.95}
+
+/* ---------- buttons: one solid, one outlined. Square corners, like everything else. ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);font-size:var(--t-sm);font-weight:700;line-height:1;text-decoration:none;border:1px solid var(--ink);background:var(--ink);color:var(--bg);transition:background-color .15s,border-color .15s,color .15s}
+.btn:hover{background:var(--surface);border-color:var(--surface);color:var(--bg)}
+:root[data-theme="light"] .btn:hover{color:var(--on-accent)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink);background:transparent;color:var(--ink)}
 
 /* ================================================================
    SHARED COMPONENTS (used by home, /projects, /resume, project pages)
    ================================================================ */
 
-/* ---------- discipline filters: the active one is the only orange control ---------- */
-.filters{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
-.filters button{background:transparent;border:1px solid var(--rule);padding:6px var(--s3);font-size:var(--t-sm);line-height:1.2;min-height:36px;transition:background-color .2s,border-color .2s,color .2s}
-.filters button:hover{border-color:var(--surface)}
-.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
-.plate-count{font-size:var(--t-xs);color:var(--ink-2);margin-left:var(--s2)}
-
-/* ---------- project grid: cards (.part) on a tray (.plate) ----------
-   Cells are placed by the page (grid-column / grid-row, or the --gc / --gr custom properties).
-   .part.is-powder = filtered out: the card fades back into the tray. */
-.plate{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:118px;gap:7px;padding:7px;background:var(--bg-2)}
-.plate > .part{grid-column:var(--gc, span 3);grid-row:var(--gr, span 2)}
-.part{position:relative;display:flex;flex-direction:column;min-width:0;background:var(--surface);color:var(--bg);text-decoration:none;overflow:hidden;transition:background-color .2s}
-.part .img{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--surface)}
-.part img{width:100%;height:100%;object-fit:cover;transition:filter .2s,opacity .2s}
-.part .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);padding:var(--s2) var(--s3);min-width:0;background:var(--surface);color:var(--bg);transition:background-color .2s,color .2s}
-.part .lbl strong{font-weight:700;font-size:var(--t-sm);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.part .lbl .mono{font-size:var(--t-xs);flex:none}
-.part.big .lbl{flex-wrap:wrap;padding:var(--s3) var(--s4)}
-.part.big .lbl strong{font-size:var(--t-lg);white-space:normal}
-.part.big .lbl p{flex-basis:100%;font-size:var(--t-sm);line-height:1.45;max-width:52ch}
-a.part:hover .lbl strong{text-decoration:underline;text-underline-offset:3px}
+/* ---------- project grid: cards (.part, see ProjectCard.svelte) on a tray (.plate) ----------
+   Cells are placed by the page (the --gc / --gr custom properties).
+   .part.is-powder = filtered out: the card sinks back into the tray. */
+.plate{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:128px;gap:7px;padding:7px;background:var(--bg-2)}
+.plate > .part{grid-column:var(--gc, span 4);grid-row:var(--gr, span 2)}
+.part{position:relative;display:flex;flex-direction:column;min-width:0;background:var(--card);color:var(--ink);text-decoration:none;overflow:hidden}
+.part .img{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--bg-2)}
+.part img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .25s,opacity .25s}
+.part .lbl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:2px var(--s3);padding:var(--s3) var(--s3) var(--s3);min-width:0}
+.part .lbl strong{font-weight:700;font-size:var(--t-md);line-height:1.2;min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.part .lbl .when{grid-column:1;font-size:var(--t-xs);color:var(--ink-2)}
+.part .lbl .leds{grid-column:2;grid-row:1;margin-top:5px}
+.part .lbl p{grid-column:1 / -1;font-size:var(--t-sm);line-height:1.45;color:var(--ink-2);max-width:56ch;margin-top:var(--s2)}
+.part.big .lbl{padding:var(--s4) var(--s4) var(--s4)}
+.part.big .lbl strong{font-size:var(--t-xl);letter-spacing:-0.01em}
+.part.big .lbl .leds{margin-top:9px}
+a.part:hover .lbl strong{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;text-decoration-color:var(--signal)}
 a.part:focus-visible{outline-offset:2px}
-.part.is-powder{background:var(--bg)}
-.part.is-powder img{filter:grayscale(1) contrast(.5);opacity:.18}
-.part.is-powder .img{background:var(--bg)}
-.part.is-powder .lbl{background:var(--bg);color:var(--ink-2)}
+.part.is-powder{background:transparent}
+.part.is-powder img{filter:grayscale(1) contrast(.6);opacity:.14}
+.part.is-powder .lbl strong,.part.is-powder .lbl .when{color:var(--ink-2);opacity:.7}
+.part.is-powder .lbl p{opacity:.5}
+
+/* Four indicator LEDs, one per stage of the signal chain a project touches:
+   hardware · firmware · software · ML/CV. The stage being filtered for lights in signal red. */
+.leds{display:flex;gap:3px;flex:none}
+.leds i{display:block;width:7px;height:7px;background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink-2) 60%, transparent)}
+.leds i.on{background:var(--link);box-shadow:none}
+.leds i.hot{background:var(--signal);box-shadow:none}
+
 @media (max-width:760px){
   .plate{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;gap:6px;padding:6px}
   .plate > .part{grid-column:auto;grid-row:auto}
-  .plate .part .img{flex:none;aspect-ratio:1/1}
+  .plate .part .img{flex:none;aspect-ratio:4/3}
   .plate > .part.wide-m{grid-column:1 / -1}
   .plate > .part.wide-m .img{aspect-ratio:16/9}
   .plate > .part.big .img{aspect-ratio:4/3}
-  .part .lbl{flex-direction:column;gap:0}
-  .part .lbl strong{white-space:normal}
-  .part.big .lbl{flex-direction:row}
+  .part .lbl strong{font-size:var(--t-sm)}
+  .part.big .lbl strong{font-size:var(--t-lg)}
 }
 
 /* ---------- tables (index tables, spec tables) ---------- */
@@ -131,7 +144,7 @@ tbody th{font-weight:700}
 .log .title{color:var(--ink-2);font-size:var(--t-md)}
 .log ul{margin:var(--s3) 0 0;padding-left:1.1em}
 .log ul li{margin-top:var(--s2)}
-.log ul li::marker{color:var(--surface)}
+.log ul li::marker{color:var(--link)}
 .log .brief{margin-top:var(--s2);color:var(--ink)}
 .skills{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--s3) var(--s6);margin:var(--s6) 0 0;font-size:var(--t-sm)}
 .skills dt{grid-column:1 / span 3;color:var(--ink-2)}
@@ -139,11 +152,12 @@ tbody th{font-weight:700}
 @media (max-width:760px){
   .log > li,.skills{grid-template-columns:minmax(0,1fr)}
   .log .when,.log .what,.skills dt,.skills dd{grid-column:1 / -1}
+  .log .when{display:flex;flex-wrap:wrap;gap:0 var(--s4)}
   .skills dd{margin-bottom:var(--s3)}
 }
 
 /* ---------- code ---------- */
-pre{margin:var(--s5) 0 0;padding:var(--s4) var(--s5);background:var(--bg-2);overflow-x:auto;font-size:var(--t-xs);line-height:1.6;max-width:100%}
+pre{margin:var(--s5) 0 0;padding:var(--s4) var(--s5);background:var(--card);overflow-x:auto;font-size:var(--t-xs);line-height:1.6;max-width:100%}
 pre code{font-family:inherit;font-size:inherit}
 code{font-size:.88em}
 

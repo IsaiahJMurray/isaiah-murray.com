@@ -1,5 +1,5 @@
 ---
-title: Github Grader
+title: GitHub Grader
 subtitle: 'An Apple Fitness–style dashboard for developers that visualizes your GitHub
   activity, daily coding stats, and repository health. Built with SvelteKit, it uses
   GitHub OAuth and Octokit APIs to aggregate commits, lines of code, and repo metadata

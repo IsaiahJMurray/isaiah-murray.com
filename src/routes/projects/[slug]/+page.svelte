@@ -10,6 +10,7 @@
 <script>
   import { onMount, tick } from 'svelte';
   import Lightbox from '$lib/chamber/Lightbox.svelte';
+  import { DISCIPLINES } from '$lib/projects.js';
 
   export let data;
 
@@ -24,6 +25,7 @@
   $: subtitle = String(metadata.subtitle || '').replace(/\s+/g, ' ').trim();
   $: status = STATUS[data.maturity] || null;
   $: tags = data.tags || [];
+  $: stages = DISCIPLINES.filter((d) => (data.disciplines || []).includes(d.id));
 
   /* ---------- contents rail ---------- */
   let lb;
@@ -225,16 +227,25 @@
         </nav>
         <h1>{metadata.title}</h1>
         {#if subtitle}<p class="lede" class:long={subtitle.length > 150}>{subtitle}</p>{/if}
-        <div class="head-grid">
-          <dl class="meta">
-            {#if status}<dt>Status</dt><dd>{status}</dd>{/if}
-            {#if data.year}<dt>Year</dt><dd class="mono">{data.year}</dd>{/if}
-            {#if tags.length}<dt>Tags</dt><dd class="mono tags">{tags.join(', ')}</dd>{/if}
-          </dl>
-          <figure class="hero">
-            <img src={heroImage} alt={metadata.title} loading="eager" fetchpriority="high" decoding="async" />
-          </figure>
-        </div>
+        <dl class="meta">
+          {#if status}<div><dt>Status</dt><dd>{status}</dd></div>{/if}
+          {#if data.year}<div><dt>Year</dt><dd class="mono">{data.year}</dd></div>{/if}
+          {#if stages.length}
+            <div>
+              <dt>Signal chain</dt>
+              <dd>
+                <span class="leds" aria-hidden="true">
+                  {#each DISCIPLINES as d}<i class:on={stages.includes(d)}></i>{/each}
+                </span>
+                {stages.map((d) => d.label).join(', ')}
+              </dd>
+            </div>
+          {/if}
+          {#if tags.length}<div class="wide"><dt>Tags</dt><dd class="mono tags">{tags.join(', ')}</dd></div>{/if}
+        </dl>
+        <figure class="hero">
+          <img src={heroImage} alt={metadata.title} loading="eager" fetchpriority="high" decoding="async" />
+        </figure>
       </header>
 
       <div class="doc" use:enhance>
@@ -302,30 +313,35 @@
   .crumbs a:hover { color: var(--ink); }
   h1 {
     font-weight: 900;
-    font-size: clamp(40px, 6.4vw, 84px);
+    font-size: clamp(40px, 7vw, 96px);
     letter-spacing: -0.03em;
     line-height: 0.95;
     margin-top: var(--s6);
     overflow-wrap: break-word;
     hyphens: auto;
   }
-  .lede { font-size: var(--t-xl); line-height: 1.35; max-width: 34ch; margin-top: var(--s5); letter-spacing: -0.005em; }
-  .lede.long { font-size: var(--t-lg); line-height: 1.45; max-width: 52ch; }
-  .head-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--s5) var(--s6);
-    margin-top: var(--s6);
-    align-items: start;
+  .lede { font-size: var(--t-xl); line-height: 1.35; max-width: 40ch; margin-top: var(--s5); letter-spacing: -0.005em; }
+  .lede.long { font-size: var(--t-lg); line-height: 1.45; max-width: 60ch; }
+  /* Spec strip: the facts in a row under the lede, then the hero image across the full column. */
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4) var(--s7);
+    margin: var(--s6) 0 0;
+    padding: var(--s4) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--t-sm);
   }
-  .meta { grid-column: 1 / span 4; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s2) var(--s4); margin: 0; font-size: var(--t-sm); }
-  .meta dt { color: var(--ink-2); }
-  .meta dd { margin: 0; min-width: 0; }
-  .meta .tags { font-size: var(--t-xs); line-height: 1.6; overflow-wrap: anywhere; color: var(--ink-2); }
-  .hero { grid-column: 5 / -1; margin: 0; padding: 7px; background: var(--bg-2); }
-  .hero img { width: 100%; aspect-ratio: 5 / 4; object-fit: contain; background: var(--bg-2); }
+  .meta > div { min-width: 0; }
+  .meta .wide { flex: 1 1 320px; }
+  .meta dt { color: var(--ink-2); font-size: var(--t-xs); margin-bottom: 2px; }
+  .meta dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: var(--s2); }
+  .meta .tags { font-size: var(--t-xs); line-height: 1.6; overflow-wrap: anywhere; }
+  .hero { margin: var(--s5) 0 0; padding: 7px; background: var(--bg-2); }
+  .hero img { width: 100%; max-height: 76vh; object-fit: contain; background: var(--card); }
   @media (max-width: 760px) {
-    .meta, .hero { grid-column: 1 / -1; }
+    .meta { gap: var(--s3) var(--s6); }
     .lede { font-size: var(--t-lg); }
     .lede.long { font-size: var(--t-md); }
     .proj-head { padding-bottom: var(--s6); }
@@ -350,20 +366,20 @@
   .doc :global(ul), .doc :global(ol) { max-width: 68ch; padding-left: 1.2em; margin: var(--s3) 0 0; }
   .doc :global(li) { margin-top: var(--s2); }
   .doc :global(li > ul), .doc :global(li > ol) { margin-top: var(--s1); }
-  .doc :global(li::marker) { color: var(--surface); }
+  .doc :global(li::marker) { color: var(--link); }
   .doc :global(ol > li::marker) { font-family: var(--f-mono); font-size: var(--t-sm); }
   .doc :global(hr) { border: 0; border-top: 1px solid var(--rule); margin: var(--s7) 0 var(--s6); }
   .doc :global(blockquote) {
     max-width: 68ch;
     margin: var(--s5) 0 0;
     padding: 0 0 0 var(--s4);
-    border-left: 2px solid var(--surface);
+    border-left: 2px solid var(--link);
     color: var(--ink-2);
   }
   .doc :global(blockquote p:first-child) { margin-top: 0; }
 
   /* code */
-  .doc :global(:not(pre) > code) { background: var(--bg-2); padding: 1px 4px; overflow-wrap: anywhere; }
+  .doc :global(:not(pre) > code) { background: var(--card); padding: 1px 4px; overflow-wrap: anywhere; }
   .doc :global(pre) { margin: var(--s5) 0 0; }
   .doc :global(pre code) { background: none; padding: 0; }
 
@@ -382,10 +398,10 @@
     height: auto;
     max-height: 80vh;
     margin-top: var(--s5);
-    background: var(--surface);
+    background: var(--card);
   }
   .doc :global(audio) { display: block; width: 100%; max-width: 68ch; margin-top: var(--s3); }
-  .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--surface); cursor: zoom-in; }
+  .doc :global(button.zoom) { display: block; width: 100%; padding: 0; border: 0; background: var(--card); cursor: zoom-in; }
   .doc :global(button.zoom img) { width: 100%; height: 100%; object-fit: cover; }
   .doc :global(button.zoom-inline) { display: inline-block; width: auto; max-width: 100%; vertical-align: middle; background: none; }
 
@@ -425,7 +441,7 @@
     align-items: baseline;
   }
   .next .go { font-size: var(--t-xl); font-weight: 700; text-decoration: none; line-height: 1.2; min-width: 0; overflow-wrap: break-word; }
-  .next .go:hover { text-decoration: underline; }
+  .next .go:hover { text-decoration: underline; text-decoration-color: var(--signal); text-decoration-thickness: 2px; text-underline-offset: 5px; }
   .next .nxt { grid-column: 2; text-align: right; }
   .next small { display: block; font-size: var(--t-xs); color: var(--ink-2); font-weight: 400; margin-bottom: var(--s1); }
   .next .all { grid-column: 1 / -1; font-size: var(--t-sm); color: var(--ink-2); }
