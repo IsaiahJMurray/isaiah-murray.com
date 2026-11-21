@@ -224,7 +224,7 @@
           </ol>
         </nav>
         <h1>{metadata.title}</h1>
-        {#if subtitle}<p class="lede" class:long={subtitle.length > 150}>{subtitle}</p>{/if}
+        {#if false}<p class="lede" class:long={subtitle.length > 150}>{subtitle}</p>{/if}
         <div class="head-grid">
           <dl class="meta">
             {#if status}<dt>Status</dt><dd>{status}</dd>{/if}

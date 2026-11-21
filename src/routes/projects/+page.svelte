@@ -144,7 +144,7 @@
           <div class="lbl">
             <strong>{p.title}</strong>
             {#if meta(p)}<span class="mono">{meta(p)}</span>{/if}
-            {#if kind === 'f' && p.subtitle}<p>{firstSentence(p.subtitle)}</p>{/if}
+            {#if kind === 'f' && p.subtitle && false}<p>{firstSentence(p.subtitle)}</p>{/if}
           </div>
           {#if !hit}<span class="visually-hidden">(filtered out)</span>{/if}
         </a>
